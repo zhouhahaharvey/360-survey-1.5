@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>提交成功 - 360调研</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/respondent.css">
+    <!-- 页面特有样式 -->
+    <style>
+        .success-page {
+            background: linear-gradient(180deg, var(--success) 0%, #059669 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .success-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        }
+        
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            animation: scaleIn 0.5s ease;
+        }
+        
+        @keyframes scaleIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .success-icon i {
+            font-size: 3rem;
+        }
+        
+        .success-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .success-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        /* Impact Card */
+        .impact-card-success {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 2rem;
+        }
+        
+        .impact-title-success {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .impact-stats-success {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .impact-stat-value-success {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .impact-stat-label-success {
+            font-size: 0.6875rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+        
+        /* Certificate Preview */
+        .certificate-preview {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .cert-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .cert-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .cert-title-success {
+            color: var(--gray-800);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .cert-subtitle {
+            color: var(--gray-600);
+            font-size: 0.75rem;
+        }
+        
+        .cert-content {
+            color: var(--gray-600);
+            font-size: 0.75rem;
+            line-height: 1.6;
+        }
+        
+        /* Actions */
+        .actions-success {
+            width: 100%;
+            max-width: 320px;
+        }
+        
+        .btn-success-custom {
+            width: 100%;
+            padding: 0.875rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .btn-white {
+            background: white;
+            color: var(--success);
+        }
+        
+        .btn-outline-white {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+        }
+        
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+        
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="success-page">
+    <div class="success-container">
+        <div class="success-icon">
+            <i class="bi bi-check-lg"></i>
+        </div>
+        
+        <h1 class="success-title">评估提交成功！</h1>
+        <p class="success-subtitle">感谢您的真诚反馈，为人才发展贡献智慧</p>
+        
+        <!-- Impact Card -->
+        <div class="impact-card-success">
+            <div class="impact-title-success">
+                <i class="bi bi-heart-fill"></i>
+                您的贡献
+            </div>
+            <div class="impact-stats-success">
+                <div class="impact-stat">
+                    <div class="impact-stat-value-success">12</div>
+                    <div class="impact-stat-label-success">累计评估</div>
+                </div>
+                <div class="impact-stat">
+                    <div class="impact-stat-value-success">3</div>
+                    <div class="impact-stat-label-success">帮助成长</div>
+                </div>
+                <div class="impact-stat">
+                    <div class="impact-stat-value-success">Top 5%</div>
+                    <div class="impact-stat-label-success">参与排名</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Certificate Preview -->
+        <div class="certificate-preview">
+            <div class="cert-header">
+                <div class="cert-icon">
+                    <i class="bi bi-award"></i>
+                </div>
+                <div>
+                    <div class="cert-title-success">360评估贡献者</div>
+                    <div class="cert-subtitle">2026年度认证</div>
+                </div>
+            </div>
+            <div class="cert-content">
+                李明 同志在2026年度人才评估工作中积极参与、认真反馈，为组织人才发展做出重要贡献。
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="actions-success">
+            <button class="btn-success-custom btn-white" id="nextBtn" style="display: none;" onclick="goToNext()">
+                <i class="bi bi-arrow-right-circle"></i>
+                下一个
+            </button>
+            <button class="btn-success-custom btn-white" id="todoBtn" onclick="location.href='todo-list.html'">
+                <i class="bi bi-clipboard-check"></i>
+                查看待办
+            </button>
+            <button class="btn-success-custom btn-outline-white" onclick="location.href='todo-list.html'">
+                <i class="bi bi-arrow-left"></i>
+                返回待办
+            </button>
+            <button class="btn-success-custom btn-outline-white" onclick="location.href='../index.html'">
+                <i class="bi bi-grid-3x3-gap"></i>
+                原型导航
+            </button>
+            <button class="btn-success-custom btn-outline-white" onclick="share()">
+                <i class="bi bi-share"></i>
+                分享成就
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../demo-data.js"></script>
+    <script>
+        // Confetti animation
+        function createConfetti() {
+            const colors = ['#fff', '#fcd34d', '#fbbf24', '#f59e0b'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 50);
+            }
+        }
+        
+        createConfetti();
+        
+        function share() {
+            alert('分享功能将在企微中打开');
+        }
+        
+        // Use demo task list or fallback
+        let taskList = [
+            { scene: 'promotion', relation: 'superior', subject: '张三', name: '张三', dept: '技术部', level: 'P7' },
+            { scene: 'probation', relation: 'superior', subject: '王五', name: '王五', dept: '产品部', level: 'P5' },
+            { scene: 'newleader', relation: 'subordinate', subject: '赵经理', name: '赵经理', dept: '技术部', level: 'P8' }
+        ];
+        
+        // Load from demo data if available
+        if (typeof DEMO_TASKS !== 'undefined') {
+            taskList = DEMO_TASKS.filter(t => t.status === 'pending').slice(0, 10).map(t => ({
+                scene: t.scene,
+                relation: t.relation,
+                subject: t.subjectId,
+                name: t.subjectName,
+                dept: t.subjectDept,
+                level: t.subjectLevel
+            }));
+        }
+        
+        let nextTask = null;
+        
+        // Check for next task
+        function checkNextTask() {
+            const params = Utils.parseUrlParams();
+            const currentScene = params.scene;
+            const currentRelation = params.relation;
+            const currentSubject = params.subject;
+            
+            // Find current task index
+            const currentIndex = taskList.findIndex(t => 
+                t.scene === currentScene && 
+                t.relation === currentRelation && 
+                t.subject === currentSubject
+            );
+            
+            // Get next task (if current is not the last)
+            if (currentIndex >= 0 && currentIndex < taskList.length - 1) {
+                nextTask = taskList[currentIndex + 1];
+                document.getElementById('nextBtn').style.display = 'flex';
+                document.getElementById('nextBtn').innerHTML = `
+                    <i class="bi bi-arrow-right-circle"></i>
+                    下一个：${nextTask.name}
+                `;
+            }
+        }
+        
+        function goToNext() {
+            if (nextTask) {
+                window.location.href = `survey-form.html?scene=${nextTask.scene}&relation=${nextTask.relation}&subject=${nextTask.subject}`;
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkNextTask();
+        });
+    </script>
+</body>
+</html>

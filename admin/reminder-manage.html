@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>催办管理 - 360调研系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 240px;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+        
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sidebar-brand i {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .sidebar-brand span {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--gray-800);
+        }
+        
+        .nav-menu {
+            padding: 1rem 0;
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .main-content {
+            margin-left: 240px;
+            padding: 2rem;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .page-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .stat-value.warning { color: var(--warning); }
+        .stat-value.danger { color: var(--danger); }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+        
+        .stat-desc {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--gray-100);
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 500;
+        }
+        
+        /* Table */
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .card-body {
+            padding: 0;
+        }
+        
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 120px 100px;
+            gap: 1rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+        
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 120px 100px;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            align-items: center;
+        }
+        
+        .table-row:hover {
+            background: var(--gray-50);
+        }
+        
+        .evaluator-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .evaluator-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .evaluator-detail h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.125rem;
+        }
+        
+        .evaluator-detail p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        .cell-text {
+            font-size: 0.875rem;
+            color: var(--gray-800);
+        }
+        
+        .urgency-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .urgency-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .urgency-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .urgency-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--gray-200);
+            color: var(--gray-600);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        /* Batch Actions */
+        .batch-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+        
+        .batch-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .selected-count {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .selected-count strong {
+            color: var(--primary);
+        }
+        
+        /* Settings Panel */
+        .settings-panel {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .settings-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-info h4 {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-800);
+            margin-bottom: 0.125rem;
+        }
+        
+        .setting-info p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        /* Toggle */
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: var(--gray-200);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .toggle.active {
+            background: var(--primary);
+        }
+        
+        .toggle::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+        
+        .toggle.active::after {
+            transform: translateX(20px);
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .table-header, .table-row {
+                grid-template-columns: 2fr 1fr 100px 100px;
+            }
+            .table-header > *:nth-child(3),
+            .table-row > *:nth-child(3) {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-360"></i>
+            <span>360调研系统</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item">
+                <i class="bi bi-house-door"></i>
+                <span>首页</span>
+            </a>
+            <a href="survey-list.html" class="nav-item">
+                <i class="bi bi-clipboard-check"></i>
+                <span>调研管理</span>
+            </a>
+            <a href="pending-push-pool.html" class="nav-item">
+                <i class="bi bi-stack"></i>
+                <span>待推送池</span>
+            </a>
+            <a href="reminder-manage.html" class="nav-item active" style="position: relative;">
+                <i class="bi bi-bell"></i>
+                <span>催办管理</span>
+                <span style="position: absolute; right: 1rem; background: #ef4444; color: white; font-size: 0.625rem; padding: 0.125rem 0.375rem; border-radius: 10px; font-weight: 600;">7</span>
+            </a>
+            <a href="create-survey-step1.html" class="nav-item">
+                <i class="bi bi-plus-circle"></i>
+                <span>发起调研</span>
+            </a>
+            <a href="templates.html" class="nav-item">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>模板中心</span>
+            </a>
+
+            <div style="border-top: 1px solid var(--gray-200); margin: 1rem 0;"></div>
+            <a href="admin-management.html?admin=true" class="nav-item">
+                <i class="bi bi-shield-lock"></i>
+                <span>系统管理</span>
+            </a>
+            <div style="border-top: 1px solid var(--gray-200); margin: 1rem 0;"></div>
+            <a href="../index.html" class="nav-item">
+                <i class="bi bi-grid-3x3-gap"></i>
+                <span>原型导航</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <div class="page-title">
+                <a href="dashboard.html" class="back-to-home">
+                    <i class="bi bi-arrow-left"></i>
+                    返回首页
+                </a>
+                <h1>催办管理</h1>
+            </div>
+            <button class="btn btn-primary">
+                <i class="bi bi-magic"></i>
+                一键智能催办
+            </button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value danger">7</div>
+                <div class="stat-label">急需催办</div>
+                <div class="stat-desc">截止前2天未完成</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value warning">15</div>
+                <div class="stat-label">即将到期</div>
+                <div class="stat-desc">截止前3-5天</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">23</div>
+                <div class="stat-label">已催办</div>
+                <div class="stat-desc">本周发送催办消息</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value success">68%</div>
+                <div class="stat-label">催办成功率</div>
+                <div class="stat-desc">催办后24h内完成</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active">待催办 (7)</div>
+            <div class="tab">催办历史 (23)</div>
+            <div class="tab">自动催办设置</div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+            <div class="batch-actions">
+                <div class="batch-left">
+                    <input type="checkbox" class="checkbox" id="selectAll">
+                    <span class="selected-count">已选择 <strong>0</strong> 人</span>
+                </div>
+                <div>
+                    <button class="btn btn-warning" onclick="batchRemind()">
+                        <i class="bi bi-bell"></i>
+                        批量催办
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-header">
+                    <span>评估人</span>
+                    <span>待评被评估人</span>
+                    <span>所属调研</span>
+                    <span>截止时间</span>
+                    <span>紧急程度</span>
+                    <span>操作</span>
+                </div>
+
+                <div class="table-row">
+                    <div class="evaluator-info">
+                        <div class="evaluator-avatar">赵</div>
+                        <div class="evaluator-detail">
+                            <h4>赵六 (10006)</h4>
+                            <p>技术部 · 前端开发</p>
+                        </div>
+                    </div>
+                    <div class="cell-text">张三、李四</div>
+                    <div class="cell-text">Q2晋升评估</div>
+                    <div class="cell-text">2026-04-15</div>
+                    <div>
+                        <span class="urgency-badge urgency-high">
+                            <i class="bi bi-exclamation-circle"></i>
+                            剩2天
+                        </span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="remind('赵六')">
+                            <i class="bi bi-bell"></i>
+                            催办
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-row">
+                    <div class="evaluator-info">
+                        <div class="evaluator-avatar">钱</div>
+                        <div class="evaluator-detail">
+                            <h4>钱七 (10007)</h4>
+                            <p>产品部 · 产品经理</p>
+                        </div>
+                    </div>
+                    <div class="cell-text">王五</div>
+                    <div class="cell-text">Q2晋升评估</div>
+                    <div class="cell-text">2026-04-15</div>
+                    <div>
+                        <span class="urgency-badge urgency-high">
+                            <i class="bi bi-exclamation-circle"></i>
+                            剩2天
+                        </span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="remind('钱七')">
+                            <i class="bi bi-bell"></i>
+                            催办
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-row">
+                    <div class="evaluator-info">
+                        <div class="evaluator-avatar">孙</div>
+                        <div class="evaluator-detail">
+                            <h4>孙八 (10008)</h4>
+                            <p>技术部 · 后端开发</p>
+                        </div>
+                    </div>
+                    <div class="cell-text">张三、李四、王五</div>
+                    <div class="cell-text">Q2晋升评估</div>
+                    <div class="cell-text">2026-04-18</div>
+                    <div>
+                        <span class="urgency-badge urgency-medium">
+                            <i class="bi bi-clock"></i>
+                            剩5天
+                        </span>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline" onclick="remind('孙八')">
+                            <i class="bi bi-bell"></i>
+                            催办
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-row">
+                    <div class="evaluator-info">
+                        <div class="evaluator-avatar">周</div>
+                        <div class="evaluator-detail">
+                            <h4>周九 (10009)</h4>
+                            <p>设计部 · UI设计师</p>
+                        </div>
+                    </div>
+                    <div class="cell-text">王五</div>
+                    <div class="cell-text">3月转正评估</div>
+                    <div class="cell-text">2026-04-18</div>
+                    <div>
+                        <span class="urgency-badge urgency-medium">
+                            <i class="bi bi-clock"></i>
+                            剩5天
+                        </span>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline" onclick="remind('周九')">
+                            <i class="bi bi-bell"></i>
+                            催办
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auto Reminder Settings -->
+        <div class="settings-panel">
+            <h3 class="settings-title"><i class="bi bi-gear"></i> 自动催办设置</h3>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>自动催办</h4>
+                    <p>系统将在截止前自动发送催办消息</p>
+                </div>
+                <div class="toggle active" onclick="toggleSwitch(this)"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>第一次催办</h4>
+                    <p>截止前3天自动发送</p>
+                </div>
+                <div class="toggle active" onclick="toggleSwitch(this)"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>第二次催办</h4>
+                    <p>截止前1天自动发送（仅未完成的）</p>
+                </div>
+                <div class="toggle active" onclick="toggleSwitch(this)"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>最后一次提醒</h4>
+                    <p>截止当天早上9点发送</p>
+                </div>
+                <div class="toggle" onclick="toggleSwitch(this)"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>合并催办消息</h4>
+                    <p>同一人的多个待办合并为一条消息</p>
+                </div>
+                <div class="toggle active" onclick="toggleSwitch(this)"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function remind(name) {
+            alert(`催办消息已发送给 ${name}`);
+        }
+        
+        function batchRemind() {
+            alert('批量催办消息已发送');
+        }
+        
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+        
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const count = this.checked ? 7 : 0;
+            document.querySelector('.selected-count strong').textContent = count;
+        });
+    </script>
+</body>
+</html>

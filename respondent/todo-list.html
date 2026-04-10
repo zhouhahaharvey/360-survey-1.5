@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>待办调研 - 360调研</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/respondent.css">
+    <!-- 页面特有样式 -->
+    <style>
+        .back-to-home {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.875rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .wecom-notice {
+            background: linear-gradient(135deg, #07c160, #05a350);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .wecom-notice-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .batch-action {
+            background: linear-gradient(135deg, var(--primary-light), #f3e8ff);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .subject-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .subject-details h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.125rem;
+        }
+        
+        .subject-details p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        .progress-info-small {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        
+        .progress-bar-small {
+            width: 80px;
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+        
+        .progress-bar-small .fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="mobile">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-top">
+            <a href="../index.html" class="back-to-home">
+                <i class="bi bi-grid-3x3-gap"></i>
+                原型导航
+            </a>
+            <div class="logo">
+                <i class="bi bi-360"></i>
+                <span>360调研</span>
+            </div>
+            <div class="user-avatar">李</div>
+        </div>
+        <div class="header-stats">
+            <div class="header-stat">
+                <div class="header-stat-value" id="pendingCount">3</div>
+                <div class="header-stat-label">待填写</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value">12</div>
+                <div class="header-stat-label">已完成</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value">85%</div>
+                <div class="header-stat-label">参与率</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="mobile-content">
+        <!-- WeCom Entry Notice -->
+        <div id="wecomNotice" class="wecom-notice" style="display: none;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>从企微消息进入</span>
+            </div>
+            <button class="wecom-notice-close" onclick="closeWecomNotice()">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" class="form-control" placeholder="搜索姓名、部门或工号" id="searchInput">
+            <button class="search-btn">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+        
+        <!-- Filter Bar -->
+        <div class="filter-chips">
+            <div class="filter-chip active" data-filter="all">全部</div>
+            <div class="filter-chip" data-filter="promotion">晋升评估</div>
+            <div class="filter-chip" data-filter="probation">转正评估</div>
+            <div class="filter-chip" data-filter="newleader">新Leader</div>
+            <div class="filter-chip" data-filter="performance">绩效考核</div>
+        </div>
+        
+        <!-- Pending Surveys -->
+        <div class="section-title">
+            <h2>待填写 (<span id="surveyCount">3</span>)</h2>
+            <span>按截止时间排序</span>
+        </div>
+
+        <div id="surveyList">
+            <!-- 动态加载 -->
+        </div>
+
+        <!-- Batch Action -->
+        <div class="batch-action" id="batchAction">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="fw-semibold text-gray-800 mb-1">🚀 快速处理同场景评估</div>
+                    <div class="small text-gray-600">有2份晋升评估可使用批量填写</div>
+                </div>
+                <a href="batch-survey.html" class="btn btn-primary btn-sm">
+                    批量填写
+                </a>
+            </div>
+        </div>
+        
+        <!-- View History Link -->
+        <div class="text-center py-4">
+            <a href="history.html" class="text-primary text-decoration-none small">
+                <i class="bi bi-clock-history"></i>
+                查看历史记录 <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="todo-list.html" class="nav-item-mobile active">
+            <i class="bi bi-clipboard-check"></i>
+            <span>待办</span>
+        </a>
+        <a href="history.html" class="nav-item-mobile">
+            <i class="bi bi-clock-history"></i>
+            <span>历史</span>
+        </a>
+        <a href="profile.html" class="nav-item-mobile">
+            <i class="bi bi-person"></i>
+            <span>我的</span>
+        </a>
+    </nav>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../demo-data.js"></script>
+    <script>
+        // URL参数处理
+        const urlParams = Utils.parseUrlParams();
+        
+        // 企微入口提示
+        if (urlParams.from === 'wechat' || urlParams.from === 'wecom') {
+            const notice = document.getElementById('wecomNotice');
+            if (notice) notice.style.display = 'flex';
+            
+            if (urlParams.scene) {
+                applySceneFilter(urlParams.scene);
+            }
+        }
+        
+        function closeWecomNotice() {
+            const notice = document.getElementById('wecomNotice');
+            if (notice) notice.style.display = 'none';
+        }
+        
+        function applySceneFilter(scene) {
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                if (chip.dataset.filter === scene) {
+                    chip.click();
+                }
+            });
+        }
+        
+        // 渲染调研卡片
+        function renderSurveyCard(task) {
+            const sceneIcons = {
+                promotion: '🔷',
+                probation: '🟢',
+                newleader: '🔶',
+                performance: '📊'
+            };
+            
+            const remainingDays = Math.ceil((new Date(task.deadline) - new Date()) / (1000 * 60 * 60 * 24));
+            const urgencyClass = remainingDays <= 3 ? 'urgent' : remainingDays <= 7 ? 'warning' : 'normal';
+            
+            return `
+                <div class="survey-card ${urgencyClass}" data-scene="${task.scene}" 
+                     onclick="location.href='survey-form.html?scene=${task.scene}&relation=${task.relation}&subject=${task.subjectId}'">
+                    <div class="card-header-row">
+                        <span class="badge badge-${task.scene === 'promotion' ? 'blue' : task.scene === 'probation' ? 'green' : task.scene === 'newleader' ? 'orange' : 'purple'}">
+                            ${sceneIcons[task.scene] || '🔷'} ${task.sceneName}
+                        </span>
+                        <span class="badge ${remainingDays <= 3 ? 'badge-red' : remainingDays <= 7 ? 'badge-orange' : 'badge-gray'}">
+                            ${remainingDays > 0 ? `剩${remainingDays}天` : '已逾期'}
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="subject-avatar">${task.subjectName ? task.subjectName[0] : '?'}</div>
+                        <div class="subject-details">
+                            <h3>${task.subjectName || '未知'}</h3>
+                            <p>${task.subjectDept || ''} · ${task.subjectLevel || ''}</p>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3 small text-muted mb-3">
+                        <span><i class="bi bi-person-badge"></i> ${task.relationName || '评估'}</span>
+                        <span><i class="bi bi-clock"></i> 8-12分钟</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-primary btn-sm">
+                            立即填写 <i class="bi bi-arrow-right"></i>
+                        </button>
+                        <span class="progress-info-small">截止 ${Utils.formatDate(task.deadline, 'MM-DD')}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 加载任务数据
+        function loadTasks() {
+            const defaultTasks = [
+                { scene: 'promotion', sceneName: '晋升评估', subjectName: '张三', subjectDept: '技术部', subjectLevel: 'P7', relation: 'peer', relationName: '平级评估', deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString() },
+                { scene: 'probation', sceneName: '转正评估', subjectName: '王五', subjectDept: '产品部', subjectLevel: 'P5', relation: 'superior', relationName: '上级评估', deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString() },
+                { scene: 'newleader', sceneName: '新Leader考察', subjectName: '赵经理', subjectDept: '技术部', subjectLevel: 'P8', relation: 'down', relationName: '下级评估', deadline: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString() }
+            ];
+            
+            let tasks = defaultTasks;
+            
+            // 尝试从DEMO_TASKS加载
+            if (typeof DEMO_TASKS !== 'undefined' && DEMO_TASKS.length > 0) {
+                const pendingTasks = DEMO_TASKS.filter(t => t.status === 'pending').slice(0, 10);
+                if (pendingTasks.length > 0) {
+                    tasks = pendingTasks;
+                }
+            }
+            
+            renderTaskList(tasks);
+            updateCount(tasks.length);
+        }
+        
+        // 渲染任务列表
+        function renderTaskList(tasks) {
+            const container = document.getElementById('surveyList');
+            container.innerHTML = tasks.map(t => renderSurveyCard(t)).join('');
+        }
+        
+        // 更新计数
+        function updateCount(count) {
+            document.getElementById('surveyCount').textContent = count;
+            document.getElementById('pendingCount').textContent = count;
+        }
+        
+        // 筛选功能
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTasks();
+            
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.dataset.filter;
+                    document.querySelectorAll('.survey-card').forEach(card => {
+                        card.style.display = (filter === 'all' || card.dataset.scene === filter) ? 'block' : 'none';
+                    });
+                    
+                    // 更新计数
+                    const visible = document.querySelectorAll('.survey-card[style="display: block;"], .survey-card:not([style*="display: none"])');
+                    document.getElementById('surveyCount').textContent = visible.length;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

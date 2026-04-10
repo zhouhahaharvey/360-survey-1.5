@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模板中心 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <!-- 页面特定样式 -->
+    <style>
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: var(--primary);
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 500;
+        }
+        
+        /* Template Grid */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .template-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        
+        .template-card:hover {
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12);
+            transform: translateY(-4px);
+        }
+        
+        .template-header {
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .template-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .template-scene {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .scene-promotion { background: #dbeafe; color: #1e40af; }
+        .scene-probation { background: #d1fae5; color: #065f46; }
+        .scene-newleader { background: #ffedd5; color: #9a3412; }
+        .scene-performance { background: #f3e8ff; color: #6b21a8; }
+        .scene-culture { background: #fce7f3; color: #be185d; }
+        
+        .template-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .template-desc {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+        
+        .template-stats {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-100);
+            background: var(--gray-50);
+        }
+        
+        .template-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .template-stat i {
+            color: var(--primary);
+        }
+        
+        .template-actions {
+            display: flex;
+            padding: 1rem 1.5rem;
+            gap: 0.75rem;
+        }
+        
+        .template-actions .btn {
+            flex: 1;
+        }
+        
+        /* Custom Template Card */
+        .custom-card {
+            background: linear-gradient(135deg, var(--primary-light), #f3e8ff);
+            border: 2px dashed var(--primary);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 320px;
+        }
+        
+        .custom-card:hover {
+            background: linear-gradient(135deg, #c7d2fe, #e9d5ff);
+            transform: translateY(-4px);
+        }
+        
+        .custom-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .custom-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .custom-desc {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        /* Preview Modal - Extended */
+        .modal-content {
+            max-width: 600px;
+        }
+        
+        .preview-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .preview-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .preview-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dimension-list {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        
+        .dimension-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .dimension-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dimension-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+        }
+        
+        .dimension-info {
+            flex: 1;
+        }
+        
+        .dimension-name {
+            font-weight: 500;
+            color: var(--gray-800);
+            margin-bottom: 0.125rem;
+        }
+        
+        .dimension-questions {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        
+        .question-count {
+            background: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        @media (max-width: 1024px) {
+            .template-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content { padding: 1rem; }
+            .template-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="page-title">
+                <a href="dashboard.html" class="back-to-home">
+                    <i class="bi bi-arrow-left"></i>
+                    返回首页
+                </a>
+                <h1>模板中心</h1>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active">全部模板</div>
+            <div class="tab">晋升评估</div>
+            <div class="tab">转正评估</div>
+            <div class="tab">新Leader</div>
+            <div class="tab">绩效考核</div>
+            <div class="tab">我的收藏</div>
+        </div>
+
+        <!-- Template Grid -->
+        <div class="template-grid">
+            <!-- Promotion Template -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-icon" style="background: linear-gradient(135deg, #dbeafe, #c7d2fe);">🔷</div>
+                    <span class="template-scene scene-promotion">晋升评估</span>
+                    <h3 class="template-title">晋升评估标准模板</h3>
+                    <p class="template-desc">适用于技术、产品、设计等岗位的晋升评估，包含专业能力、领导力、文化契合三维度评估</p>
+                </div>
+                <div class="template-stats">
+                    <div class="template-stat">
+                        <i class="bi bi-list-check"></i>
+                        <span>15题</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-clock"></i>
+                        <span>10-15分钟</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-people"></i>
+                        <span>128次使用</span>
+                    </div>
+                </div>
+                <div class="template-actions">
+                    <button class="btn btn-outline" onclick="previewTemplate('晋升评估标准模板')">
+                        <i class="bi bi-eye"></i>
+                        预览
+                    </button>
+                    <button class="btn btn-primary" onclick="useTemplate('晋升评估')">
+                        <i class="bi bi-plus-lg"></i>
+                        使用
+                    </button>
+                </div>
+            </div>
+
+            <!-- Probation Template -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-icon" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">🟢</div>
+                    <span class="template-scene scene-probation">转正评估</span>
+                    <h3 class="template-title">试用期转正评估</h3>
+                    <p class="template-desc">针对新员工试用期结束的综合评估，重点关注学习能力、工作产出、团队协作等方面</p>
+                </div>
+                <div class="template-stats">
+                    <div class="template-stat">
+                        <i class="bi bi-list-check"></i>
+                        <span>12题</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-clock"></i>
+                        <span>8-12分钟</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-people"></i>
+                        <span>86次使用</span>
+                    </div>
+                </div>
+                <div class="template-actions">
+                    <button class="btn btn-outline" onclick="previewTemplate('试用期转正评估')">
+                        <i class="bi bi-eye"></i>
+                        预览
+                    </button>
+                    <button class="btn btn-primary" onclick="useTemplate('转正评估')">
+                        <i class="bi bi-plus-lg"></i>
+                        使用
+                    </button>
+                </div>
+            </div>
+
+            <!-- New Leader Template -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-icon" style="background: linear-gradient(135deg, #ffedd5, #fed7aa);">🔶</div>
+                    <span class="template-scene scene-newleader">新Leader</span>
+                    <h3 class="template-title">新任Leader 360考察</h3>
+                    <p class="template-desc">针对新任管理者上任3-6个月的综合考察，评估领导力、团队管理、战略思维等维度</p>
+                </div>
+                <div class="template-stats">
+                    <div class="template-stat">
+                        <i class="bi bi-list-check"></i>
+                        <span>18题</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-clock"></i>
+                        <span>12-18分钟</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-people"></i>
+                        <span>45次使用</span>
+                    </div>
+                </div>
+                <div class="template-actions">
+                    <button class="btn btn-outline" onclick="previewTemplate('新任Leader 360考察')">
+                        <i class="bi bi-eye"></i>
+                        预览
+                    </button>
+                    <button class="btn btn-primary" onclick="useTemplate('新Leader考察')">
+                        <i class="bi bi-plus-lg"></i>
+                        使用
+                    </button>
+                </div>
+            </div>
+
+            <!-- Performance Template -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-icon" style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff);">📊</div>
+                    <span class="template-scene scene-performance">绩效考核</span>
+                    <h3 class="template-title">季度绩效考核反馈</h3>
+                    <p class="template-desc">季度绩效考核的360度反馈收集，关注业绩达成、能力提升、价值观践行等方面</p>
+                </div>
+                <div class="template-stats">
+                    <div class="template-stat">
+                        <i class="bi bi-list-check"></i>
+                        <span>10题</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-clock"></i>
+                        <span>8-10分钟</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-people"></i>
+                        <span>256次使用</span>
+                    </div>
+                </div>
+                <div class="template-actions">
+                    <button class="btn btn-outline" onclick="previewTemplate('季度绩效考核反馈')">
+                        <i class="bi bi-eye"></i>
+                        预览
+                    </button>
+                    <button class="btn btn-primary" onclick="useTemplate('绩效考核')">
+                        <i class="bi bi-plus-lg"></i>
+                        使用
+                    </button>
+                </div>
+            </div>
+
+            <!-- Culture Template -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-icon" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8);">🌟</div>
+                    <span class="template-scene scene-culture">文化价值观</span>
+                    <h3 class="template-title">文化价值观评估</h3>
+                    <p class="template-desc">针对企业文化价值观的践行评估，评估员工对企业核心价值观的理解和践行程度</p>
+                </div>
+                <div class="template-stats">
+                    <div class="template-stat">
+                        <i class="bi bi-list-check"></i>
+                        <span>8题</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-clock"></i>
+                        <span>5-8分钟</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="bi bi-people"></i>
+                        <span>32次使用</span>
+                    </div>
+                </div>
+                <div class="template-actions">
+                    <button class="btn btn-outline" onclick="previewTemplate('文化价值观评估')">
+                        <i class="bi bi-eye"></i>
+                        预览
+                    </button>
+                    <button class="btn btn-primary" onclick="useTemplate('文化价值观')">
+                        <i class="bi bi-plus-lg"></i>
+                        使用
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom Template -->
+            <div class="custom-card" onclick="createCustom()">
+                <div class="custom-icon">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+                <h3 class="custom-title">创建自定义模板</h3>
+                <p class="custom-desc">根据您的需求，从零开始创建专属评估模板</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="previewTitle">模板预览</div>
+                <button class="btn-icon" onclick="closeModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-section">
+                    <div class="preview-title">
+                        <i class="bi bi-list-check text-primary"></i>
+                        评估维度
+                    </div>
+                    <div class="dimension-list">
+                        <div class="dimension-item">
+                            <div class="dimension-icon">
+                                <i class="bi bi-briefcase"></i>
+                            </div>
+                            <div class="dimension-info">
+                                <div class="dimension-name">专业能力</div>
+                                <div class="dimension-questions">专业深度、技术影响力、业务理解</div>
+                            </div>
+                            <span class="question-count">5题</span>
+                        </div>
+                        <div class="dimension-item">
+                            <div class="dimension-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="dimension-info">
+                                <div class="dimension-name">领导力</div>
+                                <div class="dimension-questions">团队协作、决策能力、激励他人</div>
+                            </div>
+                            <span class="question-count">5题</span>
+                        </div>
+                        <div class="dimension-item">
+                            <div class="dimension-icon">
+                                <i class="bi bi-heart"></i>
+                            </div>
+                            <div class="dimension-info">
+                                <div class="dimension-name">文化契合</div>
+                                <div class="dimension-questions">价值观践行、创新思维、主人翁意识</div>
+                            </div>
+                            <span class="question-count">5题</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preview-section">
+                    <div class="preview-title">
+                        <i class="bi bi-chat-square-text text-primary"></i>
+                        主观评价
+                    </div>
+                    <div class="dimension-list">
+                        <div class="dimension-item">
+                            <div class="dimension-icon">
+                                <i class="bi bi-hand-thumbs-up"></i>
+                            </div>
+                            <div class="dimension-info">
+                                <div class="dimension-name">优点/亮点</div>
+                                <div class="dimension-questions">请分享被评估人的突出优点</div>
+                            </div>
+                        </div>
+                        <div class="dimension-item">
+                            <div class="dimension-icon">
+                                <i class="bi bi-lightbulb"></i>
+                            </div>
+                            <div class="dimension-info">
+                                <div class="dimension-name">建议/改进点</div>
+                                <div class="dimension-questions">请提出改进建议</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">关闭</button>
+                <button class="btn btn-primary" onclick="useTemplateFromModal()">
+                    <i class="bi bi-plus-lg"></i>
+                    使用该模板
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script>
+        // 当前选中的模板场景
+        let currentTemplateScene = '';
+        
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item active">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+        
+        // 预览模板
+        function previewTemplate(name) {
+            currentTemplateScene = name;
+            document.getElementById('previewTitle').textContent = name + ' - 预览';
+            document.getElementById('previewModal').classList.add('active');
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('previewModal').classList.remove('active');
+        }
+        
+        // 使用模板
+        function useTemplate(scene) {
+            window.location.href = 'create-survey-step1.html?scene=' + encodeURIComponent(scene);
+        }
+        
+        // 从弹窗使用模板
+        function useTemplateFromModal() {
+            if (currentTemplateScene) {
+                useTemplate(currentTemplateScene);
+            }
+        }
+        
+        // 创建自定义模板
+        function createCustom() {
+            UI.toast('创建自定义模板功能开发中', 'info');
+        }
+        
+        // Tab 切换
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // 点击遮罩关闭弹窗
+        document.getElementById('previewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+        });
+    </script>
+</body>
+</html>

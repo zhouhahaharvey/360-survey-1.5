@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待推送池 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <style>
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+        .stat-icon.orange { background: #fef3c7; color: #d97706; }
+        .stat-icon.green { background: #d1fae5; color: var(--success); }
+        .stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+        
+        /* Smart Suggestion Banner */
+        .suggestion-banner {
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            border: 1px solid #86efac;
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .suggestion-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .suggestion-content { flex: 1; }
+        
+        .suggestion-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #065f46;
+            margin-bottom: 0.25rem;
+        }
+        
+        .suggestion-text {
+            font-size: 0.875rem;
+            color: #047857;
+        }
+        
+        .suggestion-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        /* Card Body No Padding */
+        .card-body-no-padding { padding: 0; }
+        
+        /* Toolbar */
+        .toolbar {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 5;
+            background: white;
+        }
+        
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .select-all {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+        
+        .select-all input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .selected-count {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .toolbar-right {
+            display: flex;
+            gap: 0.75rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .toolbar-right .btn {
+            position: relative;
+            z-index: 11;
+            cursor: pointer;
+            pointer-events: auto;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-right .btn:disabled {
+            pointer-events: none !important;
+            opacity: 0.6;
+            cursor: not-allowed !important;
+        }
+        
+        .toolbar-right .btn:not(:disabled) {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .toolbar-right .btn:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Survey List */
+        .survey-list {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .survey-item {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            transition: all 0.2s;
+        }
+        
+        .survey-item:last-child {
+            border-bottom: none;
+        }
+        
+        .survey-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .survey-item.selected {
+            background: var(--primary-light);
+        }
+        
+        .survey-checkbox {
+            margin-right: 1rem;
+        }
+        
+        .survey-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .survey-info {
+            flex: 1;
+        }
+        
+        .survey-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .survey-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .scene-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .scene-promotion { background: #dbeafe; color: #1e40af; }
+        .scene-probation { background: #d1fae5; color: #065f46; }
+        .scene-newleader { background: #ffedd5; color: #9a3412; }
+        
+        .survey-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+        }
+        
+        .survey-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .overlap-hint {
+            color: var(--warning);
+            font-weight: 500;
+        }
+        
+        .survey-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-right: 1.5rem;
+        }
+        
+        .survey-stat {
+            text-align: center;
+        }
+        
+        .survey-stat-value {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .survey-stat-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        
+        .survey-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-success:hover:not(:disabled) { 
+            background: #059669; 
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-success:disabled {
+            background: var(--gray-300) !important;
+            color: var(--gray-500) !important;
+            cursor: not-allowed !important;
+            animation: none !important;
+            box-shadow: none !important;
+        }
+        
+        .btn-outline {
+            border: 1px solid var(--gray-300);
+            background: white;
+            color: var(--gray-700);
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-outline:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        .btn-outline:disabled {
+            border-color: var(--gray-200) !important;
+            color: var(--gray-400) !important;
+            cursor: not-allowed !important;
+            background: var(--gray-100) !important;
+        }
+        
+        /* 批量操作按钮高亮动画 */
+        @keyframes pulse-btn {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
+        }
+        
+        .btn-success:not(:disabled) {
+            animation: pulse-btn 2s infinite;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gray-100);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--gray-400);
+        }
+        
+        .empty-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-text {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Group Info Panel */
+        .group-panel {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .group-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .group-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .group-stat {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .group-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .group-stat-label {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+        
+        /* Custom styles for Bootstrap modal */
+        #previewModal .modal-content {
+            border-radius: 12px;
+        }
+        
+        @media (max-width: 1200px) {
+            .stats-container { grid-template-columns: repeat(2, 1fr); }
+            .group-stats { grid-template-columns: 1fr; }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+    
+    <!-- 侧边栏折叠按钮 -->
+    <div class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="折叠/展开侧边栏">
+        <i class="bi bi-chevron-left" id="toggleIcon"></i>
+    </div>
+
+    <!-- 主内容 -->
+    <main class="main-content" id="mainContent">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="dashboard.html" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+                    <i class="bi bi-arrow-left"></i>
+                    返回首页
+                </a>
+                <div class="page-title">
+                    <h1>待推送池</h1>
+                    <p>将多个调研合并后统一推送，减少对同一评估人的重复消息打扰</p>
+                </div>
+            </div>
+            <button class="btn btn-outline" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise"></i>
+                刷新
+            </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="bi bi-stack"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 id="totalCount">0</h4>
+                    <p>待推送调研</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 id="totalSubjects">0</h4>
+                    <p>被评估人</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 id="totalEvaluators">0</h4>
+                    <p>评估人（未去重）</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 id="selectedCount">0</h4>
+                    <p>已选择</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Suggestion -->
+        <div class="suggestion-banner" id="suggestionBanner" style="display: none;">
+            <div class="suggestion-icon">
+                <i class="bi bi-lightbulb"></i>
+            </div>
+            <div class="suggestion-content">
+                <div class="suggestion-title">智能合并建议</div>
+                <div class="suggestion-text" id="suggestionText">
+                    检测到多个调研有评估人重叠，建议合并推送以减少消息打扰
+                </div>
+            </div>
+            <div class="suggestion-actions">
+                <button class="btn btn-success" onclick="selectRecommended()">
+                    <i class="bi bi-check-all"></i>
+                    一键选择推荐
+                </button>
+            </div>
+        </div>
+
+        <!-- Group Panel (shown when selected) -->
+        <div class="group-panel" id="groupPanel" style="display: none;">
+            <div class="group-title">
+                <i class="bi bi-collection" style="color: var(--primary);"></i>
+                已选择调研的合并统计
+            </div>
+            <div class="group-stats">
+                <div class="group-stat">
+                    <div class="group-stat-value" id="groupSurveyCount">0</div>
+                    <div class="group-stat-label">调研数量</div>
+                </div>
+                <div class="group-stat">
+                    <div class="group-stat-value" id="groupSubjectCount">0</div>
+                    <div class="group-stat-label">被评估人</div>
+                </div>
+                <div class="group-stat">
+                    <div class="group-stat-value" id="groupEvaluatorCount">0</div>
+                    <div class="group-stat-label">评估人（去重后）</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Survey List -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">待推送调研列表</div>
+                <span style="font-size: 0.875rem; color: var(--gray-600);">
+                    勾选多个调研进行合并推送
+                </span>
+            </div>
+            <div class="card-body card-body-no-padding">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <label class="select-all">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                            <span>全选</span>
+                        </label>
+                        <span class="selected-count" id="selectedText">已选择 0 个</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button type="button" class="btn btn-outline" id="previewBtn" onclick="previewMerged()" disabled>
+                            <i class="bi bi-eye"></i>
+                            合并预览
+                        </button>
+                        <button type="button" class="btn btn-success" id="pushBtn" onclick="batchPush()" disabled>
+                            <i class="bi bi-send"></i>
+                            批量发起
+                        </button>
+                    </div>
+                </div>
+                <div class="survey-list" id="surveyList">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Merged Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">合并推送预览</h5>
+                    <button type="button" class="btn-close" onclick="closePreviewModal()"></button>
+                </div>
+                <div class="modal-body" id="previewContent">
+                    <!-- Dynamic content -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" onclick="closePreviewModal()">取消</button>
+                    <button type="button" class="btn btn-success" onclick="confirmBatchPush()">
+                        <i class="bi bi-send"></i>
+                        确认发起
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script src="../demo-data.js"></script>
+    <script>
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item active" style="background: #f0fdf4; color: #15803d;">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        // Load surveys from DataStore
+        function loadSurveys() {
+            let reviews;
+            if (typeof DataStore !== 'undefined') {
+                reviews = DataStore.getPushPool();
+            } else {
+                reviews = JSON.parse(localStorage.getItem('pushPool') || '[]');
+            }
+            return reviews.filter(r => r.status === 'relation_approved' && r.pushType === 'batch');
+        }
+        
+        // Format time ago
+        function timeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (hours < 1) return '刚刚';
+            if (hours < 24) return `${hours}小时前`;
+            if (days < 30) return `${days}天前`;
+            return date.toLocaleDateString('zh-CN');
+        }
+        
+        // Get scene name
+        function getSceneName(scene) {
+            const scenes = {
+                promotion: { name: '晋升评估', class: 'scene-promotion' },
+                probation: { name: '转正评估', class: 'scene-probation' },
+                newleader: { name: '新Leader考察', class: 'scene-newleader' }
+            };
+            return scenes[scene] || { name: '其他', class: '' };
+        }
+        
+        // Render survey list
+        function renderSurveyList() {
+            const surveys = loadSurveys();
+            const container = document.getElementById('surveyList');
+            
+            // Update stats
+            let totalSubjects = 0;
+            let totalEvaluators = 0;
+            
+            surveys.forEach(s => {
+                totalSubjects += (s.subjects || []).length;
+                if (s.subjects) {
+                    s.subjects.forEach(sub => {
+                        if (sub.evaluators) {
+                            totalEvaluators += Object.values(sub.evaluators).reduce((sum, list) => 
+                                sum + (list?.length || 0), 0);
+                        }
+                    });
+                }
+            });
+            
+            document.getElementById('totalCount').textContent = surveys.length;
+            document.getElementById('totalSubjects').textContent = totalSubjects;
+            document.getElementById('totalEvaluators').textContent = totalEvaluators;
+            
+            if (surveys.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <div class="empty-title">待推送池为空</div>
+                        <div class="empty-text">审核关系时选择"加入待推送池"的调研将显示在这里</div>
+                        <a href="create-survey-step4.html" class="btn btn-primary">
+                            <i class="bi bi-clipboard-check"></i>
+                            去审核调研
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 使用统一布局渲染
+            container.innerHTML = surveys.map(survey => {
+                return renderSurveyItemUnified(survey);
+            }).join('');
+            
+            // Check for smart suggestion
+            checkSmartSuggestion(surveys);
+        }
+        
+        // 统一渲染调研项（待推送池版）
+        function renderSurveyItemUnified(survey) {
+            const sceneInfo = getSceneInfo(survey.scene);
+            const dimensions = getSceneDimensions(survey.scene);
+            const subjectCount = survey.subjects ? survey.subjects.length : 0;
+            
+            // 动态计算所有关系类型的评估人总数
+            const evaluatorCount = survey.subjects ? survey.subjects.reduce((sum, s) => {
+                if (!s.evaluators) return sum;
+                return sum + Object.values(s.evaluators).reduce((relSum, evalList) => 
+                    relSum + (evalList?.length || 0), 0);
+            }, 0) : 0;
+            
+            return `
+                <div class="survey-item" data-id="${survey.id}">
+                    <div class="survey-content">
+                        <!-- 左侧：基本信息 -->
+                        <div class="survey-left">
+                            <div class="survey-checkbox" onclick="event.stopPropagation();">
+                                <input type="checkbox" value="${survey.id}" onchange="handleSelect(this)">
+                            </div>
+                            <div class="survey-info">
+                                <div class="survey-title-row">
+                                    <span class="survey-title">${survey.title || '未命名调研'}</span>
+                                    <span class="scene-tag ${sceneInfo.class}">${sceneInfo.name}</span>
+                                </div>
+                                <div class="survey-meta">
+                                    <span><i class="bi bi-clock"></i> ${timeAgo(survey.relationApprovedAt)}</span>
+                                    <span><i class="bi bi-check-circle"></i> 已审核待推送</span>
+                                </div>
+                                <div class="template-info">
+                                    <span class="template-label">模板：</span>
+                                    <span class="template-name">${sceneInfo.name}</span>
+                                    <span class="template-label">分类：</span>
+                                    <div class="category-list">${renderCategoryTags(dimensions)}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间：考核关系平铺 -->
+                        <div class="survey-relations">
+                            ${renderRelationsCompact(survey.subjects, survey.scene)}
+                        </div>
+                        
+                        <!-- 右侧：统计和操作 -->
+                        <div class="survey-right">
+                            <div class="stat-badge">
+                                <div class="stat-value-small">${subjectCount}</div>
+                                <div class="stat-label-small">被评估人</div>
+                            </div>
+                            <div class="stat-badge" style="margin-top: 0.5rem;">
+                                <div class="stat-value-small">${evaluatorCount}</div>
+                                <div class="stat-label-small">评估人</div>
+                            </div>
+                            <div style="display: flex; gap: 0.25rem; margin-top: 0.5rem; justify-content: center;">
+                                <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSingle('${survey.id}')" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); pushSingle('${survey.id}')" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Check for smart merge suggestion
+        function checkSmartSuggestion(surveys) {
+            if (surveys.length < 2) return;
+            
+            const sceneGroups = {};
+            surveys.forEach(s => {
+                if (!sceneGroups[s.scene]) sceneGroups[s.scene] = [];
+                sceneGroups[s.scene].push(s);
+            });
+            
+            let suggestion = null;
+            Object.entries(sceneGroups).forEach(([scene, list]) => {
+                if (list.length >= 2) {
+                    suggestion = { scene, count: list.length };
+                }
+            });
+            
+            if (suggestion) {
+                const banner = document.getElementById('suggestionBanner');
+                const text = document.getElementById('suggestionText');
+                text.textContent = `检测到 ${suggestion.count} 个相同场景的调研，建议合并推送以减少消息打扰`;
+                banner.style.display = 'flex';
+            }
+        }
+        
+        // Handle individual select
+        function handleSelect(checkbox) {
+            updateSelectedState();
+        }
+        
+        // Toggle select all
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.survey-item input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateSelectedState();
+        }
+        
+        // Update selected state
+        function updateSelectedState() {
+            const selected = document.querySelectorAll('.survey-item input[type="checkbox"]:checked');
+            const selectedIds = Array.from(selected).map(cb => cb.value);
+            
+            document.getElementById('selectedCount').textContent = selected.length;
+            document.getElementById('selectedText').textContent = `已选择 ${selected.length} 个`;
+            
+            const hasSelection = selected.length > 0;
+            
+            const previewBtn = document.getElementById('previewBtn');
+            const pushBtn = document.getElementById('pushBtn');
+            
+            if (previewBtn) {
+                if (hasSelection) {
+                    previewBtn.removeAttribute('disabled');
+                } else {
+                    previewBtn.setAttribute('disabled', 'true');
+                }
+                previewBtn.style.opacity = hasSelection ? '1' : '0.6';
+                previewBtn.style.cursor = hasSelection ? 'pointer' : 'not-allowed';
+                // Debug: previewBtn disabled set to: !hasSelection
+            }
+            if (pushBtn) {
+                if (hasSelection) {
+                    pushBtn.removeAttribute('disabled');
+                } else {
+                    pushBtn.setAttribute('disabled', 'true');
+                }
+                pushBtn.style.opacity = hasSelection ? '1' : '0.6';
+                pushBtn.style.cursor = hasSelection ? 'pointer' : 'not-allowed';
+                // Debug: pushBtn disabled set to: !hasSelection
+            }
+            
+            if (hasSelection) {
+                updateGroupPanel(selectedIds);
+                document.getElementById('groupPanel').style.display = 'block';
+            } else {
+                document.getElementById('groupPanel').style.display = 'none';
+            }
+            
+            document.querySelectorAll('.survey-item').forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                item.classList.toggle('selected', checkbox && checkbox.checked);
+            });
+        }
+        
+        // Update group panel stats
+        function updateGroupPanel(selectedIds) {
+            const surveys = loadSurveys().filter(s => selectedIds.includes(s.id));
+            
+            let subjectCount = 0;
+            const evaluatorSet = new Set();
+            
+            surveys.forEach(s => {
+                subjectCount += (s.subjects || []).length;
+                (s.subjects || []).forEach(sub => {
+                    ['up', 'peer', 'down'].forEach(type => {
+                        (sub.evaluators?.[type] || []).forEach(e => {
+                            evaluatorSet.add(e.id || e.name);
+                        });
+                    });
+                });
+            });
+            
+            document.getElementById('groupSurveyCount').textContent = surveys.length;
+            document.getElementById('groupSubjectCount').textContent = subjectCount;
+            document.getElementById('groupEvaluatorCount').textContent = evaluatorSet.size;
+        }
+        
+        // Select recommended surveys
+        function selectRecommended() {
+            const surveys = loadSurveys();
+            const sceneGroups = {};
+            
+            surveys.forEach(s => {
+                if (!sceneGroups[s.scene]) sceneGroups[s.scene] = [];
+                sceneGroups[s.scene].push(s.id);
+            });
+            
+            let largestGroup = [];
+            Object.values(sceneGroups).forEach(group => {
+                if (group.length > largestGroup.length) {
+                    largestGroup = group;
+                }
+            });
+            
+            const checkboxes = document.querySelectorAll('.survey-item input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = largestGroup.includes(cb.value);
+            });
+            
+            updateSelectedState();
+        }
+        
+        // Preview merged message
+        function previewMerged() {
+            console.log('previewMerged called');
+            const selected = document.querySelectorAll('.survey-item input[type="checkbox"]:checked');
+            const selectedIds = Array.from(selected).map(cb => cb.value);
+            
+            console.log('Selected count:', selected.length, 'IDs:', selectedIds);
+            
+            if (selectedIds.length === 0) {
+                // Debug: No selection, returning
+                return;
+            }
+            
+            const surveys = loadSurveys().filter(s => selectedIds.includes(s.id));
+            let subjectNames = [];
+            
+            surveys.forEach(s => {
+                (s.subjects || []).forEach(sub => {
+                    subjectNames.push(sub.name);
+                });
+            });
+            
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = `
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;">
+                        合并后消息预览：
+                    </div>
+                    <div style="background: #f5f5f5; border-radius: 12px; padding: 1.5rem;">
+                        <div style="background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="font-size: 0.75rem; color: #576b95; margin-bottom: 0.5rem;">
+                                <i class="bi bi-building"></i> 360度评估邀请
+                            </div>
+                            <div style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">
+                                【晋升评估】诚邀您参与${subjectNames.slice(0, 2).join('、')}等${subjectNames.length}人的360度评估
+                            </div>
+                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 1rem;">
+                                您好！您有${subjectNames.length}位同事的晋升评估调研待完成。
+                            </div>
+                            <div style="background: #f7f7f7; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem;">
+                                <div style="font-size: 1.125rem; font-weight: 700; color: #f59e0b; text-align: center;">
+                                    截止时间：4月15日
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">
+                        <i class="bi bi-graph-up"></i> 合并统计
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div style="background: var(--primary-light); padding: 1rem; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">${surveys.length}</div>
+                            <div style="font-size: 0.75rem; color: var(--gray-600);">合并调研</div>
+                        </div>
+                        <div style="background: #f0fdf4; padding: 1rem; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${subjectNames.length}</div>
+                            <div style="font-size: 0.75rem; color: var(--gray-600);">被评估人</div>
+                        </div>
+                        <div style="background: #f3e8ff; padding: 1rem; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #9333ea;">-</div>
+                            <div style="font-size: 0.75rem; color: var(--gray-600);">评估人（去重）</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const modalEl = document.getElementById('previewModal');
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+                // Modal shown
+            } else {
+                // Modal not found
+                alert('错误：找不到弹窗元素');
+            }
+        }
+        
+        // Close preview modal
+        function closePreviewModal() {
+            const modalEl = document.getElementById('previewModal');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        }
+        
+        // Batch push
+        function batchPush() {
+            console.log('batchPush called');
+            previewMerged();
+        }
+        
+        // Confirm batch push
+        function confirmBatchPush() {
+            const selected = document.querySelectorAll('.survey-item input[type="checkbox"]:checked');
+            const selectedIds = Array.from(selected).map(cb => cb.value);
+            
+            selectedIds.forEach(id => {
+                if (typeof DataStore !== 'undefined') {
+                    DataStore.updateSurvey(id, {
+                        status: 'active',
+                        pushedAt: new Date().toISOString(),
+                        mergedPush: true
+                    });
+                }
+            });
+            
+            alert(`已成功发起 ${selectedIds.length} 个调研的合并推送！`);
+            closePreviewModal();
+            renderSurveyList();
+        }
+        
+        // Push single survey
+        function pushSingle(surveyId) {
+            if (confirm('确认立即发起该调研？')) {
+                if (typeof DataStore !== 'undefined') {
+                    DataStore.updateSurvey(surveyId, {
+                        status: 'active',
+                        pushedAt: new Date().toISOString()
+                    });
+                }
+                alert('发起成功！');
+                renderSurveyList();
+            }
+        }
+        
+        // Preview single survey
+        function previewSingle(surveyId) {
+            window.location.href = 'create-survey-step5.html?surveyId=' + surveyId;
+        }
+        
+        // Load demo data
+        function loadDemoData() {
+            if (typeof DataStore !== 'undefined') {
+                DataStore.initDemoData(true); // forceRefresh = true
+            } else if (typeof initDemoData === 'function') {
+                initDemoData();
+            }
+        }
+        
+        // 侧边栏折叠状态
+        let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        
+        // 切换侧边栏
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+            applySidebarState();
+        }
+        
+        // 应用侧边栏状态
+        function applySidebarState() {
+            const sidebar = document.getElementById('adminSidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (sidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                toggleIcon.classList.remove('bi-chevron-left');
+                toggleIcon.classList.add('bi-chevron-right');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                toggleIcon.classList.remove('bi-chevron-right');
+                toggleIcon.classList.add('bi-chevron-left');
+            }
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            applySidebarState();
+            loadDemoData();
+            renderSurveyList();
+            
+            // 为批量操作按钮添加事件监听器
+            // 按钮事件已通过 onclick 绑定，无需额外 addEventListener
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业微信消息模板 - 360度人才调研</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../styles/common.css" rel="stylesheet">
+    <style>
+        /* ============================================
+           WeCom Messages Page - Specific Styles
+           ============================================ */
+        
+        :root {
+            --wechat-bg: #f5f5f5;
+            --wechat-blue: #576b95;
+            --wechat-border: #e5e5e5;
+            --wechat-primary: #07c160;
+            --wechat-warning: #fa5151;
+        }
+        
+        body {
+            background: #fafafa;
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* Header */
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            transition: color 0.2s;
+        }
+        
+        .back-link:hover { color: white; }
+        
+        /* Alert Section */
+        .alert-section {
+            background: #fff7ed;
+            border-bottom: 1px solid #fed7aa;
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .alert-box {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.875rem;
+        }
+        
+        .alert-box i {
+            color: #ea580c;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        
+        .alert-content h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #9a3412;
+            margin-bottom: 0.375rem;
+        }
+        
+        .alert-content p {
+            font-size: 0.8125rem;
+            color: #c2410c;
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .limit-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .limit-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.625rem;
+            background: #ffedd5;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #9a3412;
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Preview Grid */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        /* Phone Mockup */
+        .phone-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .phone-mockup {
+            background: #1a1a1a;
+            border-radius: 44px;
+            padding: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        .phone-screen {
+            background: var(--wechat-bg);
+            border-radius: 32px;
+            overflow: hidden;
+            min-height: 680px;
+        }
+        
+        .phone-notch {
+            height: 32px;
+            background: #ededed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .phone-header {
+            background: #ededed;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 0.5px solid #d9d9d9;
+        }
+        
+        .phone-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #000;
+        }
+        
+        .phone-content { padding: 1rem; }
+        
+        .msg-time {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #999;
+            margin: 1rem 0;
+        }
+        
+        /* Service Account Header */
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .service-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+        
+        .service-info h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 0.125rem;
+        }
+        
+        .service-info p {
+            font-size: 0.75rem;
+            color: #888;
+            margin: 0;
+        }
+        
+        /* Template Cards */
+        .template-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .card-source {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            font-size: 0.75rem;
+            color: var(--wechat-blue);
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .card-main { padding: 0.875rem; }
+        
+        .card-title {
+            font-size: 1.0625rem;
+            font-weight: 600;
+            color: #000;
+            line-height: 1.4;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-desc {
+            font-size: 0.9375rem;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .card-highlight {
+            background: #f7f7f7;
+            padding: 0.875rem;
+            margin: 0.75rem 0;
+            border-radius: 6px;
+        }
+        
+        .highlight-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--wechat-warning);
+            text-align: center;
+        }
+        
+        .highlight-desc {
+            font-size: 0.8125rem;
+            color: #666;
+            text-align: center;
+            margin-top: 0.25rem;
+        }
+        
+        .card-detail {
+            background: #f7f7f7;
+            border-radius: 6px;
+            padding: 0.625rem 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #333;
+            padding: 0.25rem 0;
+        }
+        
+        .detail-row i {
+            color: var(--wechat-blue);
+            font-size: 0.875rem;
+        }
+        
+        .card-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem;
+            background: #f7f7f7;
+            border-top: 1px solid var(--wechat-border);
+            color: var(--wechat-blue);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        /* Card Info */
+        .card-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .card-info-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card-info-type {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4f46e5;
+            background: #eef2ff;
+            padding: 0.25rem 0.625rem;
+            border-radius: 4px;
+        }
+        
+        .card-info-scene {
+            font-size: 0.8125rem;
+            color: #64748b;
+        }
+        
+        .card-info-desc {
+            font-size: 0.8125rem;
+            color: #475569;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card-info-limits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+        }
+        
+        .card-info-limit {
+            font-size: 0.6875rem;
+            color: #94a3b8;
+            background: #f1f5f9;
+            padding: 0.125rem 0.5rem;
+            border-radius: 3px;
+        }
+        
+        /* JSON Code Block */
+        .json-block {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.75rem;
+            overflow-x: auto;
+        }
+        
+        .json-block pre {
+            margin: 0;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        
+        .json-key { color: #7dd3fc; }
+        .json-string { color: #86efac; }
+        .json-number { color: #fca5a5; }
+        
+        /* Section Styles */
+        .specs-section,
+        .tips-section,
+        .errors-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .spec-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+        
+        .spec-card h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .spec-card ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            font-size: 0.8125rem;
+            color: #475569;
+            line-height: 1.8;
+        }
+        
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .tip-card {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+        }
+        
+        .tip-card.warning {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+        
+        .tip-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #22c55e;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .tip-card.warning .tip-icon { background: #ef4444; }
+        
+        .tip-content h5 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #166534;
+            margin-bottom: 0.375rem;
+        }
+        
+        .tip-card.warning .tip-content h5 { color: #991b1b; }
+        
+        .tip-content p {
+            font-size: 0.8125rem;
+            color: #15803d;
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .tip-card.warning .tip-content p { color: #7f1d1d; }
+        
+        .error-list { margin-top: 1.5rem; }
+        
+        .error-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .error-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #ef4444;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .error-content h5 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 0.25rem;
+        }
+        
+        .error-content p {
+            font-size: 0.8125rem;
+            color: #7f1d1d;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.8125rem;
+        }
+        
+        .page-footer p { margin: 0; }
+        
+        .page-footer p + p {
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+        
+        /* Clickable Button */
+        .card-btn.clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-btn.clickable:hover { background: #e8e8e8; }
+        .card-btn.clickable:active { transform: scale(0.98); }
+        
+        /* Toast */
+        #toast {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            z-index: 9999;
+            text-align: center;
+        }
+        
+        #toast i {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #07c160;
+        }
+        
+        /* Animations */
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .preview-grid { grid-template-columns: 1fr; }
+            .specs-grid,
+            .tips-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="page-header">
+        <div class="container">
+            <a href="../index.html" class="back-link">
+                <i class="bi bi-arrow-left"></i>
+                返回首页
+            </a>
+            <h1 class="page-title">📱 企业微信模板卡片</h1>
+            <p class="page-subtitle">评估人消息模板 | <strong>被评估人不会收到任何通知</strong> | 仅向评估人发送邀请 | 基于企业微信 API 实际能力限制设计</p>
+        </div>
+    </header>
+
+    <!-- Alert Section -->
+    <div class="alert-section">
+        <div class="alert-box">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <div class="alert-content">
+                <h4>企业微信模板卡片 API 限制说明</h4>
+                <p>以下模板设计严格遵循企业微信 API 实际能力限制。实际发送消息时请勿超出这些限制，否则会导致发送失败。</p>
+                <div class="limit-badges">
+                    <span class="limit-badge"><i class="bi bi-type"></i> 标题最多128字节</span>
+                    <span class="limit-badge"><i class="bi bi-text-paragraph"></i> 描述最多512字节</span>
+                    <span class="limit-badge"><i class="bi bi-1-circle"></i> 仅1个关键数据</span>
+                    <span class="limit-badge"><i class="bi bi-shield-lock"></i> 仅支持HTTPS</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Templates Section -->
+        <h2 class="section-title"><i class="bi bi-phone"></i> 消息模板预览</h2>
+        <p class="section-desc">企业微信 text_notice 模板，用于向评估人发送初始邀请</p>
+
+        <div class="preview-grid" style="grid-template-columns: 1fr; max-width: 600px; margin: 0 auto;">
+            <!-- Template 1: Text Notice - Initial Invitation -->
+            <div class="phone-container">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="phone-notch">9:41</div>
+                        <div class="phone-header">
+                            <span style="font-size: 0.875rem; color: #000;"><i class="bi bi-chevron-left"></i></span>
+                            <span class="phone-title">360人才调研</span>
+                            <span style="font-size: 0.875rem; color: #000;"><i class="bi bi-three-dots"></i></span>
+                        </div>
+                        <div class="phone-content">
+                            <div class="msg-time">昨天 14:30</div>
+                            
+                            <div class="service-header">
+                                <div class="service-avatar">360</div>
+                                <div class="service-info">
+                                    <h4>360人才调研系统</h4>
+                                    <p>企业微信应用</p>
+                                </div>
+                            </div>
+                            
+                            <div class="template-card">
+                                <div class="card-source">
+                                    <i class="bi bi-building"></i>
+                                    <span>晋升评估邀请</span>
+                                </div>
+                                <div class="card-main">
+                                    <div class="card-title">张三的晋升评估</div>
+                                    <div class="card-desc">诚邀您作为平级评估人参与本次晋升评估</div>
+                                    
+                                    <div class="card-highlight">
+                                        <div class="highlight-title">⏰ 4月15日截止</div>
+                                        <div class="highlight-desc">请在此日期前完成评估</div>
+                                    </div>
+                                    
+                                    <div class="card-detail">
+                                        <div class="detail-row">
+                                            <i class="bi bi-person-badge"></i>
+                                            <span>您的角色：<strong>平级评估人</strong></span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <i class="bi bi-shield-check"></i>
+                                            <span>反馈将完全匿名处理</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <i class="bi bi-clock"></i>
+                                            <span>预计用时：10-15分钟</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-btn clickable" onclick="enterTodoList()">
+                                    <span>立即填写</span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-info">
+                    <div class="card-info-header">
+                        <span class="card-info-type">text_notice</span>
+                        <span class="card-info-scene">初始邀请场景</span>
+                    </div>
+                    <p class="card-info-desc">用于向评估人发送初始邀请，包含被评估人信息、截止时间和评估角色。</p>
+                    <div class="card-info-limits">
+                        <span class="card-info-limit">✓ 标题：19字节/128</span>
+                        <span class="card-info-limit">✓ 副标题：34字节/512</span>
+                        <span class="card-info-limit">✓ 1个关键数据</span>
+                    </div>
+                    <div class="json-block">
+                        <pre>{
+  <span class="json-key">"msgtype"</span>: <span class="json-string">"template_card"</span>,
+  <span class="json-key">"template_card"</span>: {
+    <span class="json-key">"card_type"</span>: <span class="json-string">"text_notice"</span>,
+    <span class="json-key">"source"</span>: {
+      <span class="json-key">"desc"</span>: <span class="json-string">"晋升评估邀请"</span>
+    },
+    <span class="json-key">"main_title"</span>: {
+      <span class="json-key">"title"</span>: <span class="json-string">"张三的晋升评估"</span>,
+      <span class="json-key">"desc"</span>: <span class="json-string">"诚邀您作为平级评估人参与"</span>
+    },
+    <span class="json-key">"emphasis_content"</span>: {
+      <span class="json-key">"title"</span>: <span class="json-string">"⏰ 4月15日截止"</span>
+    },
+    <span class="json-key">"sub_title_text"</span>: <span class="json-string">"您的角色：平级评估人"</span>,
+    <span class="json-key">"jump_list"</span>: [{
+      <span class="json-key">"type"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"url"</span>: <span class="json-string">"https://..."</span>
+    }]
+  }
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Specs Section -->
+        <div class="specs-section">
+            <h2 class="section-title"><i class="bi bi-code-square"></i> 技术规范</h2>
+            <p class="section-desc">企业微信模板卡片 API 的完整字段说明</p>
+            
+            <div class="specs-grid">
+                <div class="spec-card">
+                    <h4><i class="bi bi-chat-square-text"></i> 文本通知型 text_notice</h4>
+                    <ul>
+                        <li><strong>card_type</strong>: "text_notice"</li>
+                        <li><strong>main_title.title</strong>: 主标题，最多128字节</li>
+                        <li><strong>main_title.desc</strong>: 副标题，最多512字节</li>
+                        <li><strong>emphasis_content</strong>: 关键数据，只能有1个</li>
+                        <li><strong>sub_title_text</strong>: 二级内容，最多512字节</li>
+                        <li><strong>jump_list</strong>: 跳转链接数组</li>
+                    </ul>
+                </div>
+                
+                <div class="spec-card">
+                    <h4><i class="bi bi-link-45deg"></i> 通用限制</h4>
+                    <ul>
+                        <li>所有 URL 必须是 HTTPS</li>
+                        <li>不支持 HTML 标签</li>
+                        <li>不支持自定义样式（颜色、字体）</li>
+                        <li>消息跳转只能到小程序或 URL</li>
+                        <li>source_desc 最多30字符</li>
+                        <li>单个消息大小不超过 2048 字节</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Practices Section -->
+        <div class="tips-section">
+            <h2 class="section-title"><i class="bi bi-lightbulb"></i> 使用建议</h2>
+            <p class="section-desc">基于实际项目经验的最佳实践</p>
+            
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="bi bi-check-lg"></i></div>
+                    <div class="tip-content">
+                        <h5>关键数据突出显示</h5>
+                        <p>使用 emphasis_content 突出最重要的信息，如截止时间或待办数量。注意：只能有一个关键数据。</p>
+                    </div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="bi bi-check-lg"></i></div>
+                    <div class="tip-content">
+                        <h5>按钮文字精简</h5>
+                        <p>按钮文字控制在16字节以内（约6-8个汉字），避免过长被截断。</p>
+                    </div>
+                </div>
+                
+                <div class="tip-card warning">
+                    <div class="tip-icon"><i class="bi bi-exclamation-lg"></i></div>
+                    <div class="tip-content">
+                        <h5>避免超出发送限制</h5>
+                        <p>发送前检查文本长度，超长的内容会导致消息发送失败。中文字符按3字节计算。</p>
+                    </div>
+                </div>
+                
+                <div class="tip-card warning">
+                    <div class="tip-icon"><i class="bi bi-exclamation-lg"></i></div>
+                    <div class="tip-content">
+                        <h5>必须使用HTTPS链接</h5>
+                        <p>所有跳转链接必须是HTTPS协议，HTTP链接会被拒绝。确保域名已备案。</p>
+                    </div>
+                </div>
+                
+                <div class="tip-card warning">
+                    <div class="tip-icon"><i class="bi bi-exclamation-lg"></i></div>
+                    <div class="tip-content">
+                        <h5>不支持富文本格式</h5>
+                        <p>不要在内容中使用HTML标签（如&lt;b&gt;、&lt;br&gt;），企业微信会直接显示为纯文本。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Errors Section -->
+        <div class="errors-section">
+            <h2 class="section-title"><i class="bi bi-x-octagon"></i> 常见错误</h2>
+            <p class="section-desc">开发中容易遇到的问题及解决方案</p>
+            
+            <div class="error-list">
+                <div class="error-item">
+                    <div class="error-icon"><i class="bi bi-x-lg"></i></div>
+                    <div class="error-content">
+                        <h5>错误：包含多个 emphasis_content</h5>
+                        <p>企业微信 text_notice 模板只支持一个关键数据。如需展示多个信息，请使用 sub_title_text 字段。</p>
+                    </div>
+                </div>
+                
+                <div class="error-item">
+                    <div class="error-icon"><i class="bi bi-x-lg"></i></div>
+                    <div class="error-content">
+                        <h5>错误：URL 使用 HTTP 协议</h5>
+                        <p>企业微信要求所有跳转链接必须是 HTTPS。请确保使用有效的 SSL 证书，且域名已完成备案。</p>
+                    </div>
+                </div>
+                
+                <div class="error-item">
+                    <div class="error-icon"><i class="bi bi-x-lg"></i></div>
+                    <div class="error-content">
+                        <h5>错误：标题或描述超出长度限制</h5>
+                        <p>标题最多128字节，描述最多512字节（1个中文约3字节）。请使用工具预先计算字节长度。</p>
+                    </div>
+                </div>
+                
+                <div class="error-item">
+                    <div class="error-icon"><i class="bi bi-x-lg"></i></div>
+                    <div class="error-content">
+                        <h5>错误：使用未授权的卡片类型</h5>
+                        <p>部分卡片类型需要申请权限。请确保在企微管理后台已启用对应的模板卡片能力。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <p>360度人才调研系统 · 企业微信模板卡片规范</p>
+        <p>基于企业微信 API 文档设计 | 实际能力可能因版本更新有所变化</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast">
+        <i class="bi bi-check-circle"></i>
+        <span id="toastText">操作成功</span>
+    </div>
+
+    <script src="../scripts/common.js"></script>
+    <script>
+        // ============================================
+        // WeCom Messages Page - Specific Scripts
+        // ============================================
+        
+        /**
+         * 进入消息详情页 - 模拟从企微消息点击进入
+         */
+        function enterTodoList() {
+            showToast('正在打开消息详情...');
+            setTimeout(() => {
+                window.location.href = '../respondent/wecom-message-detail.html?scene=promotion&subject=张三&relation=peer&deadline=2026-04-15&count=3';
+            }, 800);
+        }
+        
+        /**
+         * 显示 Toast 提示（页面特定样式）
+         */
+        function showToast(text) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastText').textContent = text;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+        
+        // 添加点击波纹效果
+        document.querySelectorAll('.clickable').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.style.cssText = `
+                    position: absolute;
+                    background: rgba(255,255,255,0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    pointer-events: none;
+                `;
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = e.clientX - rect.left - size/2 + 'px';
+                ripple.style.top = e.clientY - rect.top - size/2 + 'px';
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    </script>
+</body>
+</html>

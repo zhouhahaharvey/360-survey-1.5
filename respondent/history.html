@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>历史记录 - 360调研</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/respondent.css">
+    <!-- 页面特有样式 -->
+    <style>
+        .back-to-home {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.875rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+            background: white;
+            color: var(--gray-600);
+        }
+        
+        .filter-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Month Section */
+        .month-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .month-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 0.75rem;
+            padding-left: 0.5rem;
+        }
+        
+        /* Survey Card - History Style */
+        .survey-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .survey-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .survey-scene {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .scene-promotion { background: #dbeafe; color: #1e40af; }
+        .scene-probation { background: #d1fae5; color: #065f46; }
+        .scene-newleader { background: #ffedd5; color: #9a3412; }
+        .scene-performance { background: #f3e8ff; color: #7c3aed; }
+        
+        .completed-badge {
+            font-size: 0.75rem;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .subject-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .subject-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .subject-details h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+        
+        .subject-details p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        .survey-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-bottom: 0.75rem;
+        }
+        
+        .survey-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--gray-100);
+        }
+    </style>
+</head>
+<body class="mobile">
+    <!-- Header -->
+    <header class="app-header">
+        <a href="todo-list.html" class="back-to-home">
+            <i class="bi bi-arrow-left"></i>
+            返回待办
+        </a>
+        <a href="../index.html" class="back-to-home" style="margin-left: 0.5rem;">
+            <i class="bi bi-grid-3x3-gap"></i>
+            原型导航
+        </a>
+        <div class="header-top">
+            <div class="logo">
+                <i class="bi bi-clock-history"></i>
+                历史记录
+            </div>
+            <div class="user-avatar">张</div>
+        </div>
+        <div class="header-stats">
+            <div class="header-stat">
+                <div class="header-stat-value" id="monthCount">28</div>
+                <div class="header-stat-label">本月完成</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value" id="totalCount">156</div>
+                <div class="header-stat-label">累计完成</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value">4.8</div>
+                <div class="header-stat-label">平均评分</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="mobile-content">
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <div class="filter-tab active" onclick="switchTab(this, 'all')">全部</div>
+            <div class="filter-tab" onclick="switchTab(this, 'promotion')">晋升评估</div>
+            <div class="filter-tab" onclick="switchTab(this, 'probation')">转正评估</div>
+            <div class="filter-tab" onclick="switchTab(this, 'performance')">绩效考核</div>
+        </div>
+
+        <!-- This Month -->
+        <div class="month-section">
+            <div class="month-title">本月 (<span class="month-count">8</span>)</div>
+            
+            <div class="survey-card" data-type="promotion">
+                <div class="survey-header">
+                    <span class="survey-scene scene-promotion">晋升评估</span>
+                    <span class="completed-badge"><i class="bi bi-check-circle-fill"></i> 已完成</span>
+                </div>
+                <div class="subject-info">
+                    <div class="subject-avatar">李</div>
+                    <div class="subject-details">
+                        <h3>李四</h3>
+                        <p>技术部 · P6 · 前端开发</p>
+                    </div>
+                </div>
+                <div class="survey-meta">
+                    <span><i class="bi bi-calendar-check"></i> 完成于 03-20</span>
+                    <span><i class="bi bi-clock"></i> 用时 12分钟</span>
+                </div>
+                <div class="survey-footer">
+                    <button class="btn btn-outline btn-sm" onclick="viewDetail('promotion', '李四')">
+                        <i class="bi bi-eye"></i> 查看详情
+                    </button>
+                    <span style="font-size: 0.75rem; color: var(--success);">
+                        <i class="bi bi-star-fill"></i> 评分 4.5
+                    </span>
+                </div>
+            </div>
+
+            <div class="survey-card" data-type="probation">
+                <div class="survey-header">
+                    <span class="survey-scene scene-probation">转正评估</span>
+                    <span class="completed-badge"><i class="bi bi-check-circle-fill"></i> 已完成</span>
+                </div>
+                <div class="subject-info">
+                    <div class="subject-avatar">王</div>
+                    <div class="subject-details">
+                        <h3>王五</h3>
+                        <p>产品部 · P5 · 产品经理</p>
+                    </div>
+                </div>
+                <div class="survey-meta">
+                    <span><i class="bi bi-calendar-check"></i> 完成于 03-18</span>
+                    <span><i class="bi bi-clock"></i> 用时 8分钟</span>
+                </div>
+                <div class="survey-footer">
+                    <button class="btn btn-outline btn-sm" onclick="viewDetail('probation', '王五')">
+                        <i class="bi bi-eye"></i> 查看详情
+                    </button>
+                    <span style="font-size: 0.75rem; color: var(--success);">
+                        <i class="bi bi-star-fill"></i> 评分 4.2
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Month -->
+        <div class="month-section">
+            <div class="month-title">上月 (<span class="month-count">12</span>)</div>
+            
+            <div class="survey-card" data-type="performance">
+                <div class="survey-header">
+                    <span class="survey-scene scene-performance">绩效考核</span>
+                    <span class="completed-badge"><i class="bi bi-check-circle-fill"></i> 已完成</span>
+                </div>
+                <div class="subject-info">
+                    <div class="subject-avatar">赵</div>
+                    <div class="subject-details">
+                        <h3>赵六</h3>
+                        <p>运营部 · P7 · 运营总监</p>
+                    </div>
+                </div>
+                <div class="survey-meta">
+                    <span><i class="bi bi-calendar-check"></i> 完成于 02-28</span>
+                    <span><i class="bi bi-clock"></i> 用时 15分钟</span>
+                </div>
+                <div class="survey-footer">
+                    <button class="btn btn-outline btn-sm" onclick="viewDetail('performance', '赵六')">
+                        <i class="bi bi-eye"></i> 查看详情
+                    </button>
+                    <span style="font-size: 0.75rem; color: var(--success);">
+                        <i class="bi bi-star-fill"></i> 评分 4.7
+                    </span>
+                </div>
+            </div>
+
+            <div class="survey-card" data-type="promotion">
+                <div class="survey-header">
+                    <span class="survey-scene scene-promotion">晋升评估</span>
+                    <span class="completed-badge"><i class="bi bi-check-circle-fill"></i> 已完成</span>
+                </div>
+                <div class="subject-info">
+                    <div class="subject-avatar">孙</div>
+                    <div class="subject-details">
+                        <h3>孙八</h3>
+                        <p>技术部 · P8 · 架构师</p>
+                    </div>
+                </div>
+                <div class="survey-meta">
+                    <span><i class="bi bi-calendar-check"></i> 完成于 02-25</span>
+                    <span><i class="bi bi-clock"></i> 用时 18分钟</span>
+                </div>
+                <div class="survey-footer">
+                    <button class="btn btn-outline btn-sm" onclick="viewDetail('promotion', '孙八')">
+                        <i class="bi bi-eye"></i> 查看详情
+                    </button>
+                    <span style="font-size: 0.75rem; color: var(--success);">
+                        <i class="bi bi-star-fill"></i> 评分 4.9
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earlier -->
+        <div class="month-section">
+            <div class="month-title">更早 (<span class="month-count">6</span>)</div>
+            
+            <div class="survey-card" data-type="newleader">
+                <div class="survey-header">
+                    <span class="survey-scene scene-newleader">新Leader考察</span>
+                    <span class="completed-badge"><i class="bi bi-check-circle-fill"></i> 已完成</span>
+                </div>
+                <div class="subject-info">
+                    <div class="subject-avatar">周</div>
+                    <div class="subject-details">
+                        <h3>周九</h3>
+                        <p>技术部 · P8 · 技术总监</p>
+                    </div>
+                </div>
+                <div class="survey-meta">
+                    <span><i class="bi bi-calendar-check"></i> 完成于 01-15</span>
+                    <span><i class="bi bi-clock"></i> 用时 20分钟</span>
+                </div>
+                <div class="survey-footer">
+                    <button class="btn btn-outline btn-sm" onclick="viewDetail('newleader', '周九')">
+                        <i class="bi bi-eye"></i> 查看详情
+                    </button>
+                    <span style="font-size: 0.75rem; color: var(--success);">
+                        <i class="bi bi-star-fill"></i> 评分 4.6
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="todo-list.html" class="nav-item-mobile">
+            <i class="bi bi-clipboard-check"></i>
+            <span>待办</span>
+        </a>
+        <a href="history.html" class="nav-item-mobile active">
+            <i class="bi bi-clock-history"></i>
+            <span>历史</span>
+        </a>
+        <a href="profile.html" class="nav-item-mobile">
+            <i class="bi bi-person"></i>
+            <span>我的</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../demo-data.js"></script>
+    <script>
+        // URL参数处理
+        const urlParams = Utils.parseUrlParams();
+        
+        // 从DEMO数据加载已完成任务
+        function loadHistory() {
+            // 尝试从DEMO_TASKS加载已完成任务
+            let completedTasks = [];
+            if (typeof DEMO_TASKS !== 'undefined' && DEMO_TASKS.length > 0) {
+                completedTasks = DEMO_TASKS.filter(t => t.status === 'completed').slice(0, 20);
+            }
+            
+            // 更新统计
+            updateStats(completedTasks.length);
+        }
+        
+        function updateStats(completedCount) {
+            document.getElementById('totalCount').textContent = 156 + completedCount;
+        }
+        
+        // Tab切换
+        function switchTab(tab, type) {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Filter cards
+            const cards = document.querySelectorAll('.survey-card');
+            cards.forEach(card => {
+                if (type === 'all' || card.dataset.type === type) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update month section visibility and counts
+            document.querySelectorAll('.month-section').forEach(section => {
+                const visibleCards = section.querySelectorAll('.survey-card:not([style*="display: none"])');
+                section.style.display = visibleCards.length > 0 ? 'block' : 'none';
+                section.querySelector('.month-count').textContent = visibleCards.length;
+            });
+        }
+        
+        // 查看详情
+        function viewDetail(scene, subjectName) {
+            UI.toast(`查看 ${subjectName} 的 ${scene} 评估详情`, 'info');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+        });
+    </script>
+</body>
+</html>

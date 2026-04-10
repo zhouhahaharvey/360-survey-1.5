@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审核考核关系 - 360调研系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--gray-50); min-height: 100vh; margin: 0; }
+        .sidebar { width: 240px; background: white; border-right: 1px solid var(--gray-200); position: fixed; height: 100vh; z-index: 100; }
+        .sidebar-brand { padding: 1.5rem; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 0.75rem; }
+        .sidebar-brand i { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), #7c3aed); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem; }
+        .nav-menu { padding: 1rem 0; }
+        .nav-item { padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; color: var(--gray-600); text-decoration: none; transition: all 0.2s; }
+        .nav-item:hover, .nav-item.active { background: var(--primary-light); color: var(--primary); }
+        .main-content { margin-left: 240px; padding: 2rem; padding-bottom: 120px; }
+        .page-title { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .page-title h1 { font-size: 1.5rem; font-weight: 700; color: var(--gray-800); margin: 0; }
+        .card { background: white; border-radius: 12px; border: 1px solid var(--gray-200); margin-bottom: 1.5rem; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-200); }
+        .btn { padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; transition: all 0.2s; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-outline { background: white; border: 1px solid var(--gray-200); color: var(--gray-600); }
+        .survey-item { border-bottom: 1px solid var(--gray-200); padding: 1rem 1.25rem; }
+        .survey-item:last-child { border-bottom: none; }
+        .survey-header { display: flex; align-items: center; gap: 1rem; cursor: pointer; }
+        .survey-checkbox { width: 18px; height: 18px; cursor: pointer; }
+        .survey-info { flex: 1; }
+        .survey-title { font-weight: 600; color: var(--gray-800); font-size: 0.9375rem; }
+        .scene-tag { padding: 0.25rem 0.625rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; margin-left: 0.5rem; }
+        .scene-promotion { background: #dbeafe; color: #1e40af; }
+        .scene-probation { background: #d1fae5; color: #065f46; }
+        .scene-newleader { background: #ffedd5; color: #9a3412; }
+        .survey-meta { display: flex; gap: 1rem; font-size: 0.8125rem; color: var(--gray-500); margin-top: 0.25rem; }
+        .survey-details { display: none; padding: 1rem 0 0 2rem; }
+        .survey-details.expanded { display: block; }
+        .subject-item { background: var(--gray-50); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
+        .subject-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem; }
+        .evaluator-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .evaluator-type { background: white; border-radius: 6px; padding: 0.75rem; }
+        .type-label { font-size: 0.75rem; font-weight: 500; color: var(--gray-600); margin-bottom: 0.5rem; }
+        .evaluator-list { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+        .evaluator-tag { background: var(--gray-100); border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--gray-700); }
+        .bottom-bar { position: fixed; bottom: 0; left: 240px; right: 0; background: white; border-top: 1px solid var(--gray-200); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 50; }
+        .expand-btn { margin-left: auto; background: none; border: none; color: var(--gray-500); cursor: pointer; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-brand"><i class="bi bi-360"></i><span>360调研系统</span></div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item"><i class="bi bi-house-door"></i>首页</a>
+            <a href="create-survey-step1.html" class="nav-item"><i class="bi bi-plus-circle"></i>发起调研</a>
+            <a href="my-pending-reviews.html" class="nav-item"><i class="bi bi-hourglass-split"></i>我的待审核</a>
+            <a href="create-survey-step4.html" class="nav-item active" style="background: #fef2f2; color: #dc2626;"><i class="bi bi-clipboard-check"></i>审核中心</a>
+            <a href="survey-list.html" class="nav-item"><i class="bi bi-list-check"></i>调研管理</a>
+            <a href="pending-push-pool.html" class="nav-item"><i class="bi bi-stack"></i>待推送池</a>
+
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                <a href="../index.html" class="nav-item" style="color: var(--primary);"><i class="bi bi-grid-3x3-gap"></i>返回原型导航</a>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-title">
+            <a href="dashboard.html" class="btn btn-outline"><i class="bi bi-arrow-left"></i>返回首页</a>
+            <div><h1>审核考核关系</h1></div>
+            <a href="../index.html" class="btn btn-primary" style="margin-left: auto;"><i class="bi bi-grid-3x3-gap"></i>返回原型导航</a>
+        </div>
+
+        <div class="card">
+            <div class="toolbar">
+                <div><input type="checkbox" id="selectAll"> <label for="selectAll">全选</label> <span id="selectedCount">已选择 0 个</span></div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-outline" onclick="addToPool()" style="background: #8b5cf6; color: white; border-color: #8b5cf6;">
+                        <i class="bi bi-collection"></i>审核通过并加入待推送池
+                    </button>
+                    <button class="btn btn-success" onclick="approve()">
+                        <i class="bi bi-lightning-charge"></i>审核通过并立即推送
+                    </button>
+                </div>
+            </div>
+
+            <!-- 静态调研列表 -->
+            <div class="survey-item">
+                <div class="survey-header" onclick="toggle('s1')">
+                    <input type="checkbox" class="survey-checkbox" data-id="survey_001" onclick="event.stopPropagation(); updateCount()">
+                    <div class="survey-info">
+                        <div><span class="survey-title">张三等3人-晋升评估</span><span class="scene-tag scene-promotion">晋升评估</span></div>
+                        <div class="survey-meta"><span><i class="bi bi-person"></i> 张经理</span><span><i class="bi bi-people"></i> 3位被评估人</span><span><i class="bi bi-person-check"></i> 10位评估人</span></div>
+                    </div>
+                    <button class="expand-btn" id="btn-s1"><i class="bi bi-chevron-down"></i></button>
+                </div>
+                <div class="survey-details" id="s1">
+                    <div class="subject-item">
+                        <div class="subject-header"><div class="avatar">张</div><div><strong>张三</strong> <small>技术部 · P7</small></div></div>
+                        <div class="evaluator-section">
+                            <div class="evaluator-type"><div class="type-label">上级 2人</div><div class="evaluator-list"><span class="evaluator-tag">王总监</span><span class="evaluator-tag">刘副总</span></div></div>
+                            <div class="evaluator-type"><div class="type-label">平级 3人</div><div class="evaluator-list"><span class="evaluator-tag">李四</span><span class="evaluator-tag">赵五</span><span class="evaluator-tag">孙六</span></div></div>
+                            <div class="evaluator-type"><div class="type-label">下级 2人</div><div class="evaluator-list"><span class="evaluator-tag">小张</span><span class="evaluator-tag">小李</span></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="survey-item">
+                <div class="survey-header" onclick="toggle('s2')">
+                    <input type="checkbox" class="survey-checkbox" data-id="survey_002" onclick="event.stopPropagation(); updateCount()">
+                    <div class="survey-info">
+                        <div><span class="survey-title">小明等2人-转正评估</span><span class="scene-tag scene-probation">转正评估</span></div>
+                        <div class="survey-meta"><span><i class="bi bi-person"></i> 李经理</span><span><i class="bi bi-people"></i> 2位被评估人</span><span><i class="bi bi-person-check"></i> 5位评估人</span></div>
+                    </div>
+                    <button class="expand-btn" id="btn-s2"><i class="bi bi-chevron-down"></i></button>
+                </div>
+                <div class="survey-details" id="s2">
+                    <div class="subject-item">
+                        <div class="subject-header"><div class="avatar">明</div><div><strong>小明</strong> <small>运营部 · P4</small></div></div>
+                        <div class="evaluator-section">
+                            <div class="evaluator-type"><div class="type-label">上级 1人</div><div class="evaluator-list"><span class="evaluator-tag">赵经理</span></div></div>
+                            <div class="evaluator-type"><div class="type-label">平级 2人</div><div class="evaluator-list"><span class="evaluator-tag">小红</span><span class="evaluator-tag">小华</span></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="survey-item">
+                <div class="survey-header" onclick="toggle('s3')">
+                    <input type="checkbox" class="survey-checkbox" data-id="survey_003" onclick="event.stopPropagation(); updateCount()">
+                    <div class="survey-info">
+                        <div><span class="survey-title">刘总监-新Leader考察</span><span class="scene-tag scene-newleader">新Leader</span></div>
+                        <div class="survey-meta"><span><i class="bi bi-person"></i> 张经理</span><span><i class="bi bi-people"></i> 1位被评估人</span><span><i class="bi bi-person-check"></i> 8位评估人</span></div>
+                    </div>
+                    <button class="expand-btn" id="btn-s3"><i class="bi bi-chevron-down"></i></button>
+                </div>
+                <div class="survey-details" id="s3">
+                    <div class="subject-item">
+                        <div class="subject-header"><div class="avatar">刘</div><div><strong>刘总监</strong> <small>销售部 · M3</small></div></div>
+                        <div class="evaluator-section">
+                            <div class="evaluator-type"><div class="type-label">上级 2人</div><div class="evaluator-list"><span class="evaluator-tag">王VP</span><span class="evaluator-tag">李CEO</span></div></div>
+                            <div class="evaluator-type"><div class="type-label">平级 2人</div><div class="evaluator-list"><span class="evaluator-tag">陈总监</span><span class="evaluator-tag">杨总监</span></div></div>
+                            <div class="evaluator-type"><div class="type-label">下级 4人</div><div class="evaluator-list"><span class="evaluator-tag">小李</span><span class="evaluator-tag">小王</span><span class="evaluator-tag">小张</span><span class="evaluator-tag">小赵</span></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="bottom-bar">
+        <div>已选择 <strong id="count">0</strong> 个调研</div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-outline" onclick="addToPool()" style="background: #8b5cf6; color: white; border-color: #8b5cf6;">
+                <i class="bi bi-collection"></i> 审核通过并加入待推送池
+            </button>
+            <button class="btn btn-success" onclick="approve()">
+                <i class="bi bi-lightning-charge"></i> 审核通过并立即推送
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function toggle(id) {
+            const el = document.getElementById(id);
+            const btn = document.getElementById('btn-' + id);
+            el.classList.toggle('expanded');
+            btn.style.transform = el.classList.contains('expanded') ? 'rotate(180deg)' : '';
+        }
+        function updateCount() {
+            const checked = document.querySelectorAll('.survey-checkbox:checked').length;
+            document.getElementById('count').textContent = checked;
+            document.getElementById('selectedCount').textContent = '已选择 ' + checked + ' 个';
+        }
+        document.getElementById('selectAll').addEventListener('change', function() {
+            document.querySelectorAll('.survey-checkbox').forEach(cb => cb.checked = this.checked);
+            updateCount();
+        });
+        function approve() {
+            const checked = document.querySelectorAll('.survey-checkbox:checked');
+            if (checked.length === 0) { alert('请至少选择一个调研'); return; }
+            const ids = Array.from(checked).map(cb => cb.dataset.id).join(',');
+            window.location.href = 'create-survey-step5.html?surveyIds=' + ids;
+        }
+        function addToPool() {
+            const checked = document.querySelectorAll('.survey-checkbox:checked');
+            if (checked.length === 0) { alert('请至少选择一个调研'); return; }
+            const ids = Array.from(checked).map(cb => cb.dataset.id).join(',');
+            alert('已加入待推送池！');
+            window.location.href = 'pending-push-pool.html?addedIds=' + ids;
+        }
+    </script>
+    <!-- 返回原型导航浮动按钮 -->
+    <a href="../index.html" style="position: fixed; top: 1rem; right: 1rem; z-index: 1000; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+        <i class="bi bi-grid-3x3-gap"></i>返回导航
+    </a>
+</body>
+</html>

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告编辑 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <style>
+        /* Custom layout for report editor */
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            margin-left: 240px;
+        }
+        
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        
+        .back-btn:hover { color: var(--primary); }
+        
+        .top-bar-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .top-bar-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .main-layout {
+            display: flex;
+            height: calc(100vh - 65px);
+            margin-left: 240px;
+        }
+        
+        .edit-sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            overflow-y: auto;
+        }
+        
+        .sidebar-section {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .sidebar-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 0.375rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        textarea.form-control {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+        }
+        
+        .toggle-label {
+            font-size: 0.875rem;
+            color: var(--gray-800);
+        }
+        
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--gray-200);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .toggle-switch.active { background: var(--primary); }
+        
+        .toggle-switch::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+        
+        .toggle-switch.active::after { transform: translateX(20px); }
+        
+        .preview-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: var(--gray-100);
+        }
+        
+        .report-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 0 auto;
+            padding: 20mm;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .report-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .report-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-subtitle {
+            font-size: 1rem;
+            color: var(--gray-600);
+        }
+        
+        .report-section {
+            margin-bottom: 2rem;
+        }
+        
+        .report-section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            min-width: 80px;
+        }
+        
+        .info-value {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+        
+        .score-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .score-card {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .score-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+        
+        .dimension-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+        
+        .dimension-table th, .dimension-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .dimension-table th {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            background: var(--gray-50);
+        }
+        
+        .dimension-table td {
+            font-size: 0.875rem;
+        }
+        
+        .score-bar {
+            width: 100px;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        .comment-box {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .comment-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .comment-text {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+        
+        [contenteditable="true"] {
+            border: 1px dashed transparent;
+            padding: 2px;
+        }
+        
+        [contenteditable="true"]:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        [contenteditable="true"]:focus {
+            border-color: var(--primary);
+            background: white;
+            outline: none;
+        }
+        
+        .export-menu { position: relative; }
+        
+        .export-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            min-width: 160px;
+            display: none;
+        }
+        
+        .export-dropdown.show { display: block; }
+        
+        .export-item {
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            color: var(--gray-800);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+        
+        .export-item:hover { background: var(--gray-50); }
+        
+        @media print {
+            .sidebar, .top-bar, .edit-sidebar { display: none !important; }
+            .main-layout { margin-left: 0; }
+            .preview-area { padding: 0; }
+            .report-page { box-shadow: none; }
+        }
+        
+        @media (max-width: 768px) {
+            .edit-sidebar { display: none; }
+            .report-page { width: 100%; padding: 1rem; }
+            .score-overview { grid-template-columns: repeat(2, 1fr); }
+            .top-bar, .main-layout { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar" style="z-index: 101;"></aside>
+
+    <div class="top-bar">
+        <div class="top-bar-left">
+
+            <span class="top-bar-title">编辑报告 - 张三晋升评估</span>
+        </div>
+        <div class="top-bar-actions">
+            <button class="btn btn-outline" onclick="togglePreview()">
+                <i class="bi bi-eye"></i>
+                <span id="previewBtnText">预览</span>
+            </button>
+            <div class="export-menu">
+                <button class="btn btn-primary" onclick="toggleExportMenu()">
+                    <i class="bi bi-download"></i>
+                    导出
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <div class="export-dropdown" id="exportDropdown">
+                    <div class="export-item" onclick="exportPDF()">
+                        <i class="bi bi-file-pdf" style="color: #dc2626;"></i>
+                        导出 PDF
+                    </div>
+                    <div class="export-item" onclick="exportPNG()">
+                        <i class="bi bi-image" style="color: #2563eb;"></i>
+                        导出 PNG
+                    </div>
+                    <div class="export-item" onclick="exportWord()">
+                        <i class="bi bi-file-word" style="color: #2563eb;"></i>
+                        导出 Word
+                    </div>
+                    <div class="export-item" onclick="window.print()">
+                        <i class="bi bi-printer" style="color: var(--gray-600);"></i>
+                        打印
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="saveReport()">
+                <i class="bi bi-check-lg"></i>
+                保存
+            </button>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <aside class="edit-sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <i class="bi bi-info-circle"></i>
+                    基本信息
+                </div>
+                <div class="form-group">
+                    <label class="form-label">报告标题</label>
+                    <input type="text" class="form-control" id="reportTitle" value="360度评估报告 - 晋升评估">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">评估对象</label>
+                    <input type="text" class="form-control" id="evaluateeName" value="张三">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">部门/职级</label>
+                    <input type="text" class="form-control" id="deptInfo" value="技术部 / P6">
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <i class="bi bi-layout-grid"></i>
+                    显示设置
+                </div>
+                <div class="toggle-group">
+                    <span class="toggle-label">显示详细得分</span>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this, 'detailScores')"></div>
+                </div>
+                <div class="toggle-group">
+                    <span class="toggle-label">显示优点提炼</span>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this, 'strengths')"></div>
+                </div>
+                <div class="toggle-group">
+                    <span class="toggle-label">显示改进建议</span>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this, 'improvements')"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <i class="bi bi-pencil"></i>
+                    报告摘要
+                </div>
+                <div class="form-group">
+                    <label class="form-label">综合评价</label>
+                    <textarea class="form-control" id="summaryText" placeholder="输入综合评价摘要..."></textarea>
+                </div>
+            </div>
+        </aside>
+
+        <div class="preview-area">
+            <div class="report-page" id="reportPage">
+                <div class="report-header">
+                    <div class="report-title" contenteditable="true">360度评估报告</div>
+                    <div class="report-subtitle" contenteditable="true">晋升评估 - 技术部</div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">一、基本信息</div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">姓 名：</span>
+                            <span class="info-value" contenteditable="true">张三</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">部 门：</span>
+                            <span class="info-value" contenteditable="true">技术部</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">职 级：</span>
+                            <span class="info-value" contenteditable="true">P6</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">岗 位：</span>
+                            <span class="info-value" contenteditable="true">高级工程师</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">二、综合得分</div>
+                    <div class="score-overview">
+                        <div class="score-card">
+                            <div class="score-value" style="color: var(--primary);">4.5</div>
+                            <div class="score-label">综合得分</div>
+                        </div>
+                        <div class="score-card">
+                            <div class="score-value" style="color: #10b981;">4.6</div>
+                            <div class="score-label">专业能力</div>
+                        </div>
+                        <div class="score-card">
+                            <div class="score-value" style="color: #f59e0b;">4.3</div>
+                            <div class="score-label">团队协作</div>
+                        </div>
+                        <div class="score-card">
+                            <div class="score-value" style="color: #8b5cf6;">4.4</div>
+                            <div class="score-label">领导潜力</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section" id="detailScoresSection">
+                    <div class="report-section-title">三、维度得分明细</div>
+                    <table class="dimension-table">
+                        <thead>
+                            <tr>
+                                <th>评估维度</th>
+                                <th>权重</th>
+                                <th>上级评价</th>
+                                <th>同事评价</th>
+                                <th>下属评价</th>
+                                <th>综合得分</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>专业技能</td>
+                                <td>30%</td>
+                                <td>4.8</td>
+                                <td>4.5</td>
+                                <td>4.6</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="font-weight: 600;">4.6</span>
+                                        <div class="score-bar">
+                                            <div class="score-bar-fill" style="width: 92%; background: #10b981;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>项目管理</td>
+                                <td>25%</td>
+                                <td>4.5</td>
+                                <td>4.3</td>
+                                <td>4.4</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="font-weight: 600;">4.4</span>
+                                        <div class="score-bar">
+                                            <div class="score-bar-fill" style="width: 88%; background: #3b82f6;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="report-section" id="strengthsSection">
+                    <div class="report-section-title">四、优点提炼</div>
+                    <div class="comment-box">
+                        <div class="comment-title">专业能力突出</div>
+                        <div class="comment-text" contenteditable="true">
+                            在专业技术方面表现突出，能够独立解决复杂技术问题。在XX项目中，主动攻克了技术难关，保障了项目顺利上线。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section" id="improvementsSection">
+                    <div class="report-section-title">五、改进建议</div>
+                    <div class="comment-box">
+                        <div class="comment-title">提升系统架构能力</div>
+                        <div class="comment-text" contenteditable="true">
+                            建议进一步加强系统架构设计能力，在方案设计时考虑更多可扩展性和可维护性因素。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">六、综合评价与建议</div>
+                    <div class="comment-box" style="background: #eff6ff; border: 1px solid #dbeafe;">
+                        <div class="comment-title" style="color: #1e40af;">评价结论</div>
+                        <div class="comment-text" contenteditable="true" id="summaryContent">
+                            张三在本次晋升评估中表现优秀，综合得分4.5分（满分5.0），各维度均达到较高水平。建议在晋升后继续加强架构能力培养。
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem; border-top: 1px solid var(--gray-200); padding-top: 1.5rem; display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--gray-600);">
+                    <span>报告生成时间：2026年3月25日</span>
+                    <span>评估机构：360度人才调研系统</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script>
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        let isPreview = false;
+        
+        function togglePreview() {
+            isPreview = !isPreview;
+            document.getElementById('previewBtnText').textContent = isPreview ? '编辑' : '预览';
+            document.querySelector('.edit-sidebar').style.display = isPreview ? 'none' : 'block';
+            document.querySelectorAll('[contenteditable]').forEach(el => {
+                el.contentEditable = !isPreview;
+            });
+        }
+
+        function toggleExportMenu() {
+            document.getElementById('exportDropdown').classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.export-menu')) {
+                document.getElementById('exportDropdown').classList.remove('show');
+            }
+        });
+
+        function toggleSwitch(el, section) {
+            el.classList.toggle('active');
+            const isActive = el.classList.contains('active');
+            const sectionMap = {
+                'detailScores': 'detailScoresSection',
+                'strengths': 'strengthsSection',
+                'improvements': 'improvementsSection'
+            };
+            const sectionId = sectionMap[section];
+            if (sectionId) {
+                document.getElementById(sectionId).style.display = isActive ? 'block' : 'none';
+            }
+        }
+
+        async function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const reportPage = document.getElementById('reportPage');
+            const editables = reportPage.querySelectorAll('[contenteditable]');
+            editables.forEach(el => el.contentEditable = 'false');
+            
+            try {
+                const canvas = await html2canvas(reportPage, { scale: 2, useCORS: true, allowTaint: true });
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('张三-晋升评估报告.pdf');
+            } catch (error) {
+                alert('导出失败，请尝试打印为PDF');
+                // Export error
+            }
+            editables.forEach(el => el.contentEditable = 'true');
+        }
+
+        async function exportPNG() {
+            const reportPage = document.getElementById('reportPage');
+            const editables = reportPage.querySelectorAll('[contenteditable]');
+            editables.forEach(el => el.contentEditable = 'false');
+            
+            try {
+                const canvas = await html2canvas(reportPage, { scale: 2, useCORS: true, allowTaint: true });
+                const link = document.createElement('a');
+                link.download = '张三-晋升评估报告.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                alert('导出失败');
+                // Export error
+            }
+            editables.forEach(el => el.contentEditable = 'true');
+        }
+
+        function exportWord() {
+            const reportPage = document.getElementById('reportPage');
+            const content = reportPage.innerHTML;
+            const html = `<html><head><meta charset='utf-8'></head><body>${content}</body></html>`;
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '张三-晋升评估报告.doc';
+            link.click();
+        }
+
+        function saveReport() {
+            const btn = event.target.closest('.btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> 保存中...';
+            btn.disabled = true;
+            setTimeout(() => {
+                alert('报告已保存');
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        document.getElementById('reportTitle').addEventListener('input', function() {
+            document.querySelector('.report-title').textContent = this.value;
+        });
+        
+        document.getElementById('evaluateeName').addEventListener('input', function() {
+            document.querySelector('.info-value').textContent = this.value;
+        });
+        
+        document.getElementById('summaryText').addEventListener('input', function() {
+            document.getElementById('summaryContent').textContent = this.value;
+        });
+
+        // 获取URL参数
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        
+        // 从DataStore获取调研数据
+        function loadSurveyData() {
+            const surveyId = getUrlParam('id');
+            if (!surveyId) return null;
+            
+            if (typeof DataStore !== 'undefined') {
+                return DataStore.getSurveyById(surveyId);
+            }
+            
+            // Fallback: 从localStorage获取
+            const allSurveys = JSON.parse(localStorage.getItem('allSurveys') || '[]');
+            return allSurveys.find(s => s.id === surveyId);
+        }
+        
+        // 根据场景获取评估维度
+        function getDimensionsByScene(scene) {
+            const dimensionMap = {
+                'promotion': ['专业能力', '团队协作', '领导潜力', '业务贡献', '创新思维'],
+                'probation': ['岗位胜任力', '工作态度', '团队融入', '学习成长', '专业技能'],
+                'newleader': ['团队管理', '目标达成', '策略规划', '人才培养', '跨部门协作'],
+                'performance': ['业绩达成', '能力素质', '工作态度', '团队协作', '专业发展']
+            };
+            return dimensionMap[scene] || dimensionMap['promotion'];
+        }
+        
+        // 根据场景获取场景名称
+        function getSceneName(scene) {
+            const sceneMap = {
+                'promotion': '晋升评估',
+                'probation': '转正评估',
+                'newleader': '新Leader评估',
+                'performance': '绩效考核'
+            };
+            return sceneMap[scene] || '360度评估';
+        }
+        
+        // 渲染报告数据
+        function renderReportData(survey) {
+            if (!survey) return;
+            
+            const subject = survey.subjects?.[0];
+            if (!subject) return;
+            
+            // 更新报告标题
+            const sceneName = getSceneName(survey.scene);
+            const reportTitle = `${subject.name || '未知'}-${sceneName}报告`;
+            document.getElementById('reportTitle').value = reportTitle;
+            document.querySelector('.report-title').textContent = reportTitle;
+            
+            // 更新被评估人信息
+            document.getElementById('evaluateeName').value = subject.name || '';
+            document.querySelectorAll('.info-value')[0].textContent = subject.name || '-';
+            document.querySelectorAll('.info-value')[1].textContent = subject.dept || '-';
+            document.querySelectorAll('.info-value')[2].textContent = subject.level || '-';
+            document.querySelectorAll('.info-value')[3].textContent = survey.title || sceneName;
+            
+            // 更新维度明细表
+            const dimensions = getDimensionsByScene(survey.scene);
+            renderDimensionTable(dimensions);
+            
+            // 更新综合评价
+            const summary = generateSummary(subject, survey.scene);
+            document.getElementById('summaryText').value = summary;
+            document.getElementById('summaryContent').textContent = summary;
+        }
+        
+        // 渲染维度得分表
+        function renderDimensionTable(dimensions) {
+            const tbody = document.querySelector('.dimension-table tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = dimensions.map((dim, idx) => {
+                const weight = [30, 25, 20, 15, 10][idx] || 10;
+                const upScore = (Math.random() * 0.8 + 4.0).toFixed(1);
+                const peerScore = (Math.random() * 0.8 + 4.0).toFixed(1);
+                const downScore = (Math.random() * 0.8 + 4.0).toFixed(1);
+                const avgScore = ((parseFloat(upScore) + parseFloat(peerScore) + parseFloat(downScore)) / 3).toFixed(1);
+                const percent = Math.round((avgScore / 5) * 100);
+                const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'];
+                
+                return `
+                    <tr>
+                        <td>${dim}</td>
+                        <td>${weight}%</td>
+                        <td>${upScore}</td>
+                        <td>${peerScore}</td>
+                        <td>${downScore}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-weight: 600;">${avgScore}</span>
+                                <div class="score-bar">
+                                    <div class="score-bar-fill" style="width: ${percent}%; background: ${colors[idx % colors.length]};"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // 更新综合得分卡片
+            updateScoreCards(dimensions);
+        }
+        
+        // 更新得分卡片
+        function updateScoreCards(dimensions) {
+            const cards = document.querySelectorAll('.score-card .score-value');
+            if (cards.length >= 4) {
+                const avgScore = (Math.random() * 0.5 + 4.2).toFixed(1);
+                cards[0].textContent = avgScore;
+                cards[1].textContent = (Math.random() * 0.6 + 4.1).toFixed(1);
+                cards[2].textContent = (Math.random() * 0.6 + 4.1).toFixed(1);
+                cards[3].textContent = (Math.random() * 0.6 + 4.1).toFixed(1);
+            }
+        }
+        
+        // 生成综合评价摘要
+        function generateSummary(subject, scene) {
+            const sceneSummaries = {
+                'promotion': `${subject.name}在本次晋升评估中表现优秀，综合得分达到较高水平。专业能力突出，团队协作良好，具备一定的领导潜力。建议在晋升后继续加强架构能力培养，提升管理视野。`,
+                'probation': `${subject.name}在试用期间表现良好，能够胜任岗位工作要求。工作态度认真，学习能力较强，团队融入顺利。建议正式入职后继续保持学习热情，提升专业深度。`,
+                'newleader': `${subject.name}作为新任管理者，在团队管理和目标达成方面表现突出。能够快速融入团队，建立信任关系。建议继续加强策略规划能力，注重人才培养。`,
+                'performance': `${subject.name}本年度绩效表现优异，业绩达成情况良好，能力素质全面。工作态度积极，团队协作顺畅。建议在保持优势的同时，寻找新的业务增长点。`
+            };
+            return sceneSummaries[scene] || sceneSummaries['promotion'];
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            
+            // 加载并渲染报告数据
+            const survey = loadSurveyData();
+            if (survey) {
+                renderReportData(survey);
+            }
+        });
+    </script>
+</body>
+</html>

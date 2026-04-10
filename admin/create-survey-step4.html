@@ -1,0 +1,2631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审核考核关系（多选）- 360调研系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --purple-light: #ede9fe;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 240px;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+        
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sidebar-brand i {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .sidebar-brand span {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--gray-800);
+        }
+        
+        .nav-menu {
+            padding: 1rem 0;
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .main-content {
+            margin-left: 240px;
+            padding: 2rem;
+            padding-bottom: 120px;
+        }
+        
+        .page-title {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .page-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .page-title p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        /* Wizard Steps */
+        .wizard-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .step-item.active .step-number {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .step-item.completed .step-number {
+            background: var(--success);
+            color: white;
+        }
+        
+        .step-item.pending .step-number {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+        
+        .step-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .step-item.active .step-label {
+            color: var(--primary);
+        }
+        
+        .step-item.pending .step-label {
+            color: var(--gray-600);
+        }
+        
+        .step-divider {
+            width: 40px;
+            height: 2px;
+            background: var(--gray-200);
+            margin: 0 0.5rem;
+        }
+        
+        .step-divider.completed {
+            background: var(--success);
+        }
+        
+        /* Smart Suggestion Banner */
+        .suggestion-banner {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 1px solid #fcd34d;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .suggestion-icon {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .suggestion-content {
+            flex: 1;
+        }
+        
+        .suggestion-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 0.25rem;
+        }
+        
+        .suggestion-text {
+            font-size: 0.875rem;
+            color: #b45309;
+        }
+        
+        .suggestion-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            color: #b45309;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .suggestion-btn:hover {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .selected-count {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Survey List */
+        .survey-list {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .survey-item {
+            border-bottom: 1px solid var(--gray-200);
+            transition: all 0.2s;
+            padding: 1rem 1.25rem;
+        }
+        
+        .survey-item:last-child {
+            border-bottom: none;
+        }
+        
+        .survey-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .survey-item.selected {
+            background: var(--primary-light);
+        }
+        
+        /* PC优先布局：横向三栏 - 固定列宽确保对齐 */
+        .survey-content {
+            display: grid;
+            grid-template-columns: 260px minmax(400px, 1fr) 100px;
+            gap: 1rem;
+            min-width: 0;
+            align-items: stretch;
+        }
+        
+        /* 大屏幕优化 */
+        @media (min-width: 1400px) {
+            .survey-content {
+                grid-template-columns: 280px minmax(500px, 1fr) 120px;
+                gap: 1.25rem;
+            }
+        }
+        
+        @media (min-width: 1600px) {
+            .survey-content {
+                grid-template-columns: 300px minmax(600px, 1fr) 140px;
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1920px) {
+            .survey-content {
+                grid-template-columns: 320px minmax(700px, 1fr) 160px;
+                gap: 2rem;
+            }
+        }
+        
+        /* 左侧：基本信息 */
+        .survey-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .survey-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+        
+        .survey-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .survey-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.375rem;
+            flex-wrap: wrap;
+        }
+        
+        .survey-title {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.9375rem;
+        }
+        
+        .scene-tag {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.6875rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .scene-promotion { background: #dbeafe; color: #1e40af; }
+        .scene-probation { background: #d1fae5; color: #065f46; }
+        .scene-newleader { background: #ffedd5; color: #9a3412; }
+        .scene-performance { background: #f3e8ff; color: #7c3aed; }
+        
+        .survey-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            flex-wrap: wrap;
+            margin-bottom: 0.375rem;
+        }
+        
+        .survey-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .template-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.6875rem;
+            flex-wrap: wrap;
+        }
+        
+        .template-label {
+            color: var(--gray-400);
+            white-space: nowrap;
+        }
+        
+        .template-name {
+            color: var(--primary);
+            font-weight: 500;
+            background: var(--primary-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+        }
+        
+        .category-list {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+        
+        .category-tag {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            padding: 0.1rem 0.375rem;
+            border-radius: 3px;
+            font-size: 0.625rem;
+        }
+        
+        /* 中间：考核关系矩阵（平铺） */
+        .survey-relations {
+            flex: 1;
+            min-width: 0;
+            border-left: 1px solid var(--gray-200);
+            border-right: 1px solid var(--gray-200);
+            padding: 0 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .subject-relation-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
+        
+        .subject-relation-row:not(:last-child) {
+            border-bottom: 1px dashed var(--gray-100);
+        }
+        
+        .subject-info-compact {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 120px;
+            flex-shrink: 0;
+        }
+        
+        .mini-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        
+        .subject-name-compact {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+        
+        .subject-meta-compact {
+            font-size: 0.6875rem;
+            color: var(--gray-500);
+        }
+        
+        .evaluator-matrix-inline {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .matrix-col-inline {
+            flex: 1;
+            min-width: 0;
+            background: var(--gray-50);
+            border-radius: 6px;
+            padding: 0.5rem 0.625rem;
+        }
+        
+        .matrix-col-header {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 0.375rem;
+            white-space: nowrap;
+        }
+        
+        .evaluator-tags-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+        
+        .evaluator-tag-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-700);
+            cursor: default;
+            transition: all 0.2s;
+            position: relative;
+            max-width: 140px;
+        }
+        
+        .evaluator-tag-inline:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .evaluator-avatar-inline {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .evaluator-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        
+        .evaluator-name {
+            font-weight: 500;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .evaluator-title {
+            color: var(--gray-500);
+            font-size: 0.625rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .evaluator-dept {
+            color: var(--gray-400);
+            font-size: 0.625rem;
+        }
+        
+        .evaluator-remove {
+            color: var(--gray-300);
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-left: 0.125rem;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        
+        .evaluator-tag-inline:hover .evaluator-remove {
+            opacity: 1;
+            color: var(--danger);
+        }
+        
+        .evaluator-remove:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Tooltip */
+        .evaluator-tooltip {
+            position: fixed;
+            background: var(--gray-800);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .evaluator-tooltip::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 20px;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-bottom: 4px solid var(--gray-800);
+        }
+        
+        .tooltip-name {
+            font-weight: 600;
+            margin-bottom: 0.125rem;
+        }
+        
+        .tooltip-dept {
+            color: var(--gray-300);
+            font-size: 0.6875rem;
+        }
+        
+        /* Detailed Tooltip */
+        .evaluator-tooltip-detail {
+            padding: 0;
+            min-width: 200px;
+            overflow: hidden;
+        }
+        
+        .evaluator-tooltip-detail .tooltip-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .evaluator-tooltip-detail .tooltip-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .evaluator-tooltip-detail .tooltip-header-info {
+            flex: 1;
+        }
+        
+        .evaluator-tooltip-detail .tooltip-name {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .evaluator-tooltip-detail .tooltip-title {
+            color: var(--gray-300);
+            font-size: 0.75rem;
+        }
+        
+        .evaluator-tooltip-detail .tooltip-body {
+            padding: 0.75rem;
+        }
+        
+        .evaluator-tooltip-detail .tooltip-row {
+            display: flex;
+            margin-bottom: 0.375rem;
+            font-size: 0.75rem;
+        }
+        
+        .evaluator-tooltip-detail .tooltip-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .evaluator-tooltip-detail .tooltip-label {
+            color: var(--gray-400);
+            width: 48px;
+            flex-shrink: 0;
+        }
+        
+        .evaluator-tooltip-detail .tooltip-value {
+            color: white;
+            font-weight: 500;
+        }
+        
+        /* Add Evaluator Modal Styles */
+        .evaluator-filter {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .filter-input-group {
+            flex: 1;
+            position: relative;
+        }
+        
+        .filter-input-group i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 0.875rem;
+        }
+        
+        .filter-input-group input {
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 2rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        
+        .filter-input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            min-width: 120px;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .evaluator-list-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .evaluator-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .evaluator-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .evaluator-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        .evaluator-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+        
+        .evaluator-option-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        
+        .evaluator-option-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .evaluator-option-name {
+            font-weight: 500;
+            color: var(--gray-800);
+            font-size: 0.875rem;
+        }
+        
+        .evaluator-option-dept {
+            color: var(--gray-500);
+            font-size: 0.75rem;
+        }
+        
+        .evaluator-option-empid {
+            color: var(--gray-400);
+            font-size: 0.6875rem;
+            font-family: monospace;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 0.0625rem 0.375rem;
+            border-radius: 3px;
+            font-size: 0.625rem;
+            font-weight: 500;
+            margin-left: 0.375rem;
+            vertical-align: middle;
+        }
+        
+        .evaluator-option-check {
+            color: var(--primary);
+            font-size: 1.25rem;
+            opacity: 0;
+        }
+        
+        .evaluator-option.selected .evaluator-option-check {
+            opacity: 1;
+        }
+        
+        /* Add evaluator button */
+        .add-evaluator-btn {
+            width: 16px;
+            height: 16px;
+            border: none;
+            background: var(--gray-200);
+            color: var(--gray-600);
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.625rem;
+            margin-left: 0.25rem;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        
+        .add-evaluator-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Matrix column header with add button */
+        .matrix-col-header {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 0.375rem;
+            white-space: nowrap;
+        }
+        
+        /* 右侧：统计和操作 - 宽度由grid控制 */
+        .survey-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+        
+        .stat-badge {
+            text-align: center;
+            padding: 0.375rem 0.75rem;
+            background: var(--gray-100);
+            border-radius: 6px;
+        }
+        
+        .stat-value-small {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .stat-label-small {
+            font-size: 0.6875rem;
+            color: var(--gray-500);
+        }
+        
+        .details-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+            padding-top: 1rem;
+        }
+        
+        .subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .subject-item {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .subject-header-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .subject-name-info h5 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.125rem;
+        }
+        
+        .subject-name-info p {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin: 0;
+        }
+        
+        .evaluator-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .matrix-column {
+            background: var(--gray-50);
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+        
+        .matrix-header {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+        
+        .evaluator-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .evaluator-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-700);
+        }
+        
+        .mini-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+        
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--gray-200);
+            color: var(--gray-600);
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+        
+        .btn-purple {
+            background: var(--purple);
+            color: white;
+        }
+        
+        .btn-purple:hover {
+            background: #7c3aed;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8125rem;
+        }
+        
+        /* Bottom Action Bar */
+        .bottom-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 240px;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--gray-200);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .bottom-action-bar.show {
+            transform: translateY(0);
+        }
+        
+        .bottom-action-info {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .bottom-action-info strong {
+            color: var(--gray-800);
+        }
+        
+        .bottom-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gray-100);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--gray-400);
+        }
+        
+        .empty-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-text {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: var(--gray-100);
+        }
+        
+        .modal-body {
+            padding: 1.25rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        .textarea-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        .textarea-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .reject-reason-input {
+            margin-bottom: 0.5rem;
+        }
+        
+        .reject-hint {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        
+        /* Selection Detail Modal */
+        .detail-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-survey-title {
+            font-weight: 500;
+            color: var(--gray-800);
+            font-size: 0.875rem;
+        }
+        
+        .detail-survey-meta {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 1rem; padding-bottom: 140px; }
+            .bottom-action-bar { left: 0; }
+            .wizard-steps { flex-wrap: wrap; gap: 0.5rem; }
+            .step-divider { display: none; }
+            .step-label { display: none; }
+            .survey-stats { display: none; }
+            .toolbar-right { flex-wrap: wrap; }
+            .suggestion-banner { flex-direction: column; text-align: center; }
+            .evaluator-matrix { grid-template-columns: 1fr; }
+            .bottom-action-bar { flex-direction: column; gap: 1rem; }
+            .bottom-actions { flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-title">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="survey-list.html" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+                    <i class="bi bi-arrow-left"></i>
+                    返回列表
+                </a>
+                <div>
+                    <h1>审核中心 - 批量审核</h1>
+                    <p>批量选择多个调研进行审核，支持部分立即推送，部分加入待推送池</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wizard Steps -->
+        <div class="wizard-steps">
+            <div class="step-item completed">
+                <div class="step-number"><i class="bi bi-check"></i></div>
+                <span class="step-label">选择场景</span>
+            </div>
+            <div class="step-divider completed"></div>
+            <div class="step-item completed">
+                <div class="step-number"><i class="bi bi-check"></i></div>
+                <span class="step-label">批量导入</span>
+            </div>
+            <div class="step-divider completed"></div>
+            <div class="step-item completed">
+                <div class="step-number"><i class="bi bi-check"></i></div>
+                <span class="step-label">确认关系</span>
+            </div>
+            <div class="step-divider completed"></div>
+            <div class="step-item active">
+                <div class="step-number">4</div>
+                <span class="step-label">审核关系</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item pending">
+                <div class="step-number">5</div>
+                <span class="step-label">配置消息</span>
+            </div>
+        </div>
+
+        <!-- Smart Suggestion Banner -->
+        <div class="suggestion-banner" id="suggestionBanner">
+            <div class="suggestion-icon">💡</div>
+            <div class="suggestion-content">
+                <div class="suggestion-title">智能合并建议</div>
+                <div class="suggestion-text" id="suggestionText">检测到多个调研来自同一发起人，建议一起审核</div>
+            </div>
+            <button class="suggestion-btn" onclick="selectAllSurveys()">
+                <i class="bi bi-check-all"></i>
+                一键全选
+            </button>
+        </div>
+
+        <!-- Survey List Card -->
+        <div class="card">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="selectAllCheckbox">
+                        <span>全选</span>
+                    </label>
+                    <span class="selected-count" id="toolbarSelectedCount">已选择 0 个</span>
+                    <span class="edit-hint" id="editHint" style="color: var(--gray-400); font-size: 0.75rem; margin-left: 1rem;">
+                        <i class="bi bi-info-circle"></i> 选中后可编辑考核关系
+                    </span>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-outline btn-sm" onclick="showSelectionDetails()" id="viewDetailsBtn" disabled>
+                        <i class="bi bi-eye"></i>
+                        查看选中详情
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="batchReject()" id="batchRejectBtn" disabled>
+                        <i class="bi bi-x-lg"></i>
+                        批量退回
+                    </button>
+                </div>
+            </div>
+
+            <!-- Survey List -->
+            <div class="survey-list" id="surveyList">
+                <!-- Dynamic content will be rendered here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Action Bar -->
+    <div class="bottom-action-bar" id="bottomActionBar">
+        <div class="bottom-action-info">
+            已选择 <strong id="bottomSurveyCount">0</strong> 个调研，
+            <strong id="bottomSubjectCount">0</strong> 位被评估人，
+            <strong id="bottomEvaluatorCount">0</strong> 位评估人（去重）
+        </div>
+        <div class="bottom-actions">
+            <button class="btn btn-success" onclick="batchApproveImmediate()">
+                <i class="bi bi-lightning-charge"></i>
+                审核通过并立即推送
+            </button>
+            <button class="btn btn-purple" onclick="batchApproveBatch()">
+                <i class="bi bi-collection"></i>
+                审核通过并加入待推送池
+            </button>
+            <button class="btn btn-danger" onclick="batchRejectFromBottom()">
+                <i class="bi bi-x-lg"></i>
+                退回修改
+            </button>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal-overlay" id="rejectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="bi bi-x-circle text-danger"></i> 退回调研</h3>
+                <button class="modal-close" onclick="closeRejectModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="reject-reason-input">
+                    <textarea class="textarea-input" id="rejectReasonInput" placeholder="请输入退回原因，例如：评估人关系不完整、被评估人信息有误等"></textarea>
+                </div>
+                <p class="reject-hint">退回后发起人将收到通知并可以修改后重新提交</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeRejectModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmReject()">确认退回</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Evaluator Modal -->
+    <div class="modal-overlay" id="addEvaluatorModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="bi bi-person-plus"></i> 添加评估人</h3>
+                <button class="modal-close" onclick="closeAddEvaluatorModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="evaluator-filter">
+                    <div class="filter-row">
+                        <div class="filter-input-group">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="evaluatorSearchInput" placeholder="搜索姓名、部门..." oninput="filterEvaluators()">
+                        </div>
+                        <select id="deptFilter" class="filter-select" onchange="filterEvaluators()">
+                            <option value="">全部部门</option>
+                            <option value="技术部">技术部</option>
+                            <option value="产品部">产品部</option>
+                            <option value="设计部">设计部</option>
+                            <option value="运营部">运营部</option>
+                            <option value="市场部">市场部</option>
+                            <option value="HR">HR</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="evaluator-list-container">
+                    <div id="evaluatorList" class="evaluator-grid">
+                        <!-- 员工列表将在这里渲染 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selection Detail Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="bi bi-list-check"></i> 选中调研详情</h3>
+                <button class="modal-close" onclick="closeDetailModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-list" id="detailList">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Render sidebar - 与 survey-list.html 保持一致
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item active" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        // State
+        let surveys = [];
+        let selectedSurveyIds = new Set();
+        let rejectCallback = null;
+
+        // Scene mapping
+        const sceneMap = {
+            promotion: { name: '晋升评估', class: 'scene-promotion', dimensions: ['专业能力', '领导力', '文化契合', '发展潜力', '跨团队协作'] },
+            probation: { name: '转正评估', class: 'scene-probation', dimensions: ['岗位胜任', '团队协作', '学习成长', '文化融入', '工作态度'] },
+            newleader: { name: '新Leader考察', class: 'scene-newleader', dimensions: ['管理能力', '团队反馈', '业务理解', '沟通协作', '决策能力'] },
+            performance: { name: '绩效考核', class: 'scene-performance', dimensions: ['目标达成', '协作能力', '价值观践行', '创新能力', '执行效率'] }
+        };
+        
+        // 关系类型定义 - 支持自定义名称
+        const RELATION_TYPES = {
+            up: { key: 'up', label: '上级', icon: '↑', color: '#1e40af', description: '直属领导或更高层级管理者' },
+            peer: { key: 'peer', label: '平级', icon: '↔', color: '#065f46', description: '同部门或跨部门同级别同事' },
+            down: { key: 'down', label: '下级', icon: '↓', color: '#9a3412', description: '直接下属或团队成员' },
+            cross_dept: { key: 'cross_dept', label: '横向部门', icon: '⛔', color: '#7c3aed', description: '其他部门高层或跨部门协作者' },
+            hr_partner: { key: 'hr_partner', label: 'HRBP', icon: '♥', color: '#db2777', description: 'HR业务伙伴' },
+            project_lead: { key: 'project_lead', label: '项目负责人', icon: '◆', color: '#0369a1', description: '核心项目负责人' },
+            external: { key: 'external', label: '外部客户', icon: '☆', color: '#666666', description: '外部客户或合作方' }
+        };
+        
+        // 获取关系类型配置
+        function getEvaluatorRelations(scene) {
+            const sceneConfigs = {
+                promotion: [
+                    { type: 'up', label: '直属Leader' },
+                    { type: 'cross_dept', label: '跨部门高层' },
+                    { type: 'peer', label: '同仁互评' },
+                    { type: 'hr_partner', label: 'HRBP评价' }
+                ],
+                probation: [
+                    { type: 'up', label: '直属Leader' },
+                    { type: 'peer', label: '师傅/平级' },
+                    { type: 'hr_partner', label: 'HRBP评价' }
+                ],
+                newleader: [
+                    { type: 'up', label: '上级VP' },
+                    { type: 'cross_dept', label: '协作部门负责人' },
+                    { type: 'peer', label: '其他Leader' },
+                    { type: 'down', label: '团队成员反馈' },
+                    { type: 'hr_partner', label: 'HRBP评价' }
+                ],
+                performance: [
+                    { type: 'up', label: '直属Leader' },
+                    { type: 'peer', label: '同仁互评' },
+                    { type: 'project_lead', label: '项目负责人' }
+                ]
+            };
+            return sceneConfigs[scene] || [
+                { type: 'up', label: '上级' },
+                { type: 'peer', label: '平级' },
+                { type: 'down', label: '下级' }
+            ];
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderSidebar();
+            loadSurveys();
+            renderSurveyList();
+            updateSelectionUI();
+            
+            // Select all checkbox
+            document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+                if (this.checked) {
+                    surveys.forEach(s => selectedSurveyIds.add(s.id));
+                } else {
+                    selectedSurveyIds.clear();
+                }
+                renderSurveyList();
+                updateSelectionUI();
+            });
+        });
+
+        // Get URL parameter
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Load surveys from localStorage
+        function loadSurveys() {
+            try {
+                // Loading pending reviews...
+                
+                // 优先使用 DataStore 的数据，确保与列表页一致
+                if (typeof DataStore !== 'undefined') {
+                    // 初始化 Demo 数据（强制刷新确保更新）
+                    DataStore.initDemoData(true); // forceRefresh = true
+                    // 获取待审核列表
+                    surveys = DataStore.getPendingReviews();
+                    // Loaded surveys from DataStore
+                } else {
+                    // Fallback: 使用 localStorage
+                    const allReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+                    surveys = allReviews.filter(r => r.status === 'pending_review');
+                }
+                
+                // 如果没有待审核数据，使用内置数据作为后备
+                if (surveys.length === 0) {
+                    // No pending data, using default
+                    surveys = getDemoSurveys();
+                    // 保存到 localStorage
+                    localStorage.setItem('myPendingReviews', JSON.stringify(surveys));
+                }
+                
+                // 如果URL中有surveyId，默认选中该调研
+                const preselectId = getUrlParam('surveyId');
+                if (preselectId) {
+                    const targetSurvey = surveys.find(s => s.id === preselectId);
+                    if (targetSurvey) {
+                        selectedSurveyIds.add(preselectId);
+                        // Default selected survey
+                    }
+                }
+                
+                // Final loaded surveys count
+            } catch (e) {
+                // Error loading data
+                surveys = getDemoSurveys();
+            }
+        }
+
+        // Get demo surveys - 与 demo-data.js createPendingReviewStory 保持一致
+        function getDemoSurveys() {
+            // 扩展员工池到25人，支持20+ case
+            const EMPLOYEE_POOL = [
+                // 技术部 (8人)
+                { id: 'E001', name: '张三', dept: '技术部', level: 'P7' },
+                { id: 'E002', name: '李四', dept: '技术部', level: 'P6' },
+                { id: 'E005', name: '孙七', dept: '技术部', level: 'P8' },
+                { id: 'E008', name: '郑十', dept: '技术部', level: 'P7' },
+                { id: 'E011', name: '刘明', dept: '技术部', level: 'M1' },
+                { id: 'E012', name: '黄华', dept: '技术部', level: 'P6' },
+                { id: 'E016', name: '彭磊', dept: '技术部', level: 'P7' },
+                { id: 'E017', name: '许静', dept: '技术部', level: 'P5' },
+                // 产品部 (5人)
+                { id: 'E003', name: '王五', dept: '产品部', level: 'P5' },
+                { id: 'E009', name: '钱十一', dept: '产品部', level: 'P8' },
+                { id: 'E013', name: '林小丽', dept: '产品部', level: 'P5' },
+                { id: 'E018', name: '沈洋', dept: '产品部', level: 'P6' },
+                { id: 'E019', name: '韩梅', dept: '产品部', level: 'M2' },
+                // 设计部 (4人)
+                { id: 'E004', name: '赵六', dept: '设计部', level: 'P6' },
+                { id: 'E010', name: '陈十二', dept: '设计部', level: 'P5' },
+                { id: 'E020', name: '杨青', dept: '设计部', level: 'P7' },
+                { id: 'E021', name: '朱雪', dept: '设计部', level: 'P5' },
+                // 运营部 (4人)
+                { id: 'E006', name: '周八', dept: '运营部', level: 'P5' },
+                { id: 'E014', name: '何伟', dept: '运营部', level: 'P7' },
+                { id: 'E022', name: '秦朝', dept: '运营部', level: 'P6' },
+                { id: 'E023', name: '叶卉', dept: '运营部', level: 'P5' },
+                // 市场部 (4人)
+                { id: 'E007', name: '吴九', dept: '市场部', level: 'P6' },
+                { id: 'E015', name: '高强', dept: '市场部', level: 'P6' },
+                { id: 'E024', name: '田亚', dept: '市场部', level: 'P5' },
+                { id: 'E025', name: '范雨', dept: '市场部', level: 'M1' }
+            ];
+            
+            // 场景配置 - 支持自定义关系类型
+            const SCENE_CONFIG = {
+                promotion: { 
+                    name: '晋升评估', 
+                    icon: '🔷',
+                    relations: [
+                        { type: 'up', count: 1 },
+                        { type: 'cross_dept', count: 2 },
+                        { type: 'peer', count: 3 },
+                        { type: 'hr_partner', count: 1 }
+                    ]
+                },
+                newleader: { 
+                    name: '新Leader考察', 
+                    icon: '🔶',
+                    relations: [
+                        { type: 'up', count: 1 },
+                        { type: 'cross_dept', count: 2 },
+                        { type: 'peer', count: 2 },
+                        { type: 'down', count: 3 },
+                        { type: 'hr_partner', count: 1 }
+                    ]
+                },
+                performance: { 
+                    name: '绩效考核', 
+                    icon: '📊',
+                    relations: [
+                        { type: 'up', count: 1 },
+                        { type: 'peer', count: 2 },
+                        { type: 'project_lead', count: 1 }
+                    ]
+                }
+            };
+            
+            // 高级评估人池 - 带完整信息
+            const EVALUATOR_POOL = [
+                { id: 'V001', name: '王技术VP', dept: '技术部', level: 'M3', title: '技术VP', empId: 'T001' },
+                { id: 'V002', name: '李架构师', dept: '技术部', level: 'P8', title: '首席架构师', empId: 'T002' },
+                { id: 'V003', name: '张技术总监', dept: '技术部', level: 'M2', title: '技术总监', empId: 'T003' },
+                { id: 'V004', name: '刘前端专家', dept: '技术部', level: 'P7', title: '高级前端工程师', empId: 'T004' },
+                { id: 'V005', name: '陈后端专家', dept: '技术部', level: 'P7', title: '高级后端工程师', empId: 'T005' },
+                { id: 'V006', name: '郑产品VP', dept: '产品部', level: 'M3', title: '产品VP', empId: 'P001' },
+                { id: 'V007', name: '黄产品总监', dept: '产品部', level: 'M2', title: '产品总监', empId: 'P002' },
+                { id: 'V008', name: '赵高级PM', dept: '产品部', level: 'P7', title: '高级产品经理', empId: 'P003' },
+                { id: 'V009', name: '钱PM', dept: '产品部', level: 'P6', title: '产品经理', empId: 'P004' },
+                { id: 'V010', name: '孙设计VP', dept: '设计部', level: 'M3', title: '设计VP', empId: 'D001' },
+                { id: 'V011', name: '刘HRD', dept: 'HR', level: 'M3', title: 'HRD', empId: 'H001' },
+                { id: 'V012', name: '陈HRBP', dept: 'HR', level: 'M2', title: '高级HRBP', empId: 'H002' },
+                { id: 'V013', name: '李项目总监', dept: '技术部', level: 'M2', title: '项目总监', empId: 'J001' }
+            ];
+            
+            function createSubject(employee, scene) {
+                const config = SCENE_CONFIG[scene];
+                let idx = 0;
+                const evaluators = {};
+                
+                // 按配置的关系类型分配评估人
+                config.relations.forEach(rel => {
+                    evaluators[rel.type] = Array(rel.count).fill(0).map((_, i) => ({
+                        ...EVALUATOR_POOL[(idx++) % EVALUATOR_POOL.length],
+                        relation: rel.type
+                    }));
+                });
+                
+                return {
+                    ...employee,
+                    evaluators
+                };
+            }
+            
+            const now = new Date();
+            const daysAgo = (n) => new Date(now - n * 86400000);
+            const daysFromNow = (n) => new Date(now + n * 86400000);
+            const formatDate = (d) => d.toISOString().split('T')[0];
+            
+            function getUrgency(deadline) {
+                const days = Math.ceil((new Date(deadline) - now) / 86400000);
+                if (days < 3) return { level: 'urgent', class: 'deadline-urgent', text: days + '天后截止' };
+                if (days < 7) return { level: 'warning', class: 'deadline-warning', text: days + '天后截止' };
+                return { level: 'normal', class: 'normal', text: days + '天后截止' };
+            }
+            
+            // 创建与 demo-data.js 一致的12个待审核调研
+            // 使用员工池创建演示数据
+            const EMPLOYEE_POOL_LOCAL = [
+                { id: 'E001', name: '张三', dept: '技术部', level: 'P7' },
+                { id: 'E002', name: '李四', dept: '技术部', level: 'P6' },
+                { id: 'E003', name: '王五', dept: '产品部', level: 'P5' },
+                { id: 'E004', name: '赵六', dept: '设计部', level: 'P6' },
+                { id: 'E005', name: '孙七', dept: '技术部', level: 'P8' },
+                { id: 'E006', name: '周八', dept: '运营部', level: 'P5' },
+                { id: 'E007', name: '吴九', dept: '市场部', level: 'P6' },
+                { id: 'E008', name: '郑十', dept: '技术部', level: 'P7' },
+                { id: 'E009', name: '钱十一', dept: '产品部', level: 'P8' },
+                { id: 'E010', name: '陈十二', dept: '设计部', level: 'P5' },
+                { id: 'E011', name: '刘明', dept: '技术部', level: 'M1' },
+                { id: 'E012', name: '黄华', dept: '技术部', level: 'P6' }
+            ];
+            
+            return Array.from({length: 12}, (_, index) => {
+                const scene = ['promotion', 'newleader', 'performance'][index % 3];
+                const config = SCENE_CONFIG[scene];
+                const subject = createSubject(EMPLOYEE_POOL_LOCAL[(index + 8) % EMPLOYEE_POOL_LOCAL.length], scene);
+                // 计算总评估人数（新版配置）
+                const evalCount = config.relations.reduce((sum, rel) => sum + rel.count, 0);
+                const deadline = daysFromNow(14);
+                
+                return {
+                    id: `survey_pending_${index}`,
+                    title: `${subject.name}-${config.name}`,
+                    scene: scene,
+                    sceneName: config.name,
+                    sceneIcon: config.icon,
+                    submittedBy: 'current_user',
+                    submittedAt: formatDate(daysAgo(1)),
+                    status: 'pending_review',
+                    statusText: '待审核',
+                    subjects: [subject],
+                    subjectCount: 1,
+                    evaluatorCount: evalCount,
+                    submittedCount: 0,
+                    progress: 0,
+                    createdAt: formatDate(daysAgo(3)),
+                    deadline: formatDate(deadline),
+                    urgency: getUrgency(deadline),
+                    hasReport: false
+                };
+            });
+        }
+
+        // Render survey list
+        function renderSurveyList() {
+            const container = document.getElementById('surveyList');
+            
+            if (surveys.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <div class="empty-title">暂无待审核调研</div>
+                        <div class="empty-text">当前没有需要审核的调研，请稍后再来</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = surveys.map(survey => {
+                const isSelected = selectedSurveyIds.has(survey.id);
+                const subjectCount = survey.subjects ? survey.subjects.length : 0;
+                // 动态计算所有关系类型的评估人总数
+                const evaluatorCount = survey.subjects ? survey.subjects.reduce((sum, s) => {
+                    if (!s.evaluators) return sum;
+                    return sum + Object.values(s.evaluators).reduce((relSum, evalList) => 
+                        relSum + (evalList?.length || 0), 0);
+                }, 0) : 0;
+                
+                const sceneInfo = sceneMap[survey.scene] || { name: '其他', class: '', dimensions: [] };
+                const dimensionTags = sceneInfo.dimensions.map(d => `<span class="category-tag">${d}</span>`).join('');
+                
+                return `
+                    <div class="survey-item ${isSelected ? 'selected' : ''}" data-id="${survey.id}">
+                        <div class="survey-content">
+                            <!-- 左侧：基本信息 -->
+                            <div class="survey-left">
+                                <input type="checkbox" 
+                                       class="survey-checkbox" 
+                                       ${isSelected ? 'checked' : ''} 
+                                       onclick="event.stopPropagation(); toggleSelect('${survey.id}')">
+                                <div class="survey-info">
+                                    <div class="survey-title-row">
+                                        <span class="survey-title">${survey.title || '未命名调研'}</span>
+                                        <span class="scene-tag ${sceneInfo.class}">${sceneInfo.name}</span>
+                                    </div>
+                                    <div class="survey-meta">
+                                        <span><i class="bi bi-person"></i> ${survey.submittedBy || '未知'}</span>
+                                        <span><i class="bi bi-clock"></i> ${formatDate(survey.submittedAt)}</span>
+                                    </div>
+                                    <div class="template-info">
+                                        <span class="template-label">模板：</span>
+                                        <span class="template-name">${sceneInfo.name}</span>
+                                        <span class="template-label">分类：</span>
+                                        <div class="category-list">${dimensionTags}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 中间：考核关系平铺 -->
+                            <div class="survey-relations">
+                                ${renderRelationsCompact(survey.subjects, survey.id, isSelected, survey.scene)}
+                            </div>
+                            
+                            <!-- 右侧：统计 -->
+                            <div class="survey-right">
+                                <div class="stat-badge">
+                                    <div class="stat-value-small">${subjectCount}</div>
+                                    <div class="stat-label-small">被评估人</div>
+                                </div>
+                                <div class="stat-badge">
+                                    <div class="stat-value-small">${evaluatorCount}</div>
+                                    <div class="stat-label-small">评估人</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render relations compact (inline for PC view)
+        function renderRelationsCompact(subjects, surveyId, isEditable, scene) {
+            if (!subjects || subjects.length === 0) {
+                return '<div style="color: var(--gray-400); font-size: 0.75rem; padding: 0.5rem 0;">暂无被评估人信息</div>';
+            }
+            
+            // 获取该场景的关系类型配置
+            const relations = scene ? getEvaluatorRelations(scene) : [
+                { type: 'up', label: '上级' },
+                { type: 'peer', label: '平级' },
+                { type: 'down', label: '下级' }
+            ];
+            
+            return subjects.map(subject => {
+                const addBtn = (relationType, label) => isEditable ? `
+                    <button class="add-evaluator-btn" onclick="openAddEvaluatorModal('${subject.id}', '${relationType}', '${surveyId}')" title="添加${label}">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                ` : '';
+                
+                // 动态渲染关系列
+                const relationColumns = relations.map(rel => {
+                    const relationType = rel.type;
+                    const label = rel.label || RELATION_TYPES[relationType]?.label || relationType;
+                    const typeConfig = RELATION_TYPES[relationType] || RELATION_TYPES.peer;
+                    const count = subject.evaluators?.[relationType]?.length || 0;
+                    const color = typeConfig.color || '#666';
+                    
+                    return `
+                        <div class="matrix-col-inline">
+                            <div class="matrix-col-header">
+                                <span style="color: ${color}; font-size: 0.75rem; margin-right: 0.25rem;">${typeConfig.icon}</span>
+                                <span style="color: ${color}; font-weight: 600;">${label}</span>
+                                <span style="color: var(--gray-400); font-size: 0.625rem;">(${count})</span>
+                                ${addBtn(relationType, label)}
+                            </div>
+                            <div class="evaluator-tags-inline">
+                                ${renderEvaluatorTagsCompact(subject.evaluators?.[relationType] || [], subject.id, relationType, surveyId, isEditable)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                return `
+                    <div class="subject-relation-row">
+                        <div class="subject-info-compact">
+                            <div class="mini-avatar">${subject.name.charAt(0)}</div>
+                            <div>
+                                <div class="subject-name-compact">${subject.name}</div>
+                                <div class="subject-meta-compact">${subject.dept || '未知部门'} · ${subject.level || '未知职级'}</div>
+                            </div>
+                        </div>
+                        <div class="evaluator-matrix-inline" style="grid-template-columns: repeat(${relations.length}, 1fr); display: grid; gap: 0.75rem;">
+                            ${relationColumns}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Render evaluator tags compact with edit capability
+        function renderEvaluatorTagsCompact(evaluators, subjectId, relationType, surveyId, isEditable) {
+            if (evaluators.length === 0) {
+                return '<span style="color: var(--gray-400); font-size: 0.625rem;">-</span>';
+            }
+            return evaluators.map((e, index) => {
+                const title = e.title || e.role || '';
+                const level = e.level || '';
+                const empId = e.empId || '';
+                const dept = e.dept || '未知部门';
+                
+                // 构建详细的tooltip内容
+                const tooltipContent = [
+                    e.name,
+                    title ? `岗位：${title}` : '',
+                    level ? `职级：${level}` : '',
+                    dept ? `部门：${dept}` : '',
+                    empId ? `工号：${empId}` : ''
+                ].filter(Boolean).join(' | ');
+                
+                return `
+                <span class="evaluator-tag-inline ${isEditable ? 'evaluator-editable' : ''}" 
+                      title="${tooltipContent}"
+                      onmouseenter="${isEditable ? `showEvaluatorTooltipDetail(this, '${e.name}', '${title}', '${level}', '${dept}', '${empId}')` : ''}"
+                      onmouseleave="hideEvaluatorTooltip()">
+                    <span class="evaluator-avatar-inline">${e.name.charAt(0)}</span>
+                    <span class="evaluator-info">
+                        <span class="evaluator-name">${e.name}</span>
+                        ${title ? `<span class="evaluator-title">${title}</span>` : ''}
+                    </span>
+                    ${isEditable ? `<i class="bi bi-x-circle-fill evaluator-remove" 
+                       onclick="event.stopPropagation(); removeEvaluator('${surveyId}', '${subjectId}', '${relationType}', ${index})"
+                       title="移除该评估人"></i>` : ''}
+                </span>
+            `}).join('');
+        }
+        
+        // Enhanced Tooltip with full info
+        function showEvaluatorTooltipDetail(element, name, title, level, dept, empId) {
+            hideEvaluatorTooltip();
+            const tooltip = document.createElement('div');
+            tooltip.id = 'evaluator-tooltip';
+            tooltip.className = 'evaluator-tooltip evaluator-tooltip-detail';
+            tooltip.innerHTML = `
+                <div class="tooltip-header">
+                    <div class="tooltip-avatar">${name.charAt(0)}</div>
+                    <div class="tooltip-header-info">
+                        <div class="tooltip-name">${name}</div>
+                        ${title ? `<div class="tooltip-title">${title}</div>` : ''}
+                    </div>
+                </div>
+                <div class="tooltip-body">
+                    ${level ? `<div class="tooltip-row"><span class="tooltip-label">职级：</span><span class="tooltip-value">${level}</span></div>` : ''}
+                    ${dept ? `<div class="tooltip-row"><span class="tooltip-label">部门：</span><span class="tooltip-value">${dept}</span></div>` : ''}
+                    ${empId ? `<div class="tooltip-row"><span class="tooltip-label">工号：</span><span class="tooltip-value">${empId}</span></div>` : ''}
+                </div>
+            `;
+            document.body.appendChild(tooltip);
+            
+            const rect = element.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            // 确保tooltip不会超出屏幕右侧
+            let left = rect.left;
+            if (left + tooltipRect.width > window.innerWidth) {
+                left = window.innerWidth - tooltipRect.width - 10;
+            }
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = (rect.bottom + 8) + 'px';
+        }
+        
+        function hideEvaluatorTooltip() {
+            const tooltip = document.getElementById('evaluator-tooltip');
+            if (tooltip) tooltip.remove();
+        }
+        
+        // Remove evaluator
+        function removeEvaluator(surveyId, subjectId, relationType, index) {
+            const survey = surveys.find(s => s.id === surveyId);
+            if (!survey) return;
+            
+            const subject = survey.subjects.find(s => s.id === subjectId);
+            if (!subject || !subject.evaluators[relationType]) return;
+            
+            const evaluatorName = subject.evaluators[relationType][index]?.name || '评估人';
+            
+            if (confirm(`确定移除"${evaluatorName}"${relationType === 'up' ? '上级' : relationType === 'peer' ? '平级' : '下级'}评估人身份？`)) {
+                subject.evaluators[relationType].splice(index, 1);
+                
+                // Save changes
+                saveSurveyChanges(survey);
+                
+                renderSurveyList();
+                updateSelectionUI();
+                
+                // Auto reselect the survey
+                selectedSurveyIds.add(surveyId);
+                renderSurveyList();
+                updateSelectionUI();
+            }
+        }
+        
+        // Save survey changes to localStorage
+        function saveSurveyChanges(survey) {
+            // Update in surveys array
+            const idx = surveys.findIndex(s => s.id === survey.id);
+            if (idx !== -1) {
+                surveys[idx] = survey;
+            }
+            
+            // Update in localStorage via DataStore if available
+            if (typeof DataStore !== 'undefined' && DataStore.updateSurvey) {
+                DataStore.updateSurvey(survey);
+            } else {
+                // Fallback: update localStorage directly
+                const allSurveys = JSON.parse(localStorage.getItem('surveys') || '[]');
+                const storedIdx = allSurveys.findIndex(s => s.id === survey.id);
+                if (storedIdx !== -1) {
+                    allSurveys[storedIdx] = survey;
+                    localStorage.setItem('surveys', JSON.stringify(allSurveys));
+                }
+            }
+        }
+
+        // Render subject details (for modal - keep original)
+        function renderSubjectDetails(subjects) {
+            if (!subjects || subjects.length === 0) {
+                return '<div style="color: var(--gray-500); font-size: 0.875rem;">暂无被评估人信息</div>';
+            }
+            
+            return subjects.map(subject => {
+                const upCount = subject.evaluators?.up?.length || 0;
+                const peerCount = subject.evaluators?.peer?.length || 0;
+                const downCount = subject.evaluators?.down?.length || 0;
+                
+                return `
+                    <div class="subject-item">
+                        <div class="subject-header-info">
+                            <div class="avatar">${subject.name.charAt(0)}</div>
+                            <div class="subject-name-info">
+                                <h5>${subject.name}</h5>
+                                <p>${subject.dept || '未知部门'} · ${subject.level || '未知职级'}</p>
+                            </div>
+                        </div>
+                        <div class="evaluator-matrix">
+                            <div class="matrix-column">
+                                <div class="matrix-header">
+                                    <i class="bi bi-arrow-up-circle-fill" style="color: #1e40af;"></i>
+                                    上级 (${upCount}人)
+                                </div>
+                                <div class="evaluator-list">
+                                    ${renderEvaluatorTags(subject.evaluators?.up || [])}
+                                </div>
+                            </div>
+                            <div class="matrix-column">
+                                <div class="matrix-header">
+                                    <i class="bi bi-arrow-left-right" style="color: #065f46;"></i>
+                                    平级 (${peerCount}人)
+                                </div>
+                                <div class="evaluator-list">
+                                    ${renderEvaluatorTags(subject.evaluators?.peer || [])}
+                                </div>
+                            </div>
+                            <div class="matrix-column">
+                                <div class="matrix-header">
+                                    <i class="bi bi-arrow-down-circle-fill" style="color: #9a3412;"></i>
+                                    下级 (${downCount}人)
+                                </div>
+                                <div class="evaluator-list">
+                                    ${renderEvaluatorTags(subject.evaluators?.down || [])}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render evaluator tags
+        function renderEvaluatorTags(evaluators) {
+            if (evaluators.length === 0) {
+                return '<span style="color: var(--gray-400); font-size: 0.75rem;">无</span>';
+            }
+            return evaluators.map(e => `
+                <div class="evaluator-tag">
+                    <div class="mini-avatar">${e.name.charAt(0)}</div>
+                    <span>${e.name}</span>
+                </div>
+            `).join('');
+        }
+
+        // Toggle expand (deprecated - now showing inline)
+        function toggleExpand(surveyId) {
+            // 已废弃，考核关系现在平铺展示
+            console.log('考核关系已平铺展示，无需点击展开');
+        }
+        
+        // ==================== Add Evaluator Modal ====================
+        let currentEditingSurveyId = null;
+        let currentEditingSubjectId = null;
+        let currentEditingRelationType = null;
+        let selectedEvaluator = null;
+        
+        // Employee pool for selection
+        // 员工池 - 包含完整基础信息
+        const EMPLOYEE_POOL_FOR_EDIT = [
+            // 技术部 - 高层管理者
+            { id: 'V001', name: '王技术VP', dept: '技术部', level: 'M3', title: '技术VP', role: 'high_level_manager', empId: 'T001' },
+            { id: 'V002', name: '李架构师', dept: '技术部', level: 'P8', title: '首席架构师', role: 'tech_expert', empId: 'T002' },
+            { id: 'V003', name: '张技术总监', dept: '技术部', level: 'M2', title: '技术总监', role: 'manager', empId: 'T003' },
+            { id: 'V004', name: '刘前端专家', dept: '技术部', level: 'P7', title: '高级前端工程师', role: 'senior_engineer', empId: 'T004' },
+            { id: 'V005', name: '陈后端专家', dept: '技术部', level: 'P7', title: '高级后端工程师', role: 'senior_engineer', empId: 'T005' },
+            
+            // 产品部
+            { id: 'V006', name: '郑产品VP', dept: '产品部', level: 'M3', title: '产品VP', role: 'high_level_manager', empId: 'P001' },
+            { id: 'V007', name: '黄产品总监', dept: '产品部', level: 'M2', title: '产品总监', role: 'manager', empId: 'P002' },
+            { id: 'V008', name: '赵高级PM', dept: '产品部', level: 'P7', title: '高级产品经理', role: 'senior_pm', empId: 'P003' },
+            { id: 'V009', name: '钱PM', dept: '产品部', level: 'P6', title: '产品经理', role: 'pm', empId: 'P004' },
+            
+            // 设计部
+            { id: 'V010', name: '孙设计VP', dept: '设计部', level: 'M3', title: '设计VP', role: 'high_level_manager', empId: 'D001' },
+            { id: 'V011', name: '周设计总监', dept: '设计部', level: 'M2', title: '设计总监', role: 'manager', empId: 'D002' },
+            { id: 'V012', name: '吴高级设计师', dept: '设计部', level: 'P7', title: '高级交互设计师', role: 'senior_designer', empId: 'D003' },
+            
+            // 运营部
+            { id: 'V013', name: '郑运营VP', dept: '运营部', level: 'M3', title: '运营VP', role: 'high_level_manager', empId: 'O001' },
+            { id: 'V014', name: '王运营总监', dept: '运营部', level: 'M2', title: '运营总监', role: 'manager', empId: 'O002' },
+            { id: 'V015', name: '胡运营专家', dept: '运营部', level: 'P7', title: '高级运营经理', role: 'senior_ops', empId: 'O003' },
+            
+            // 市场部
+            { id: 'V016', name: '林市场VP', dept: '市场部', level: 'M3', title: '市场VP', role: 'high_level_manager', empId: 'M001' },
+            { id: 'V017', name: '何市场总监', dept: '市场部', level: 'M2', title: '市场总监', role: 'manager', empId: 'M002' },
+            { id: 'V018', name: '郑市场专家', dept: '市场部', level: 'P7', title: '高级市场经理', role: 'senior_marketing', empId: 'M003' },
+            
+            // HR部
+            { id: 'V019', name: '刘HRD', dept: 'HR', level: 'M3', title: 'HRD', role: 'hr_director', empId: 'H001' },
+            { id: 'V020', name: '陈HRBP', dept: 'HR', level: 'M2', title: '高级HRBP', role: 'hrbp', empId: 'H002' },
+            { id: 'V021', name: '黄HRBP', dept: 'HR', level: 'P7', title: 'HRBP', role: 'hrbp', empId: 'H003' },
+            
+            // 项目管理
+            { id: 'V022', name: '李项目总监', dept: '技术部', level: 'M2', title: '项目总监', role: 'project_manager', empId: 'J001' },
+            { id: 'V023', name: '周PMO', dept: '技术部', level: 'P7', title: 'PMO专家', role: 'pmo', empId: 'J002' },
+            
+            // 外部/其他
+            { id: 'V024', name: '孙大客户', dept: '外部', level: '-', title: '重点客户代表', role: 'external_client', empId: 'E001' },
+            { id: 'V025', name: '吴合作伙伴', dept: '外部', level: '-', title: '战略合作伙伴', role: 'external_partner', empId: 'E002' }
+        ];
+        
+        function openAddEvaluatorModal(subjectId, relationType, surveyId) {
+            currentEditingSurveyId = surveyId;
+            currentEditingSubjectId = subjectId;
+            currentEditingRelationType = relationType;
+            selectedEvaluator = null;
+            
+            const typeConfig = RELATION_TYPES[relationType] || { label: relationType };
+            document.querySelector('#addEvaluatorModal .modal-header h3').innerHTML = 
+                `<i class="bi bi-person-plus"></i> 添加${typeConfig.label}评估人`;
+            
+            document.getElementById('evaluatorSearchInput').value = '';
+            document.getElementById('deptFilter').value = '';
+            
+            renderEvaluatorList(EMPLOYEE_POOL_FOR_EDIT);
+            document.getElementById('addEvaluatorModal').classList.add('show');
+        }
+        
+        function closeAddEvaluatorModal() {
+            document.getElementById('addEvaluatorModal').classList.remove('show');
+            currentEditingSurveyId = null;
+            currentEditingSubjectId = null;
+            currentEditingRelationType = null;
+            selectedEvaluator = null;
+        }
+        
+        function filterEvaluators() {
+            const search = document.getElementById('evaluatorSearchInput').value.toLowerCase();
+            const dept = document.getElementById('deptFilter').value;
+            
+            const filtered = EMPLOYEE_POOL_FOR_EDIT.filter(e => {
+                const matchSearch = e.name.toLowerCase().includes(search) || 
+                                   e.dept.toLowerCase().includes(search) ||
+                                   (e.title && e.title.toLowerCase().includes(search)) ||
+                                   (e.level && e.level.toLowerCase().includes(search)) ||
+                                   (e.empId && e.empId.toLowerCase().includes(search));
+                const matchDept = !dept || e.dept === dept;
+                return matchSearch && matchDept;
+            });
+            
+            renderEvaluatorList(filtered);
+        }
+        
+        function renderEvaluatorList(employees) {
+            const container = document.getElementById('evaluatorList');
+            
+            if (employees.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--gray-400); padding: 2rem;">未找到匹配的员工</div>';
+                return;
+            }
+            
+            container.innerHTML = employees.map(emp => {
+                const title = emp.title || '';
+                const level = emp.level || '';
+                const empId = emp.empId || '';
+                const roleBadge = emp.role ? getRoleBadge(emp.role) : '';
+                
+                return `
+                <div class="evaluator-option ${selectedEvaluator?.id === emp.id ? 'selected' : ''}" 
+                     onclick="selectEvaluator('${emp.id}', '${emp.name}', '${emp.dept}', '${emp.title || ''}', '${emp.level || ''}', '${emp.empId || ''}')">
+                    <div class="evaluator-option-avatar">${emp.name.charAt(0)}</div>
+                    <div class="evaluator-option-info">
+                        <div class="evaluator-option-name">
+                            ${emp.name}
+                            ${roleBadge}
+                        </div>
+                        <div class="evaluator-option-dept">
+                            ${emp.dept} ${level ? '· ' + level : ''}
+                            ${title ? ' · ' + title : ''}
+                        </div>
+                        ${empId ? `<div class="evaluator-option-empid">工号：${empId}</div>` : ''}
+                    </div>
+                    <i class="bi bi-check-circle-fill evaluator-option-check"></i>
+                </div>
+            `}).join('');
+        }
+        
+        // 获取角色标签
+        function getRoleBadge(role) {
+            const roleMap = {
+                high_level_manager: { label: '高层', color: '#dc2626' },
+                manager: { label: '管理', color: '#ea580c' },
+                tech_expert: { label: '专家', color: '#7c3aed' },
+                senior_engineer: { label: '高级', color: '#2563eb' },
+                hrbp: { label: 'HR', color: '#db2777' },
+                hrd: { label: 'HRD', color: '#be185d' },
+                project_manager: { label: 'PM', color: '#0891b2' },
+                external_client: { label: '客户', color: '#4b5563' },
+                external_partner: { label: '合作', color: '#6b7280' }
+            };
+            const config = roleMap[role];
+            if (!config) return '';
+            return `<span class="role-badge" style="background: ${config.color}20; color: ${config.color}; border: 1px solid ${config.color}40;">${config.label}</span>`;
+        }
+        
+        function selectEvaluator(id, name, dept, title, level, empId) {
+            selectedEvaluator = { id, name, dept, title, level, empId };
+            renderEvaluatorList(document.getElementById('evaluatorSearchInput').value || document.getElementById('deptFilter').value 
+                ? EMPLOYEE_POOL_FOR_EDIT.filter(e => {
+                    const search = document.getElementById('evaluatorSearchInput').value.toLowerCase();
+                    const deptFilter = document.getElementById('deptFilter').value;
+                    return (e.name.toLowerCase().includes(search) || e.dept.toLowerCase().includes(search)) &&
+                           (!deptFilter || e.dept === deptFilter);
+                  })
+                : EMPLOYEE_POOL_FOR_EDIT);
+            
+            // Auto confirm after selection with small delay
+            setTimeout(() => {
+                confirmAddEvaluator();
+            }, 200);
+        }
+        
+        function confirmAddEvaluator() {
+            if (!selectedEvaluator || !currentEditingSubjectId || !currentEditingRelationType || !currentEditingSurveyId) {
+                return;
+            }
+            
+            const survey = surveys.find(s => s.id === currentEditingSurveyId);
+            if (!survey) return;
+            
+            const subject = survey.subjects.find(s => s.id === currentEditingSubjectId);
+            if (!subject) return;
+            
+            // Check if already exists
+            const exists = subject.evaluators[currentEditingRelationType].some(e => e.id === selectedEvaluator.id);
+            if (exists) {
+                alert('该员工已是该关系的评估人');
+                return;
+            }
+            
+            // Add evaluator with full info
+            subject.evaluators[currentEditingRelationType].push({
+                id: selectedEvaluator.id,
+                name: selectedEvaluator.name,
+                dept: selectedEvaluator.dept,
+                title: selectedEvaluator.title || '',
+                level: selectedEvaluator.level || '',
+                empId: selectedEvaluator.empId || '',
+                relation: currentEditingRelationType
+            });
+            
+            // Save changes
+            saveSurveyChanges(survey);
+            
+            closeAddEvaluatorModal();
+            renderSurveyList();
+            updateSelectionUI();
+            
+            // Reselect the survey
+            selectedSurveyIds.add(currentEditingSurveyId);
+            renderSurveyList();
+            updateSelectionUI();
+        }
+
+        // Toggle select
+        function toggleSelect(surveyId) {
+            if (selectedSurveyIds.has(surveyId)) {
+                selectedSurveyIds.delete(surveyId);
+            } else {
+                selectedSurveyIds.add(surveyId);
+            }
+            renderSurveyList();
+            updateSelectionUI();
+        }
+
+        // Select all surveys
+        function selectAllSurveys() {
+            surveys.forEach(s => selectedSurveyIds.add(s.id));
+            document.getElementById('selectAllCheckbox').checked = true;
+            renderSurveyList();
+            updateSelectionUI();
+        }
+
+        // Update selection UI
+        function updateSelectionUI() {
+            const count = selectedSurveyIds.size;
+            const totalSurveys = surveys.length;
+            
+            // Update select all checkbox
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (count === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (count === totalSurveys) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+            
+            // Update toolbar
+            document.getElementById('toolbarSelectedCount').textContent = `已选择 ${count} 个`;
+            document.getElementById('viewDetailsBtn').disabled = count === 0;
+            document.getElementById('batchRejectBtn').disabled = count === 0;
+            
+            // Update edit hint
+            const editHint = document.getElementById('editHint');
+            if (editHint) {
+                if (count === 1) {
+                    editHint.innerHTML = '<i class="bi bi-pencil-square"></i> 已开启编辑模式，可点击 + 添加或 × 移除评估人';
+                    editHint.style.color = 'var(--primary)';
+                } else if (count > 1) {
+                    editHint.innerHTML = '<i class="bi bi-info-circle"></i> 仅选中1个时可编辑考核关系';
+                    editHint.style.color = 'var(--gray-400)';
+                } else {
+                    editHint.innerHTML = '<i class="bi bi-info-circle"></i> 选中后可编辑考核关系';
+                    editHint.style.color = 'var(--gray-400)';
+                }
+            }
+            
+            // Calculate stats
+            let subjectCount = 0;
+            const uniqueEvaluators = new Set();
+            
+            surveys.forEach(survey => {
+                if (selectedSurveyIds.has(survey.id)) {
+                    subjectCount += survey.subjects ? survey.subjects.length : 0;
+                    if (survey.subjects) {
+                        survey.subjects.forEach(subject => {
+                            ['up', 'peer', 'down'].forEach(type => {
+                                (subject.evaluators?.[type] || []).forEach(e => {
+                                    uniqueEvaluators.add(e.name);
+                                });
+                            });
+                        });
+                    }
+                }
+            });
+            
+            // Update bottom action bar
+            document.getElementById('bottomSurveyCount').textContent = count;
+            document.getElementById('bottomSubjectCount').textContent = subjectCount;
+            document.getElementById('bottomEvaluatorCount').textContent = uniqueEvaluators.size;
+            
+            // Show/hide bottom action bar
+            const bottomBar = document.getElementById('bottomActionBar');
+            if (count > 0) {
+                bottomBar.classList.add('show');
+            } else {
+                bottomBar.classList.remove('show');
+            }
+        }
+
+        // Show selection details
+        function showSelectionDetails() {
+            const selectedSurveys = surveys.filter(s => selectedSurveyIds.has(s.id));
+            const container = document.getElementById('detailList');
+            
+            container.innerHTML = selectedSurveys.map(survey => {
+                const subjectCount = survey.subjects ? survey.subjects.length : 0;
+                const sceneInfo = sceneMap[survey.scene] || { name: '其他' };
+                
+                return `
+                    <div class="detail-item">
+                        <div>
+                            <div class="detail-survey-title">${survey.title || '未命名调研'}</div>
+                            <div class="detail-survey-meta">${sceneInfo.name} · ${subjectCount}位被评估人 · ${survey.submittedBy}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('detailModal').classList.add('show');
+        }
+
+        // Close detail modal
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('show');
+        }
+
+        // Batch approve - immediate
+        function batchApproveImmediate() {
+            const selectedIds = Array.from(selectedSurveyIds);
+            if (selectedIds.length === 0) return;
+            
+            // Update status
+            updateSurveyStatus(selectedIds, 'relation_approved', { pushType: 'immediate' });
+            
+            // Redirect to step 5
+            window.location.href = `create-survey-step5.html?surveyIds=${selectedIds.join(',')}`;
+        }
+
+        // Batch approve - batch pool
+        function batchApproveBatch() {
+            const selectedIds = Array.from(selectedSurveyIds);
+            if (selectedIds.length === 0) return;
+            
+            // Update status
+            updateSurveyStatus(selectedIds, 'relation_approved', { pushType: 'batch' });
+            
+            // Redirect to pending push pool
+            window.location.href = `pending-push-pool.html?addedIds=${selectedIds.join(',')}`;
+        }
+
+        // Batch reject
+        function batchReject() {
+            rejectCallback = function(reason) {
+                const selectedIds = Array.from(selectedSurveyIds);
+                updateSurveyStatus(selectedIds, 'rejected', { rejectReason: reason });
+                
+                // Clear selection and reload
+                selectedSurveyIds.clear();
+                loadSurveys();
+                renderSurveyList();
+                updateSelectionUI();
+                
+                alert(`已退回 ${selectedIds.length} 个调研`);
+            };
+            
+            document.getElementById('rejectReasonInput').value = '';
+            document.getElementById('rejectModal').classList.add('show');
+        }
+
+        // Batch reject from bottom bar
+        function batchRejectFromBottom() {
+            batchReject();
+        }
+
+        // Confirm reject
+        function confirmReject() {
+            const reason = document.getElementById('rejectReasonInput').value.trim();
+            if (!reason) {
+                alert('请输入退回原因');
+                return;
+            }
+            
+            if (rejectCallback) {
+                rejectCallback(reason);
+            }
+            closeRejectModal();
+        }
+
+        // Close reject modal
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.remove('show');
+            rejectCallback = null;
+        }
+
+        // Update survey status
+        function updateSurveyStatus(surveyIds, status, extraData = {}) {
+            try {
+                const allReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+                
+                allReviews.forEach(review => {
+                    if (surveyIds.includes(review.id)) {
+                        review.status = status;
+                        Object.assign(review, extraData);
+                        review.reviewedAt = new Date().toISOString().split('T')[0];
+                    }
+                });
+                
+                localStorage.setItem('myPendingReviews', JSON.stringify(allReviews));
+            } catch (e) {
+                // Error updating survey status
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '未知时间';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / 86400000);
+            
+            if (days === 0) return '今天';
+            if (days === 1) return '昨天';
+            if (days < 30) return `${days}天前`;
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        // Close modals on overlay click
+        document.getElementById('rejectModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRejectModal();
+        });
+        
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDetailModal();
+        });
+        
+        document.getElementById('addEvaluatorModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddEvaluatorModal();
+        });
+    </script>
+</body>
+</html>

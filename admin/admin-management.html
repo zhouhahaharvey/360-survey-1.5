@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统管理 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <style>
+        /* Admin Stats */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .admin-stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .admin-stat-card.danger { border-left: 4px solid var(--danger); }
+        .admin-stat-card.warning { border-left: 4px solid var(--warning); }
+        .admin-stat-card.success { border-left: 4px solid var(--success); }
+        .admin-stat-card.primary { border-left: 4px solid var(--primary); }
+        
+        .admin-stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .admin-stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+        
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-200);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .filter-select, .filter-input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+        }
+        
+        .filter-select { min-width: 120px; }
+        .filter-input { width: 200px; }
+        
+        .filter-label {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+        
+        /* Section Card */
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-body {
+            padding: 1.25rem;
+        }
+        
+        /* Batch Actions Bar */
+        .batch-actions-bar {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .batch-actions-bar.show { display: flex; }
+        
+        .batch-info {
+            font-size: 0.875rem;
+            color: #1e40af;
+            font-weight: 500;
+        }
+        
+        .batch-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* Table */
+        .data-table {
+            width: 100%;
+        }
+        
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.875rem;
+        }
+        
+        .data-table tr:hover { background: var(--gray-50); }
+        .data-table tr.selected { background: #eff6ff; }
+        
+        /* Checkbox */
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--gray-300);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .custom-checkbox:hover { border-color: var(--primary); }
+        
+        .custom-checkbox.checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .custom-checkbox.checked::after {
+            content: '\\2713';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        /* Status Tags */
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-tag.running { background: #dbeafe; color: #1e40af; }
+        .status-tag.stopped { background: #fee2e2; color: #991b1b; }
+        .status-tag.completed { background: #d1fae5; color: #065f46; }
+        .status-tag.draft { background: #f3f4f6; color: #4b5563; }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+        
+        /* Action Menu */
+        .action-menu {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .info-box-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-box-text {
+            font-size: 0.875rem;
+            color: #3b82f6;
+            line-height: 1.6;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.show { display: flex; }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-body {
+            padding: 1.25rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .survey-list-preview {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .survey-list-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.875rem;
+        }
+        
+        .survey-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .admin-stats { grid-template-columns: repeat(2, 1fr); }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group { flex-wrap: wrap; }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="page-title">
+                <a href="dashboard.html" class="back-to-home">
+                    <i class="bi bi-arrow-left"></i>
+                    返回首页
+                </a>
+                <h1>系统管理</h1>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <div class="info-box-title">
+                <i class="bi bi-shield-check"></i>
+                管理员权限说明
+            </div>
+            <div class="info-box-text">
+                作为系统管理员，您可以：管理全局调研状态、批量终止进行中的调研、查看系统日志、管理用户权限。请谨慎操作，所有管理操作将被记录在审计日志中。
+            </div>
+        </div>
+
+        <!-- Admin Stats -->
+        <div class="admin-stats">
+            <div class="admin-stat-card danger">
+                <div class="admin-stat-value">3</div>
+                <div class="admin-stat-label">需要关注的异常调研</div>
+            </div>
+            <div class="admin-stat-card warning">
+                <div class="admin-stat-value">12</div>
+                <div class="admin-stat-label">近期已终止调研</div>
+            </div>
+            <div class="admin-stat-card success">
+                <div class="admin-stat-value">89%</div>
+                <div class="admin-stat-label">系统健康度</div>
+            </div>
+            <div class="admin-stat-card primary">
+                <div class="admin-stat-value">156</div>
+                <div class="admin-stat-label">本月操作日志</div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <span class="filter-label">状态：</span>
+                <select class="filter-select" id="filterStatus" onchange="applyFilters()">
+                    <option value="">全部状态</option>
+                    <option value="running">进行中</option>
+                    <option value="completed">已完成</option>
+                    <option value="stopped">已终止</option>
+                    <option value="draft">草稿</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">场景：</span>
+                <select class="filter-select" id="filterScene" onchange="applyFilters()">
+                    <option value="">全部场景</option>
+                    <option value="promotion">晋升评估</option>
+                    <option value="probation">转正评估</option>
+                    <option value="newleader">新Leader考察</option>
+                    <option value="performance">绩效考核</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">部门：</span>
+                <select class="filter-select" id="filterDept" onchange="applyFilters()">
+                    <option value="">全部部门</option>
+                    <option value="tech">技术部</option>
+                    <option value="product">产品部</option>
+                    <option value="operation">运营部</option>
+                    <option value="marketing">市场部</option>
+                    <option value="hr">人力资源部</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">时间：</span>
+                <select class="filter-select" id="filterTime" onchange="applyFilters()">
+                    <option value="">全部时间</option>
+                    <option value="today">今天</option>
+                    <option value="week">近7天</option>
+                    <option value="month">本月</option>
+                    <option value="quarter">本季度</option>
+                </select>
+            </div>
+            <div class="filter-group" style="margin-left: auto;">
+                <input type="text" class="filter-input" id="filterSearch" placeholder="搜索调研名称/ID/负责人..." oninput="applyFilters()">
+                <button class="btn btn-outline btn-sm" onclick="resetFilters()">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    重置筛选
+                </button>
+            </div>
+        </div>
+
+        <!-- Active Surveys Management -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="bi bi-lightning-charge"></i>
+                    调研管理
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="refreshData()">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    刷新
+                </button>
+            </div>
+            <div class="section-body">
+                <!-- Batch Actions Bar -->
+                <div class="batch-actions-bar" id="batchActionsBar">
+                    <span class="batch-info">
+                        <i class="bi bi-check-square-fill"></i>
+                        已选择 <strong id="selectedCount">0</strong> 个调研
+                    </span>
+                    <div class="batch-btns">
+                        <button class="btn btn-danger btn-sm" onclick="batchTerminate()">
+                            <i class="bi bi-x-octagon"></i>
+                            批量终止
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="clearSelection()">
+                            取消选择
+                        </button>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">
+                                <div class="custom-checkbox" id="selectAllCheckbox" onclick="toggleSelectAll()"></div>
+                            </th>
+                            <th>调研名称</th>
+                            <th>场景</th>
+                            <th>负责人/部门</th>
+                            <th>进度</th>
+                            <th>剩余时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="surveyTableBody">
+                        <tr data-id="SV20260325001" data-status="running" data-scene="promotion" data-dept="tech">
+                            <td>
+                                <div class="custom-checkbox" onclick="toggleRow(this, 'SV20260325001')"></div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 500;">张三晋升评估</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600);">ID: SV20260325001</div>
+                            </td>
+                            <td><span class="status-tag" style="background: #dbeafe; color: #1e40af;">晋升评估</span></td>
+                            <td>李HRBP / 技术部</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 60px; height: 6px; background: var(--gray-200); border-radius: 3px;">
+                                        <div style="width: 85%; height: 100%; background: var(--success); border-radius: 3px;"></div>
+                                    </div>
+                                    <span style="font-size: 0.75rem;">85%</span>
+                                </div>
+                            </td>
+                            <td>2天</td>
+                            <td><span class="status-tag running">进行中</span></td>
+                            <td>
+                                <div class="action-menu">
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="terminateSurvey('SV20260325001', '张三晋升评估')">
+                                        <i class="bi bi-x-octagon"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-id="SV20260325002" data-status="running" data-scene="probation" data-dept="product">
+                            <td>
+                                <div class="custom-checkbox" onclick="toggleRow(this, 'SV20260325002')"></div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 500;">王五转正评估</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600);">ID: SV20260325002</div>
+                            </td>
+                            <td><span class="status-tag" style="background: #d1fae5; color: #065f46;">转正评估</span></td>
+                            <td>王HRBP / 产品部</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 60px; height: 6px; background: var(--gray-200); border-radius: 3px;">
+                                        <div style="width: 62%; height: 100%; background: var(--warning); border-radius: 3px;"></div>
+                                    </div>
+                                    <span style="font-size: 0.75rem;">62%</span>
+                                </div>
+                            </td>
+                            <td>5天</td>
+                            <td><span class="status-tag running">进行中</span></td>
+                            <td>
+                                <div class="action-menu">
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="terminateSurvey('SV20260325002', '王五转正评估')">
+                                        <i class="bi bi-x-octagon"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-id="SV20260325003" data-status="running" data-scene="newleader" data-dept="tech">
+                            <td>
+                                <div class="custom-checkbox" onclick="toggleRow(this, 'SV20260325003')"></div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 500;">赵六新Leader考察</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600);">ID: SV20260325003</div>
+                            </td>
+                            <td><span class="status-tag" style="background: #ffedd5; color: #9a3412;">新Leader</span></td>
+                            <td>张HRBP / 技术部</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 60px; height: 6px; background: var(--gray-200); border-radius: 3px;">
+                                        <div style="width: 35%; height: 100%; background: var(--danger); border-radius: 3px;"></div>
+                                    </div>
+                                    <span style="font-size: 0.75rem;">35%</span>
+                                </div>
+                            </td>
+                            <td style="color: var(--danger);">已超期2天</td>
+                            <td><span class="status-tag warning" style="background: #fef3c7; color: #92400e;">异常</span></td>
+                            <td>
+                                <div class="action-menu">
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="terminateSurvey('SV20260325003', '赵六新Leader考察')">
+                                        <i class="bi bi-x-octagon"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-id="SV20260301001" data-status="stopped" data-scene="performance" data-dept="all">
+                            <td>
+                                <div class="custom-checkbox" onclick="toggleRow(this, 'SV20260301001')"></div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 500;">Q1绩效考核</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600);">ID: SV20260301001</div>
+                            </td>
+                            <td><span class="status-tag" style="background: #f3e8ff; color: #7c3aed;">绩效考核</span></td>
+                            <td>系统 / 全员</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 60px; height: 6px; background: var(--gray-200); border-radius: 3px;">
+                                        <div style="width: 100%; height: 100%; background: var(--gray-400); border-radius: 3px;"></div>
+                                    </div>
+                                    <span style="font-size: 0.75rem;">100%</span>
+                                </div>
+                            </td>
+                            <td>已结束</td>
+                            <td><span class="status-tag stopped">已终止</span></td>
+                            <td>
+                                <div class="action-menu">
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline btn-sm" disabled>
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-id="SV20260320001" data-status="completed" data-scene="promotion" data-dept="marketing">
+                            <td>
+                                <div class="custom-checkbox" onclick="toggleRow(this, 'SV20260320001')"></div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 500;">李四晋升评估</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600);">ID: SV20260320001</div>
+                            </td>
+                            <td><span class="status-tag" style="background: #dbeafe; color: #1e40af;">晋升评估</span></td>
+                            <td>陈HRBP / 市场部</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 60px; height: 6px; background: var(--gray-200); border-radius: 3px;">
+                                        <div style="width: 100%; height: 100%; background: var(--success); border-radius: 3px;"></div>
+                                    </div>
+                                    <span style="font-size: 0.75rem;">100%</span>
+                                </div>
+                            </td>
+                            <td>已完成</td>
+                            <td><span class="status-tag completed">已完成</span></td>
+                            <td>
+                                <div class="action-menu">
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline btn-sm" disabled>
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Admin Logs -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="bi bi-journal-text"></i>
+                    管理操作日志
+                </div>
+                <div class="filter-group">
+                    <select class="filter-select" style="min-width: 100px;">
+                        <option>全部操作</option>
+                        <option>终止调研</option>
+                        <option>修改权限</option>
+                        <option>数据导出</option>
+                    </select>
+                    <a href="#" class="btn btn-outline btn-sm">
+                        <i class="bi bi-arrow-right"></i>
+                        查看全部
+                    </a>
+                </div>
+            </div>
+            <div class="section-body">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>操作人</th>
+                            <th>操作类型</th>
+                            <th>对象</th>
+                            <th>详情</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2026-03-25 14:32</td>
+                            <td>系统管理员</td>
+                            <td><span class="status-tag" style="background: #fee2e2; color: #991b1b;">终止调研</span></td>
+                            <td>赵六-新Leader评估</td>
+                            <td>原因: 评估对象调离岗位</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-25 11:15</td>
+                            <td>系统管理员</td>
+                            <td><span class="status-tag" style="background: #dbeafe; color: #1e40af;">修改权限</span></td>
+                            <td>用户: 张三</td>
+                            <td>将HRBP权限扩展至全部技术部门</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-24 16:48</td>
+                            <td>系统管理员</td>
+                            <td><span class="status-tag" style="background: #d1fae5; color: #065f46;">数据导出</span></td>
+                            <td>全部已完成调研</td>
+                            <td>导出格式: Excel, 156条记录</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-24 09:22</td>
+                            <td>系统管理员</td>
+                            <td><span class="status-tag" style="background: #f3e8ff; color: #7c3aed;">系统配置</span></td>
+                            <td>通知模板</td>
+                            <td>更新企微消息模板内容</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Batch Terminate Modal -->
+    <div class="modal-overlay" id="batchTerminateModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="bi bi-x-octagon" style="color: var(--danger);"></i>
+                    批量终止调研
+                </h3>
+                <button class="modal-close" onclick="closeBatchModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">即将终止的调研（<span id="modalSelectedCount">0</span>个）</label>
+                    <div class="survey-list-preview" id="selectedSurveyList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">终止原因 <span style="color: var(--danger);">*</span></label>
+                    <textarea class="form-control" id="batchTerminateReason" rows="3" placeholder="请输入批量终止的原因，该原因将记录到操作日志中..."></textarea>
+                </div>
+                <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 1rem; font-size: 0.875rem; color: #92400e;">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>注意：</strong>终止后这些调研将立即停止收集数据，已收集的数据仍可查看。此操作不可撤销。
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeBatchModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmBatchTerminate()">
+                    <i class="bi bi-x-octagon"></i>
+                    确认终止
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script>
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="admin-management.html" class="nav-item active">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>系统管理</span>
+                        </a>
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        // Selected surveys
+        let selectedSurveys = new Set();
+
+        // Toggle row selection
+        function toggleRow(checkbox, surveyId) {
+            checkbox.classList.toggle('checked');
+            const row = checkbox.closest('tr');
+            
+            if (checkbox.classList.contains('checked')) {
+                selectedSurveys.add(surveyId);
+                row.classList.add('selected');
+            } else {
+                selectedSurveys.delete(surveyId);
+                row.classList.remove('selected');
+            }
+            
+            updateBatchBar();
+        }
+
+        // Toggle select all
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const allCheckboxes = document.querySelectorAll('#surveyTableBody .custom-checkbox');
+            const isChecked = !selectAllCheckbox.classList.contains('checked');
+            
+            selectAllCheckbox.classList.toggle('checked', isChecked);
+            
+            allCheckboxes.forEach((checkbox) => {
+                const row = checkbox.closest('tr');
+                const surveyId = row.dataset.id;
+                
+                checkbox.classList.toggle('checked', isChecked);
+                
+                if (isChecked) {
+                    selectedSurveys.add(surveyId);
+                    row.classList.add('selected');
+                } else {
+                    selectedSurveys.delete(surveyId);
+                    row.classList.remove('selected');
+                }
+            });
+            
+            updateBatchBar();
+        }
+
+        // Update batch actions bar
+        function updateBatchBar() {
+            const batchBar = document.getElementById('batchActionsBar');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            selectedCount.textContent = selectedSurveys.size;
+            
+            if (selectedSurveys.size > 0) {
+                batchBar.classList.add('show');
+            } else {
+                batchBar.classList.remove('show');
+            }
+        }
+
+        // Clear selection
+        function clearSelection() {
+            selectedSurveys.clear();
+            document.querySelectorAll('.custom-checkbox').forEach(cb => {
+                cb.classList.remove('checked');
+            });
+            document.querySelectorAll('#surveyTableBody tr').forEach(row => {
+                row.classList.remove('selected');
+            });
+            updateBatchBar();
+        }
+
+        // Batch terminate
+        function batchTerminate() {
+            if (selectedSurveys.size === 0) {
+                alert('请至少选择一个调研');
+                return;
+            }
+            
+            const listContainer = document.getElementById('selectedSurveyList');
+            document.getElementById('modalSelectedCount').textContent = selectedSurveys.size;
+            
+            listContainer.innerHTML = '';
+            selectedSurveys.forEach(id => {
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                const name = row.querySelector('td:nth-child(2)').textContent.trim();
+                listContainer.innerHTML += `<div class="survey-list-item">• ${name}</div>`;
+            });
+            
+            document.getElementById('batchTerminateModal').classList.add('show');
+        }
+
+        // Close batch modal
+        function closeBatchModal() {
+            document.getElementById('batchTerminateModal').classList.remove('show');
+            document.getElementById('batchTerminateReason').value = '';
+        }
+
+        // Confirm batch terminate
+        function confirmBatchTerminate() {
+            const reason = document.getElementById('batchTerminateReason').value.trim();
+            
+            if (!reason) {
+                alert('请填写终止原因');
+                return;
+            }
+            
+            alert(`已成功终止 ${selectedSurveys.size} 个调研\n\n原因: ${reason}\n\n操作已记录到管理日志。`);
+            closeBatchModal();
+            clearSelection();
+        }
+
+        // Single terminate
+        function terminateSurvey(id, name) {
+            if (!confirm(`确定要终止调研【${name}】吗？\n\n终止后：\n- 该调研将立即结束\n- 已收集数据仍可查看\n- 操作不可撤销`)) {
+                return;
+            }
+            
+            const reason = prompt('请输入终止原因（必填）：');
+            if (!reason || !reason.trim()) {
+                alert('必须填写终止原因');
+                return;
+            }
+            
+            alert(`调研已终止\n\n调研: ${name}\nID: ${id}\n原因: ${reason}\n\n操作已记录到管理日志。`);
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const status = document.getElementById('filterStatus').value;
+            const scene = document.getElementById('filterScene').value;
+            const dept = document.getElementById('filterDept').value;
+            const search = document.getElementById('filterSearch').value.toLowerCase();
+            
+            const rows = document.querySelectorAll('#surveyTableBody tr');
+            
+            rows.forEach(row => {
+                const rowStatus = row.dataset.status;
+                const rowScene = row.dataset.scene;
+                const rowDept = row.dataset.dept;
+                const rowText = row.textContent.toLowerCase();
+                
+                let show = true;
+                
+                if (status && rowStatus !== status) show = false;
+                if (scene && rowScene !== scene) show = false;
+                if (dept && rowDept !== dept) show = false;
+                if (search && !rowText.includes(search)) show = false;
+                
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterScene').value = '';
+            document.getElementById('filterDept').value = '';
+            document.getElementById('filterTime').value = '';
+            document.getElementById('filterSearch').value = '';
+            
+            const rows = document.querySelectorAll('#surveyTableBody tr');
+            rows.forEach(row => {
+                row.style.display = '';
+            });
+        }
+
+        // Refresh data
+        function refreshData() {
+            const btn = event.target.closest('.btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> 刷新中...';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                alert('数据已刷新');
+            }, 800);
+        }
+
+        // Close modal on overlay click
+        document.getElementById('batchTerminateModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeBatchModal();
+            }
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+        });
+    </script>
+</body>
+</html>

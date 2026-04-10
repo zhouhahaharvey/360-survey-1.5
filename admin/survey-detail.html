@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调研详情 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <style>
+        /* Status Banner */
+        .status-banner {
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status-banner.pending {
+            background: linear-gradient(135deg, #fef3c7, #ffedd5);
+            border: 1px solid #fcd34d;
+        }
+        
+        .status-banner.rejected {
+            background: linear-gradient(135deg, #fee2e2, #fef2f2);
+            border: 1px solid #fca5a5;
+        }
+        
+        .status-banner.approved {
+            background: linear-gradient(135deg, #d1fae5, #f0fdf4);
+            border: 1px solid #86efac;
+        }
+        
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .status-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .status-banner.pending .status-icon {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .status-banner.rejected .status-icon {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .status-banner.approved .status-icon {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status-text h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+        
+        .status-text p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+        
+        .info-label {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+        }
+        
+        .info-value {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+        
+        /* Subject List */
+        .subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .subject-item {
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .subject-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, var(--gray-50), white);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .subject-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        
+        .subject-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+        
+        .subject-info p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        .subject-body {
+            padding: 1.25rem;
+        }
+        
+        /* Evaluator Groups */
+        .evaluator-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .evaluator-group {
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .evaluator-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .evaluator-group-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .evaluator-group-title.up { color: #1e40af; }
+        .evaluator-group-title.peer { color: #065f46; }
+        .evaluator-group-title.down { color: #9a3412; }
+        .evaluator-group-title.cross_dept { color: #7c3aed; }
+        .evaluator-group-title.hr_partner { color: #db2777; }
+        .evaluator-group-title.project_lead { color: #0369a1; }
+        .evaluator-group-title.external { color: #6b7280; }
+        
+        .evaluator-count {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            background: white;
+            color: var(--gray-600);
+        }
+        
+        .evaluator-list {
+            padding: 0.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        /* 统一的评估人标签样式 */
+        .evaluator-tag-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-700);
+            cursor: default;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .evaluator-tag-inline:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .evaluator-avatar-inline {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .evaluator-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        
+        .evaluator-name {
+            font-weight: 500;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .evaluator-title {
+            color: var(--gray-500);
+            font-size: 0.625rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .evaluator-source {
+            margin-left: 0.25rem;
+            font-size: 0.625rem;
+        }
+        
+        .evaluator-source.auto { color: #3b82f6; }
+        .evaluator-source.manual { color: #10b981; }
+        
+        /* 兼容旧样式 */
+        .evaluator-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.625rem;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+        
+        /* Summary Card */
+        .summary-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #bae6fd;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .summary-title {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #0369a1;
+            margin-bottom: 0.75rem;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .summary-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .summary-value.up { color: #1e40af; }
+        .summary-value.peer { color: #065f46; }
+        .summary-value.down { color: #9a3412; }
+        .summary-value.cross_dept { color: #7c3aed; }
+        .summary-value.hr_partner { color: #db2777; }
+        .summary-value.project_lead { color: #0369a1; }
+        .summary-value.external { color: #6b7280; }
+        
+        .summary-label {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+        
+        /* Timeline */
+        .timeline-section {
+            padding: 1.5rem;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gray-200);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -1.5rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--gray-200);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--gray-200);
+        }
+        
+        .timeline-item.completed .timeline-dot {
+            background: var(--success);
+            box-shadow: 0 0 0 2px var(--success);
+        }
+        
+        .timeline-item.active .timeline-dot {
+            background: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .timeline-content h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-content p {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-time {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+        
+        .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+        
+        /* Reject Reason Box */
+        .reject-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .reject-box h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .reject-box p {
+            font-size: 0.875rem;
+            color: #7f1d1d;
+            margin: 0;
+        }
+        
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-box {
+            background: var(--gray-50);
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        
+        .stat-box h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-box p {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        /* Progress Chart */
+        .progress-chart {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 1rem;
+        }
+        
+        .progress-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, var(--gray-200) 0%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .progress-circle::before {
+            content: '';
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+        
+        .progress-percent {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            z-index: 1;
+        }
+        
+        .progress-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex: 1;
+        }
+        
+        .progress-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+        
+        .progress-stat-item .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .progress-stat-item .stat-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        /* Compact Progress Bar */
+        .progress-compact {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+        
+        .progress-bar-compact {
+            flex: 1;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .progress-text-compact {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            white-space: nowrap;
+        }
+        
+        /* Report Preview Card */
+        .report-preview-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #bae6fd;
+        }
+        
+        .report-preview-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .report-preview-stat {
+            text-align: center;
+        }
+        
+        .report-preview-stat .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .report-preview-stat .label {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Compact Subject List */
+        .subject-list-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .subject-item-compact {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--gray-50);
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .subject-item-compact .subject-name {
+            font-weight: 500;
+            font-size: 0.8125rem;
+            color: var(--gray-800);
+        }
+        
+        .subject-item-compact .subject-meta {
+            font-size: 0.6875rem;
+            color: var(--gray-500);
+        }
+        
+        .subject-item-compact .evaluators-summary {
+            display: flex;
+            gap: 0.375rem;
+            flex-wrap: wrap;
+        }
+        
+        .subject-item-compact .evaluator-count {
+            font-size: 0.625rem;
+            padding: 0.1rem 0.375rem;
+            border-radius: 3px;
+            background: white;
+            color: var(--gray-600);
+            border: 1px solid var(--gray-200);
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            text-decoration: none;
+        }
+        
+        .action-btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .action-btn-primary:hover {
+            background: var(--primary-dark);
+            color: white;
+        }
+        
+        .action-btn-success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        
+        .action-btn-success:hover {
+            background: #059669;
+            color: white;
+        }
+        
+        .action-btn-outline {
+            background: white;
+            color: var(--gray-700);
+            border-color: var(--gray-300);
+        }
+        
+        .action-btn-outline:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+            color: var(--gray-800);
+        }
+        
+        .action-btn-danger {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+        
+        .action-btn-danger:hover {
+            background: #dc2626;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="page-title">
+                <div style="display: flex; align-items: center;">
+                    <a href="my-pending-reviews.html" class="back-to-home">
+                        <i class="bi bi-arrow-left"></i>
+                        返回
+                    </a>
+                    <h1>调研详情</h1>
+                </div>
+                <p id="surveySubtitle">查看调研提交信息和审核进度</p>
+            </div>
+            <div id="headerActions">
+                <!-- Dynamic buttons will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Status Banner -->
+        <div class="status-banner" id="statusBanner">
+            <div class="status-info">
+                <div class="status-icon" id="statusIcon">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="status-text">
+                    <h2 id="statusTitle">审核中</h2>
+                    <p id="statusDesc">您的调研已提交，等待管理员审核</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-box">
+                <h3 id="statSubjectCount">0</h3>
+                <p>被评估人</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="statEvaluatorCount">0</h3>
+                <p>评估人</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="statRelationCount">0</h3>
+                <p>评估关系</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="statScene">-</h3>
+                <p>评估场景</p>
+            </div>
+        </div>
+
+        <!-- Basic Info -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="bi bi-info-circle"></i>
+                    基本信息
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">调研标题</span>
+                        <span class="info-value" id="infoTitle">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">评估场景</span>
+                        <span class="info-value" id="infoScene">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">提交时间</span>
+                        <span class="info-value" id="infoSubmittedAt">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">当前状态</span>
+                        <span class="info-value" id="infoStatus">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">审核人</span>
+                        <span class="info-value" id="infoReviewer">待分配</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">审核时间</span>
+                        <span class="info-value" id="infoReviewedAt">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject List (Collapsed by default) -->
+        <div class="card">
+            <div class="card-header" style="cursor: pointer;" onclick="toggleSubjectDetails()">
+                <div class="card-title">
+                    <i class="bi bi-people"></i>
+                    考核关系明细
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 0.875rem; color: var(--gray-600);">
+                        共 <strong id="totalSubjects" style="color: var(--gray-800);">0</strong> 位被评估人
+                    </span>
+                    <i class="bi bi-chevron-down" id="subjectDetailsIcon" style="color: var(--gray-400); transition: transform 0.2s;"></i>
+                </div>
+            </div>
+            <div class="card-body" id="subjectDetailsBody" style="display: none;">
+                <div class="subject-list" id="subjectList">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reject Reason (if rejected) -->
+        <div class="card" id="rejectCard" style="display: none;">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="bi bi-x-circle"></i>
+                    退回信息
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="reject-box">
+                    <h4><i class="bi bi-exclamation-triangle"></i> 退回原因</h4>
+                    <p id="rejectReason">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Preview (Show if has submissions) -->
+        <div class="card report-preview-card" id="reportPreviewCard" style="display: none;">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="bi bi-file-earmark-text"></i>
+                    报告预览
+                </div>
+                <span class="badge badge-blue" id="reportStatusBadge">收集中</span>
+            </div>
+            <div class="card-body">
+                <div class="report-preview-stats">
+                    <div class="report-preview-stat">
+                        <div class="value" id="previewSubmitted">0</div>
+                        <div class="label">已提交</div>
+                    </div>
+                    <div class="report-preview-stat">
+                        <div class="value" id="previewTotal">0</div>
+                        <div class="label">总评估人</div>
+                    </div>
+                    <div class="report-preview-stat">
+                        <div class="value" id="previewProgress">0%</div>
+                        <div class="label">完成度</div>
+                    </div>
+                </div>
+                <div class="progress-compact" style="margin-bottom: 1rem;">
+                    <div class="progress-bar-compact">
+                        <div class="progress-bar-fill" id="previewProgressBar" style="width: 0%"></div>
+                    </div>
+                    <span class="progress-text-compact"><strong id="previewProgressText">0</strong>%</span>
+                </div>
+                <div class="report-actions">
+                    <a href="#" class="action-btn action-btn-success" id="viewReportBtn">
+                        <i class="bi bi-eye"></i>
+                        预览报告
+                    </a>
+                    <button class="action-btn action-btn-outline" onclick="showExportDialog()">
+                        <i class="bi bi-download"></i>
+                        导出报告
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compact Progress & Subjects -->
+        <div class="card" id="progressCard" style="display: none;">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="bi bi-graph-up"></i>
+                    收集进度
+                </div>
+                <span class="badge badge-blue" id="progressBadge">0%</span>
+            </div>
+            <div class="card-body">
+                <div class="progress-compact" style="margin-bottom: 1rem;">
+                    <div class="progress-bar-compact">
+                        <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+                    </div>
+                    <span class="progress-text-compact">
+                        <strong id="submittedCount">0</strong> / <span id="totalCount">0</span>
+                    </span>
+                </div>
+                <div id="subjectListCompact" class="subject-list-compact">
+                    <!-- Compact subject list -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="bi bi-lightning-charge"></i>
+                    快捷操作
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="action-buttons" id="actionButtons">
+                    <!-- Dynamic action buttons -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Timeline -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="bi bi-clock-history"></i>
+                    审核进度
+                </div>
+            </div>
+            <div class="timeline-section">
+                <div class="timeline" id="timeline">
+                    <!-- Dynamic timeline -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Export Report Dialog -->
+    <div class="modal fade" id="exportDialog" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-download"></i> 导出报告
+                    </h5>
+                    <button type="button" class="btn-close" onclick="closeExportDialog()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <label class="form-label">导出格式</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exportFormat" id="formatPdf" value="pdf" checked>
+                                <label class="form-check-label" for="formatPdf">
+                                    <i class="bi bi-file-pdf text-danger"></i> PDF
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exportFormat" id="formatExcel" value="excel">
+                                <label class="form-check-label" for="formatExcel">
+                                    <i class="bi bi-file-excel text-success"></i> Excel
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exportFormat" id="formatWord" value="word">
+                                <label class="form-check-label" for="formatWord">
+                                    <i class="bi bi-file-word text-primary"></i> Word
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">评估人显示方式</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exportAnonymous" id="showRealName" value="real" checked>
+                                <label class="form-check-label" for="showRealName">
+                                    <i class="bi bi-person-check text-primary"></i> 实名
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exportAnonymous" id="showAnonymous" value="anonymous">
+                                <label class="form-check-label" for="showAnonymous">
+                                    <i class="bi bi-incognito text-secondary"></i> 匿名
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-text text-muted mt-2">
+                            <i class="bi bi-info-circle"></i> 匿名模式下，评估人身份将隐藏，仅以"上级A"、"同事B"等标识显示
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" onclick="closeExportDialog()">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmExport()">
+                        <i class="bi bi-download"></i> 确认导出
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Detail Modal -->
+    <div class="modal fade" id="reportDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl" style="max-width: 1000px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-file-earmark-text"></i> 
+                        <span id="reportDetailTitle">360度评估报告</span>
+                    </h5>
+                    <button type="button" class="btn-close" onclick="closeReportDetail()"></button>
+                </div>
+                <div class="modal-body" id="reportDetailBody" style="max-height: 70vh; overflow-y: auto;">
+                    <!-- Report content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" onclick="closeReportDetail()">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="showExportDialog()">
+                        <i class="bi bi-download"></i> 导出报告
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script>
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item active">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        // Get URL params
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        
+        // Load survey data
+        function loadSurvey() {
+            const surveyId = getUrlParam('id');
+            
+            if (typeof DataStore !== 'undefined') {
+                return DataStore.getSurvey(surveyId);
+            }
+            
+            const allSurveys = JSON.parse(localStorage.getItem('allSurveys') || '[]');
+            const pendingReviews = JSON.parse(localStorage.getItem('pendingReviews') || '[]');
+            const myReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+            const pushPool = JSON.parse(localStorage.getItem('pushPool') || '[]');
+            
+            return allSurveys.find(s => s.id === surveyId) ||
+                   pendingReviews.find(s => s.id === surveyId) ||
+                   myReviews.find(s => s.id === surveyId) ||
+                   pushPool.find(s => s.id === surveyId);
+        }
+        
+        // Get scene name
+        function getSceneName(scene) {
+            const names = {
+                'promotion': '晋升评估',
+                'probation': '转正评估',
+                'newleader': '新Leader考察',
+                'performance': '绩效考核'
+            };
+            return names[scene] || '其他';
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Show not found message
+        function showNotFoundMessage() {
+            const main = document.querySelector('main');
+            if (main) {
+                main.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 2rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+                        <h2 style="color: var(--gray-800); margin-bottom: 0.5rem;">未找到调研数据</h2>
+                        <p style="color: var(--gray-600); margin-bottom: 1.5rem;">该调研详情尚未加载到本地存储中</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <a href="survey-list.html" class="btn btn-primary">
+                                <i class="bi bi-arrow-left"></i> 返回调研列表
+                            </a>
+                            <a href="dashboard.html" class="btn btn-outline">
+                                <i class="bi bi-house-door"></i> 返回首页
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Render page
+        function renderPage() {
+            const survey = loadSurvey();
+            if (!survey) {
+                showNotFoundMessage();
+                return;
+            }
+            
+            const isPending = survey.status === 'pending_review';
+            const isRejected = survey.status === 'rejected';
+            const isApproved = survey.status === 'active' || survey.status === 'completed';
+            
+            // Status banner
+            const banner = document.getElementById('statusBanner');
+            const icon = document.getElementById('statusIcon');
+            const title = document.getElementById('statusTitle');
+            const desc = document.getElementById('statusDesc');
+            
+            if (isPending) {
+                banner.className = 'status-banner pending';
+                icon.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+                title.textContent = '审核中';
+                desc.textContent = '您的调研已提交，等待管理员审核';
+            } else if (isRejected) {
+                banner.className = 'status-banner rejected';
+                icon.innerHTML = '<i class="bi bi-x-circle"></i>';
+                title.textContent = '已退回';
+                desc.textContent = '管理员退回您的调研，请查看原因后修改';
+            } else {
+                banner.className = 'status-banner approved';
+                icon.innerHTML = '<i class="bi bi-check-circle"></i>';
+                title.textContent = '已通过并发起';
+                desc.textContent = '审核通过，调研已成功发起';
+            }
+            
+            // Stats
+            const subjectCount = survey.subjects ? survey.subjects.length : 1;
+            const evaluatorCount = survey.subjects ? survey.subjects.reduce((sum, s) => {
+                return sum + (s.evaluators?.up?.length || 0) + 
+                             (s.evaluators?.peer?.length || 0) + 
+                             (s.evaluators?.down?.length || 0);
+            }, 0) : 5;
+            const relationCount = evaluatorCount;
+            
+            document.getElementById('statSubjectCount').textContent = subjectCount;
+            document.getElementById('statEvaluatorCount').textContent = evaluatorCount;
+            document.getElementById('statRelationCount').textContent = relationCount;
+            document.getElementById('statScene').textContent = getSceneName(survey.scene);
+            
+            // Basic info
+            document.getElementById('infoTitle').textContent = survey.title || '未命名调研';
+            document.getElementById('infoScene').textContent = getSceneName(survey.scene);
+            document.getElementById('infoSubmittedAt').textContent = formatDate(survey.submittedAt);
+            document.getElementById('infoStatus').textContent = isPending ? '审核中' : isRejected ? '已退回' : '已通过';
+            document.getElementById('infoReviewer').textContent = survey.reviewedBy || (isApproved ? '系统管理员' : '待分配');
+            document.getElementById('infoReviewedAt').textContent = formatDate(survey.reviewedAt);
+            
+            // Subject list
+            const subjectList = document.getElementById('subjectList');
+            document.getElementById('totalSubjects').textContent = survey.subjects?.length || 0;
+            
+            if (survey.subjects && survey.subjects.length > 0) {
+                subjectList.innerHTML = survey.subjects.map(subject => {
+                    const upEvaluators = subject.evaluators?.up || [];
+                    const peerEvaluators = subject.evaluators?.peer || [];
+                    const downEvaluators = subject.evaluators?.down || [];
+                    const upCount = upEvaluators.length;
+                    const peerCount = peerEvaluators.length;
+                    const downCount = downEvaluators.length;
+                    
+                    // 使用 RELATION_TYPES 中的图标
+                    const upConfig = RELATION_TYPES.up;
+                    const peerConfig = RELATION_TYPES.peer;
+                    const downConfig = RELATION_TYPES.down;
+                    
+                    // 渲染评估人标签（统一样式）
+                    const renderEvaluators = (evaluators) => {
+                        if (evaluators.length === 0) return '<span style="color: var(--gray-400); font-size: 0.8125rem;">暂无</span>';
+                        return evaluators.map(ev => {
+                            const title = ev.title || ev.role || '';
+                            const tooltipContent = [
+                                ev.name || '未知',
+                                title ? `岗位：${title}` : '',
+                                ev.level ? `职级：${ev.level}` : '',
+                                ev.dept ? `部门：${ev.dept}` : '',
+                                ev.source === 'auto' ? '来源：系统自动' : '来源：手动添加'
+                            ].filter(Boolean).join(' | ');
+                            return `
+                                <span class="evaluator-tag-inline" title="${tooltipContent}">
+                                    <span class="evaluator-avatar-inline">${(ev.name || '?').charAt(0)}</span>
+                                    <span class="evaluator-info">
+                                        <span class="evaluator-name">${ev.name || '未知'}</span>
+                                        ${title ? `<span class="evaluator-title">${title}</span>` : ''}
+                                    </span>
+                                    <span class="evaluator-source ${ev.source || 'auto'}">
+                                        <i class="bi bi-${ev.source === 'auto' ? 'cpu' : 'hand-thumbs-up'}"></i>
+                                    </span>
+                                </span>
+                            `;
+                        }).join('');
+                    };
+                    
+                    return `
+                        <div class="subject-item">
+                            <div class="subject-header">
+                                <div class="subject-avatar">${subject.name?.[0] || '?'}</div>
+                                <div class="subject-info">
+                                    <h4>${subject.name || '未知'} <span style="color: var(--gray-500); font-weight: normal;">(${subject.id || '-'})</span></h4>
+                                    <p>${subject.dept || '-'} · ${subject.level || '-'} · 共 ${upCount + peerCount + downCount} 位评估人</p>
+                                </div>
+                            </div>
+                            <div class="subject-body">
+                                <div class="evaluator-groups">
+                                    ${upCount > 0 ? `
+                                        <div class="evaluator-group">
+                                            <div class="evaluator-group-header">
+                                                <span class="evaluator-group-title up" title="${upConfig.description}">
+                                                    <span style="margin-right: 0.25rem;">${upConfig.icon}</span> 上级评估人
+                                                </span>
+                                                <span class="evaluator-count">${upCount}人</span>
+                                            </div>
+                                            <div class="evaluator-list">
+                                                ${renderEvaluators(upEvaluators)}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    ${peerCount > 0 ? `
+                                        <div class="evaluator-group">
+                                            <div class="evaluator-group-header">
+                                                <span class="evaluator-group-title peer" title="${peerConfig.description}">
+                                                    <span style="margin-right: 0.25rem;">${peerConfig.icon}</span> 平级评估人
+                                                </span>
+                                                <span class="evaluator-count">${peerCount}人</span>
+                                            </div>
+                                            <div class="evaluator-list">
+                                                ${renderEvaluators(peerEvaluators)}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    ${downCount > 0 ? `
+                                        <div class="evaluator-group">
+                                            <div class="evaluator-group-header">
+                                                <span class="evaluator-group-title down" title="${downConfig.description}">
+                                                    <span style="margin-right: 0.25rem;">${downConfig.icon}</span> 下级评估人
+                                                </span>
+                                                <span class="evaluator-count">${downCount}人</span>
+                                            </div>
+                                            <div class="evaluator-list">
+                                                ${renderEvaluators(downEvaluators)}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                
+                                <div class="summary-card">
+                                    <div class="summary-title">
+                                        <i class="bi bi-pie-chart"></i> 评估关系概览
+                                    </div>
+                                    <div class="summary-grid">
+                                        <div class="summary-item">
+                                            <div class="summary-value up">${upCount}</div>
+                                            <div class="summary-label">上级</div>
+                                        </div>
+                                        <div class="summary-item">
+                                            <div class="summary-value peer">${peerCount}</div>
+                                            <div class="summary-label">平级</div>
+                                        </div>
+                                        <div class="summary-item">
+                                            <div class="summary-value down">${downCount}</div>
+                                            <div class="summary-label">下级</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                subjectList.innerHTML = '<p style="color: var(--gray-600); text-align: center; padding: 2rem;">暂无被评估人数据</p>';
+            }
+            
+            // Reject reason
+            if (isRejected && survey.rejectReason) {
+                document.getElementById('rejectCard').style.display = 'block';
+                document.getElementById('rejectReason').textContent = survey.rejectReason;
+            }
+            
+            // Timeline
+            const timeline = document.getElementById('timeline');
+            let timelineHTML = `
+                <div class="timeline-item completed">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>提交审核</h4>
+                        <p>您成功提交了调研审核申请</p>
+                        <span class="timeline-time">${formatDate(survey.submittedAt)}</span>
+                    </div>
+                </div>
+            `;
+            
+            if (isRejected) {
+                timelineHTML += `
+                    <div class="timeline-item completed">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h4>审核退回</h4>
+                            <p>管理员审核后退回，需要修改</p>
+                            <span class="timeline-time">${formatDate(survey.reviewedAt)}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (isApproved) {
+                timelineHTML += `
+                    <div class="timeline-item completed">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h4>审核通过</h4>
+                            <p>管理员审核通过并发起调研</p>
+                            <span class="timeline-time">${formatDate(survey.reviewedAt)}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                timelineHTML += `
+                    <div class="timeline-item active">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h4>等待审核</h4>
+                            <p>管理员正在审核您的调研</p>
+                            <span class="timeline-time">预计24小时内完成</span>
+                        </div>
+                    </div>
+                `;
+            }
+            timeline.innerHTML = timelineHTML;
+            
+            // Render Progress Stats (for active/completed surveys)
+            const progressCard = document.getElementById('progressCard');
+            if (survey.status === 'active' || survey.status === 'completed') {
+                progressCard.style.display = 'block';
+                const progress = survey.progress || 0;
+                const submitted = survey.submittedCount || 0;
+                const total = survey.evaluatorCount || 0;
+                
+                // Compact progress bar
+                document.getElementById('progressBarFill').style.width = progress + '%';
+                document.getElementById('progressBadge').textContent = progress + '%';
+                document.getElementById('submittedCount').textContent = submitted;
+                document.getElementById('totalCount').textContent = total;
+                
+                // Render compact subject list
+                renderCompactSubjectList(survey);
+            }
+            
+            // Render Report Preview (if has any submissions)
+            const reportPreviewCard = document.getElementById('reportPreviewCard');
+            const submittedCount = survey.submittedCount || 0;
+            if (submittedCount > 0) {
+                reportPreviewCard.style.display = 'block';
+                const total = survey.evaluatorCount || 0;
+                const progress = survey.progress || 0;
+                
+                document.getElementById('previewSubmitted').textContent = submittedCount;
+                document.getElementById('previewTotal').textContent = total;
+                document.getElementById('previewProgress').textContent = progress + '%';
+                document.getElementById('previewProgressBar').style.width = progress + '%';
+                document.getElementById('previewProgressText').textContent = progress;
+                
+                // Update report status badge
+                const statusBadge = document.getElementById('reportStatusBadge');
+                if (progress === 100) {
+                    statusBadge.textContent = '已完成';
+                    statusBadge.className = 'badge badge-green';
+                } else {
+                    statusBadge.textContent = '收集中 (' + submittedCount + '/' + total + ')';
+                    statusBadge.className = 'badge badge-blue';
+                }
+                
+                // Set view report click handler
+                document.getElementById('viewReportBtn').onclick = function(e) {
+                    e.preventDefault();
+                    openReportDetail(survey);
+                };
+            }
+            
+            // Render Action Buttons
+            const actionButtons = document.getElementById('actionButtons');
+            let actionsHTML = '';
+            
+            if (isPending) {
+                actionsHTML += `
+                    <button class="action-btn action-btn-danger" onclick="withdrawSurvey()">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        撤回调研
+                    </button>
+                `;
+            } else if (isRejected) {
+                actionsHTML += `
+                    <button class="action-btn action-btn-primary" onclick="editSurvey()">
+                        <i class="bi bi-pencil"></i>
+                        编辑修改
+                    </button>
+                `;
+            } else if (survey.status === 'active') {
+                actionsHTML += `
+                    <a href="survey-list.html" class="action-btn action-btn-outline">
+                        <i class="bi bi-bell"></i>
+                        催办提醒
+                    </a>
+                    <a href="survey-list.html" class="action-btn action-btn-outline">
+                        <i class="bi bi-graph-up"></i>
+                        查看详情
+                    </a>
+                `;
+            } else if (survey.status === 'completed' || survey.hasReport) {
+                actionsHTML += `
+                    <a href="report-editor.html?id=${survey.id}" class="action-btn action-btn-success">
+                        <i class="bi bi-file-earmark-text"></i>
+                        查看报告
+                    </a>
+                    <button class="action-btn action-btn-outline" onclick="showExportDialog()">
+                        <i class="bi bi-download"></i>
+                        导出报告
+                    </button>
+                `;
+            }
+            
+            // Common actions
+            actionsHTML += `
+                <a href="survey-list.html" class="action-btn action-btn-outline">
+                    <i class="bi bi-arrow-left"></i>
+                    返回列表
+                </a>
+            `;
+            
+            actionButtons.innerHTML = actionsHTML;
+            
+            // Header actions
+            const headerActions = document.getElementById('headerActions');
+            if (isPending) {
+                headerActions.innerHTML = `
+                    <button class="btn btn-danger" onclick="withdrawSurvey()">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        撤回
+                    </button>
+                `;
+            } else if (isRejected) {
+                headerActions.innerHTML = `
+                    <button class="btn btn-primary" onclick="editSurvey()">
+                        <i class="bi bi-pencil"></i>
+                        去修改
+                    </button>
+                `;
+            } else if (survey.status === 'completed' || survey.hasReport) {
+                headerActions.innerHTML = `
+                    <a href="report-editor.html?id=${survey.id}" class="btn btn-success">
+                        <i class="bi bi-file-earmark-text"></i>
+                        查看报告
+                    </a>
+                `;
+            } else {
+                headerActions.innerHTML = `
+                    <a href="survey-list.html" class="btn btn-outline">
+                        <i class="bi bi-graph-up"></i>
+                        查看进度
+                    </a>
+                `;
+            }
+            
+            // Update badge
+            updateBadge();
+        }
+        
+        // Update sidebar badge
+        function updateBadge() {
+            let pendingCount = 0;
+            if (typeof DataStore !== 'undefined') {
+                pendingCount = DataStore.getMyPendingReviews().filter(r => r.status === 'pending_review').length;
+            } else {
+                const myReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+                pendingCount = myReviews.filter(r => r.status === 'pending_review').length;
+            }
+            const badge = document.getElementById('pendingBadge');
+            if (badge && pendingCount > 0) {
+                badge.textContent = pendingCount;
+                badge.style.display = 'block';
+            }
+        }
+        
+        // Withdraw survey
+        function withdrawSurvey() {
+            const surveyId = getUrlParam('id');
+            if (confirm('确认撤回？\n\n撤回后调研将回到编辑状态，您可以修改后重新提交审核。')) {
+                if (typeof DataStore !== 'undefined') {
+                    DataStore.updateSurvey(surveyId, {status: 'draft'});
+                } else {
+                    let myReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+                    myReviews = myReviews.filter(s => s.id !== surveyId);
+                    localStorage.setItem('myPendingReviews', JSON.stringify(myReviews));
+                    
+                    let pendingReviews = JSON.parse(localStorage.getItem('pendingReviews') || '[]');
+                    pendingReviews = pendingReviews.filter(s => s.id !== surveyId);
+                    localStorage.setItem('pendingReviews', JSON.stringify(pendingReviews));
+                }
+                
+                alert('调研已撤回');
+                window.location.href = 'my-pending-reviews.html';
+            }
+        }
+        
+        // Edit survey
+        function editSurvey() {
+            const surveyId = getUrlParam('id');
+            if (typeof DataStore !== 'undefined') {
+                DataStore.updateSurvey(surveyId, {status: 'draft'});
+            } else {
+                let myReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+                myReviews = myReviews.filter(s => s.id !== surveyId);
+                localStorage.setItem('myPendingReviews', JSON.stringify(myReviews));
+            }
+            window.location.href = 'create-survey-step3.html';
+        }
+        
+        // Toggle subject details visibility
+        function toggleSubjectDetails() {
+            const body = document.getElementById('subjectDetailsBody');
+            const icon = document.getElementById('subjectDetailsIcon');
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                body.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        // Render compact subject list
+        function renderCompactSubjectList(survey) {
+            const container = document.getElementById('subjectListCompact');
+            if (!container || !survey.subjects) return;
+            
+            container.innerHTML = survey.subjects.slice(0, 3).map(subject => {
+                const evaluatorCounts = [];
+                if (subject.evaluators) {
+                    Object.entries(subject.evaluators).forEach(([type, list]) => {
+                        if (list && list.length > 0) {
+                            const typeConfig = RELATION_TYPES[type] || {};
+                            evaluatorCounts.push(`<span class="evaluator-count" style="color: ${typeConfig.color || '#666'};">${typeConfig.label || type}: ${list.length}</span>`);
+                        }
+                    });
+                }
+                
+                return `
+                    <div class="subject-item-compact">
+                        <div class="mini-avatar">${subject.name.charAt(0)}</div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="subject-name">${subject.name}</div>
+                            <div class="subject-meta">${subject.dept || ''} · ${subject.level || ''}</div>
+                        </div>
+                        <div class="evaluators-summary">
+                            ${evaluatorCounts.join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('') + (survey.subjects.length > 3 ? `
+                <div style="text-align: center; font-size: 0.75rem; color: var(--gray-500); padding: 0.25rem;">
+                    还有 ${survey.subjects.length - 3} 位被评估人...
+                </div>
+            ` : '');
+        }
+        
+        // Show export dialog
+        function showExportDialog() {
+            const modal = new bootstrap.Modal(document.getElementById('exportDialog'));
+            modal.show();
+        }
+        
+        // Close export dialog
+        function closeExportDialog() {
+            const modalEl = document.getElementById('exportDialog');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+        
+        // Confirm export
+        function confirmExport() {
+            const format = document.querySelector('input[name="exportFormat"]:checked').value;
+            const anonymous = document.querySelector('input[name="exportAnonymous"]:checked').value === 'anonymous';
+            
+            const formatNames = { pdf: 'PDF', excel: 'Excel', word: 'Word' };
+            const surveyId = getUrlParam('id');
+            
+            // Build export URL with parameters
+            let exportUrl = `report-editor.html?id=${surveyId}&export=1&format=${format}`;
+            if (anonymous) exportUrl += '&anonymous=1';
+            
+            // Show confirmation
+            const displayMode = anonymous ? '匿名模式' : '实名模式';
+            
+            alert(`即将导出 ${formatNames[format]} 格式报告\n\n评估人显示：${displayMode}\n\n点击确认后开始下载...`);
+            
+            closeExportDialog();
+            
+            // Navigate to export URL
+            window.location.href = exportUrl;
+        }
+        
+        // Open report detail modal
+        function openReportDetail(survey) {
+            const modal = new bootstrap.Modal(document.getElementById('reportDetailModal'));
+            document.getElementById('reportDetailTitle').textContent = (survey.title || '未命名调研') + ' - 360度评估报告';
+            
+            // Generate report content
+            const reportBody = document.getElementById('reportDetailBody');
+            reportBody.innerHTML = generateReportContent(survey);
+            
+            modal.show();
+        }
+        
+        // Close report detail modal
+        function closeReportDetail() {
+            const modalEl = document.getElementById('reportDetailModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+        
+        // Generate report content HTML
+        function generateReportContent(survey) {
+            const sceneConfig = SCENE_CONFIG[survey.scene] || {};
+            const dimensions = sceneConfig.dimensions || ['综合评估'];
+            
+            // Mock scores for each dimension
+            const scores = dimensions.map(d => ({
+                dimension: d,
+                score: (Math.random() * 2 + 3).toFixed(1),
+                count: Math.floor(Math.random() * 5) + 3
+            }));
+            
+            const avgScore = (scores.reduce((sum, s) => sum + parseFloat(s.score), 0) / scores.length).toFixed(1);
+            
+            let html = `
+                <div class="report-content">
+                    <!-- Overall Score -->
+                    <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border-radius: 12px; margin-bottom: 1.5rem;">
+                        <div style="font-size: 3rem; font-weight: 700; color: var(--primary);">${avgScore}</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-600);">综合得分</div>
+                        <div style="margin-top: 0.5rem;">
+                            <span class="badge badge-blue">${survey.sceneName || '综合评估'}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Dimension Scores -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h6 style="font-weight: 600; margin-bottom: 1rem;">各维度得分</h6>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            ${scores.map(s => `
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div style="width: 120px; font-size: 0.875rem; color: var(--gray-700);">${s.dimension}</div>
+                                    <div style="flex: 1; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
+                                        <div style="height: 100%; width: ${(s.score / 5 * 100)}%; background: ${s.score >= 4 ? 'var(--success)' : s.score >= 3 ? 'var(--primary)' : 'var(--warning)'}; border-radius: 4px;"></div>
+                                    </div>
+                                    <div style="width: 60px; text-align: right; font-weight: 600; color: var(--gray-800);">${s.score}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Evaluator Breakdown -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h6 style="font-weight: 600; margin-bottom: 1rem;">评估人投票情况</h6>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                            ${['上级', '平级', '下级'].map(type => `
+                                <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 1.25rem; font-weight: 600; color: var(--gray-800);">${(Math.random() * 2 + 3).toFixed(1)}</div>
+                                    <div style="font-size: 0.75rem; color: var(--gray-600);">${type}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Comments Summary -->
+                    <div>
+                        <h6 style="font-weight: 600; margin-bottom: 1rem;">评语摘要</h6>
+                        <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px; font-size: 0.875rem; color: var(--gray-700); line-height: 1.6;">
+                            <p><strong>优点：</strong>被评估人在团队协作和专业能力方面表现突出，能够有效完成工作任务。</p>
+                            <p style="margin-top: 0.5rem;"><strong>待提升：</strong>建议在沟通表达和创新思维方面继续加强，以适应更高层级的岗位要求。</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return html;
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            renderPage();
+        });
+    </script>
+</body>
+</html>

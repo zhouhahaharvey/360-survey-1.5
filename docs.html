@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档中心 - 360调研系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 8px;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+        
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+            flex: 1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            padding: 1rem;
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+        
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            padding: 0 0.5rem;
+        }
+        
+        .doc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .doc-item {
+            margin-bottom: 0.25rem;
+        }
+        
+        .doc-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .doc-link:hover {
+            background: var(--gray-50);
+            color: var(--primary);
+        }
+        
+        .doc-link.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .doc-link i {
+            font-size: 1rem;
+        }
+        
+        /* Content Area */
+        .content-wrapper {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            min-height: calc(100vh - 200px);
+        }
+        
+        .content-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .content-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+        
+        .content-meta {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .content-body {
+            padding: 2rem;
+            line-height: 1.8;
+            color: var(--gray-800);
+        }
+        
+        .content-body h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .content-body h2 {
+            font-size: 1.375rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+        }
+        
+        .content-body h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--gray-800);
+        }
+        
+        .content-body p {
+            margin-bottom: 1rem;
+        }
+        
+        .content-body ul, .content-body ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .content-body li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .content-body code {
+            background: var(--gray-100);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875em;
+        }
+        
+        .content-body pre {
+            background: var(--gray-800);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .content-body blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin-left: 0;
+            color: var(--gray-600);
+            font-style: italic;
+        }
+        
+        .content-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        
+        .content-body th, .content-body td {
+            border: 1px solid var(--gray-200);
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .content-body th {
+            background: var(--gray-50);
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-600);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--gray-200);
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        
+        .tag-prd { background: #dbeafe; color: #1e40af; }
+        .tag-readme { background: #d1fae5; color: #065f46; }
+        .tag-release { background: #fef3c7; color: #92400e; }
+        .tag-opt { background: #f3e8ff; color: #6b21a8; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-btn">
+                <i class="bi bi-arrow-left"></i>
+                返回原型导航
+            </a>
+            <h1><i class="bi bi-book" style="color: var(--primary);"></i> 文档中心</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-title">项目文档</div>
+            <ul class="doc-list">
+                <li class="doc-item">
+                    <a class="doc-link active" onclick="loadDoc('readme')">
+                        <i class="bi bi-info-circle"></i>
+                        README 项目介绍
+                        <span class="tag tag-readme">README</span>
+                    </a>
+                </li>
+                <li class="doc-item">
+                    <a class="doc-link" onclick="loadDoc('prd')">
+                        <i class="bi bi-file-text"></i>
+                        PRD 产品需求文档
+                        <span class="tag tag-prd">PRD</span>
+                    </a>
+                </li>
+                <li class="doc-item">
+                    <a class="doc-link" onclick="loadDoc('guide')">
+                        <i class="bi bi-compass"></i>
+                        快速上手指南
+                        <span class="tag tag-readme">指南</span>
+                    </a>
+                </li>
+                <li class="doc-item">
+                    <a class="doc-link" onclick="loadDoc('data')">
+                        <i class="bi bi-database"></i>
+                        数据说明
+                        <span class="tag tag-release">数据</span>
+                    </a>
+                </li>
+                <li class="doc-item">
+                    <a class="doc-link" onclick="loadDoc('changelog')">
+                        <i class="bi bi-journal-text"></i>
+                        更新日志
+                        <span class="tag tag-release">日志</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-title" style="margin-top: 1.5rem;">快捷链接</div>
+            <ul class="doc-list">
+                <li class="doc-item">
+                    <a class="doc-link" href="index.html">
+                        <i class="bi bi-grid-3x3-gap"></i>
+                        原型导航
+                    </a>
+                </li>
+                <li class="doc-item">
+                    <a class="doc-link" href="admin/dashboard.html">
+                        <i class="bi bi-house-door"></i>
+                        仪表盘
+                    </a>
+                </li>
+                <li class="doc-item">
+                    <a class="doc-link" href="admin/create-survey-step4.html">
+                        <i class="bi bi-clipboard-check"></i>
+                        审核中心
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-wrapper">
+            <div class="content-header">
+                <h2 class="content-title" id="docTitle">README 项目介绍</h2>
+                <span class="content-meta" id="docMeta">v1.5 | 2026-04-10</span>
+            </div>
+            <div class="content-body" id="docContent">
+                <div class="empty-state">
+                    <i class="bi bi-file-text"></i>
+                    <p>正在加载文档...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 文档内容
+        const docs = {
+            readme: {
+                title: 'README 项目介绍',
+                meta: 'v1.5 | 2026-04-10',
+                content: `
+<h1>360调研系统 v1.5</h1>
+
+<blockquote>
+审核流程 · 待推送池 · 双视角催办 · 连续填写
+</blockquote>
+
+<h2>🚀 版本亮点</h2>
+
+<h3>v1.5 核心功能</h3>
+<ul>
+<li><strong>审核流程</strong> - 发起人提交 → 管理员二次确认 → 发起调研</li>
+<li><strong>待推送池</strong> - 批量合并推送，减少消息打扰</li>
+<li><strong>双视角催办</strong> - 按被评估人/评估人分别催办</li>
+<li><strong>连续填写</strong> - 提交后自动进入下一份</li>
+<li><strong>丰富数据</strong> - 25人员工池，36个调研案例</li>
+</ul>
+
+<h2>📁 项目结构</h2>
+
+<pre>
+360-survey-2/
+├── index.html              # 原型导航首页
+├── docs.html               # 文档中心（本文档）
+├── data-store.js           # 数据层封装
+├── demo-data.js            # Demo数据（36个案例）
+├── styles/                 # 公共样式
+│   ├── common.css
+│   ├── admin.css
+│   └── respondent.css
+├── scripts/                # 公共脚本
+│   └── common.js
+├── admin/                  # 管理端
+│   ├── dashboard.html
+│   ├── survey-list.html
+│   ├── create-survey-step[1-5].html
+│   ├── pending-push-pool.html
+│   └── ...
+├── respondent/             # 员工端
+│   ├── todo-list.html
+│   ├── survey-form.html
+│   └── ...
+└── public/
+    └── wecom-messages.html
+</pre>
+
+<h2>🎯 快速开始</h2>
+
+<h3>启动本地服务器</h3>
+<pre>cd 360-survey-2
+python3 -m http.server 8080
+
+# 访问 http://localhost:8080</pre>
+
+<h3>推荐体验流程</h3>
+<ol>
+<li><strong>发起调研</strong> - 体验 Step1→Step2→Step3→提交审核</li>
+<li><strong>管理员审核</strong> - 审核中心 → 批量审核 → 选择推送方式</li>
+<li><strong>待推送池</strong> - 合并多个调研统一推送</li>
+<li><strong>员工填写</strong> - 待办列表 → 问卷填写 → 连续填写</li>
+<li><strong>查看报告</strong> - 报告中心 → 调研详情</li>
+</ol>
+
+<h2>📊 数据规模</h2>
+
+<table>
+<tr><th>类型</th><th>数量</th><th>说明</th></tr>
+<tr><td>员工池</td><td>25人</td><td>5部门，多职级</td></tr>
+<tr><td>调研案例</td><td>36个</td><td>4完成+5进行中+12待审核+12待推送+3草稿</td></tr>
+<tr><td>场景类型</td><td>4种</td><td>晋升/转正/新Leader/绩效</td></tr>
+</table>
+
+<h2>📚 相关文档</h2>
+<ul>
+<li><a href="PRD.md">PRD 产品需求文档</a> - 详细功能说明</li>
+<li><a href="OPTIMIZATION-SUMMARY.md">优化总结</a> - 技术优化详情</li>
+</ul>
+                `
+            },
+            prd: {
+                title: 'PRD 产品需求文档',
+                meta: 'v1.5 | 2026-04-10',
+                content: `
+<h1>360度人才调研系统 PRD</h1>
+
+<h2>1. 核心流程</h2>
+
+<h3>1.1 审核流程（v1.4）</h3>
+<pre>
+HRBP发起 → Step1选择场景 → Step2导入人员 → Step3确认关系 → 提交审核
+                                                            ↓
+管理员审核 ← 审核中心 ← 批量审核 ← 选择推送方式（立即/待推送池）
+                ↓
+         发起调研 → 员工填写 → 生成报告
+</pre>
+
+<h3>1.2 状态流转</h3>
+<table>
+<tr><th>状态</th><th>说明</th><th>操作</th></tr>
+<tr><td>draft</td><td>草稿</td><td>编辑、提交审核</td></tr>
+<tr><td>pending_review</td><td>待审核</td><td>管理员审核、撤回</td></tr>
+<tr><td>relation_approved</td><td>审核通过</td><td>推送或加入待推送池</td></tr>
+<tr><td>active</td><td>收集中</td><td>催办、查看进度</td></tr>
+<tr><td>completed</td><td>已完成</td><td>查看报告</td></tr>
+</table>
+
+<h2>2. 功能模块</h2>
+
+<h3>2.1 管理端</h3>
+<ul>
+<li><strong>仪表盘</strong> - 数据统计、快捷入口、图表</li>
+<li><strong>发起调研</strong> - 5步向导（Step1-Step3 + 审核 + 推送）</li>
+<li><strong>审核中心</strong> - 批量审核、批量退回</li>
+<li><strong>待推送池</strong> - 合并推送、减少打扰</li>
+<li><strong>调研列表</strong> - 管理、催办、筛选</li>
+<li><strong>报告中心</strong> - 查看、编辑、导出</li>
+</ul>
+
+<h3>2.2 员工端</h3>
+<ul>
+<li><strong>待办列表</strong> - 场景化卡片、筛选</li>
+<li><strong>问卷填写</strong> - 分维度评分、主观题</li>
+<li><strong>连续填写</strong> - 提交后自动进入下一份</li>
+<li><strong>历史记录</strong> - 已完成评估</li>
+<li><strong>个人中心</strong> - 统计、徽章、证书</li>
+</ul>
+
+<h2>3. 页面清单</h2>
+
+<h3>管理端</h3>
+<table>
+<tr><th>页面</th><th>路径</th><th>说明</th></tr>
+<tr><td>仪表盘</td><td>admin/dashboard.html</td><td>数据统计</td></tr>
+<tr><td>审核中心</td><td>admin/create-survey-step4.html</td><td>批量审核</td></tr>
+<tr><td>批量审核</td><td>admin/create-survey-step4.html</td><td>审核关系</td></tr>
+<tr><td>待推送池</td><td>admin/pending-push-pool.html</td><td>合并推送</td></tr>
+<tr><td>调研详情</td><td>admin/survey-detail.html</td><td>详情、进度</td></tr>
+</table>
+
+<h3>员工端</h3>
+<table>
+<tr><th>页面</th><th>路径</th><th>说明</th></tr>
+<tr><td>待办列表</td><td>respondent/todo-list.html</td><td>场景化卡片</td></tr>
+<tr><td>问卷填写</td><td>respondent/survey-form.html</td><td>连续填写</td></tr>
+</table>
+
+<h2>4. 技术规格</h2>
+
+<h3>技术栈</h3>
+<ul>
+<li>UI框架: Bootstrap 5.3</li>
+<li>图标: Bootstrap Icons</li>
+<li>图表: Chart.js</li>
+<li>数据: LocalStorage + DataStore</li>
+</ul>
+
+<h3>数据规范</h3>
+<pre>
+ID格式: survey_{status}_{index}
+示例: survey_pending_0, survey_pushpool_5
+</pre>
+                `
+            },
+            guide: {
+                title: '快速上手指南',
+                meta: 'v1.4 | 操作指南',
+                content: `
+<h1>快速上手指南</h1>
+
+<h2>🎯 完整业务流程体验</h2>
+
+<h3>第一步：HRBP发起调研</h3>
+<ol>
+<li>访问 <strong>仪表盘</strong> - 查看数据统计</li>
+<li>点击 <strong>发起调研</strong> - 进入Step1选择场景
+<ul>
+<li>选择评估场景（晋升/转正/新Leader/绩效）</li>
+</ul>
+</li>
+<li>进入 <strong>Step2</strong> - 导入被评估人
+<ul>
+<li>粘贴工号，智能解析人员信息</li>
+</ul>
+</li>
+<li>进入 <strong>Step3</strong> - 确认评估关系
+<ul>
+<li>查看可视化关系矩阵</li>
+<li>确认上级/平级/下级评估人</li>
+</ul>
+</li>
+<li>点击 <strong>提交审核</strong> - 调研进入待审核状态</li>
+</ol>
+
+<h3>第二步：管理员审核</h3>
+<ol>
+<li>访问 <strong>审核中心</strong>（导航栏红色高亮）</li>
+<li>查看待审核列表
+<ul>
+<li>可以看到HRBP提交的所有待审核调研</li>
+<li>勾选需要审核的调研（支持批量）</li>
+</ul>
+</li>
+<li>点击 <strong>批量审核</strong> 按钮</li>
+<li>选择推送方式：
+<ul>
+<li><strong>立即推送</strong> - 直接发起调研，员工立即收到通知</li>
+<li><strong>加入待推送池</strong> - 暂不发通知，等待合并推送</li>
+</ul>
+</li>
+</ol>
+
+<h3>第三步：待推送池合并（可选）</h3>
+<ol>
+<li>访问 <strong>待推送池</strong></li>
+<li>查看已加入待推送的调研</li>
+<li>勾选需要合并的调研</li>
+<li>点击 <strong>合并推送</strong> - 将多条调研合并为一条通知发送</li>
+</ol>
+
+<h3>第四步：员工填写评估</h3>
+<ol>
+<li>员工收到 <strong>企微消息</strong> 推送</li>
+<li>点击进入 <strong>待办列表</strong></li>
+<li>选择评估卡片进入 <strong>问卷填写</strong></li>
+<li>分维度评分（1-5星）
+<ul>
+<li>专业能力、领导力、文化契合等维度</li>
+</ul>
+</li>
+<li>填写主观评价
+<ul>
+<li>优点提炼</li>
+<li>改进建议</li>
+</ul>
+</li>
+<li>点击 <strong>提交并进入下一份</strong>（如有多个待办）</li>
+</ol>
+
+<h3>第五步：查看报告</h3>
+<ol>
+<li>调研完成后，访问 <strong>报告中心</strong></li>
+<li>查看已完成调研的报告</li>
+<li>或使用 <strong>调研详情</strong> 查看进度统计</li>
+<li>导出报告（PDF/PNG/Word）</li>
+</ol>
+
+<h2>💡 关键功能说明</h2>
+
+<h3>双视角催办</h3>
+<p>在<strong>调研列表</strong>页面，点击"催办"按钮：</p>
+<ul>
+<li><strong>按被考评人</strong> - 查看每个被评估人的整体完成进度</li>
+<li><strong>按考评人</strong> - 查看每个评估人的待办列表，定向催办</li>
+</ul>
+
+<h3>连续填写</h3>
+<p>员工有多个评估任务时：</p>
+<ol>
+<li>填写完一份评估</li>
+<li>点击"提交并进入下一份"</li>
+<li>系统自动跳转到下一个待办</li>
+<li>无需返回列表，提升效率</li>
+</ol>
+
+<h2>📊 查看Demo数据</h2>
+
+<p>系统预置了36个调研案例：</p>
+<ul>
+<li><strong>待审核</strong>：12个 - 体验管理员审核流程</li>
+<li><strong>待推送</strong>：12个 - 体验合并推送功能</li>
+<li><strong>进行中</strong>：5个 - 体验催办功能</li>
+<li><strong>已完成</strong>：4个 - 体验报告功能</li>
+</ul>
+                `
+            },
+            data: {
+                title: '数据说明',
+                meta: 'v1.4 | 36个案例',
+                content: `
+<h1>数据说明</h1>
+
+<h2>📊 数据规模概览</h2>
+
+<table>
+<tr><th>类型</th><th>数量</th><th>说明</th></tr>
+<tr><td>员工池</td><td>25人</td><td>5个部门，多职级覆盖</td></tr>
+<tr><td>调研案例</td><td>36个</td><td>覆盖全业务流程</td></tr>
+<tr><td>评估人池</td><td>12人</td><td>用于生成评估关系</td></tr>
+</table>
+
+<h2>👥 员工池详情</h2>
+
+<h3>技术部（8人）</h3>
+<table>
+<tr><th>姓名</th><th>职级</th><th>说明</th></tr>
+<tr><td>张三</td><td>P7</td><td>高级工程师</td></tr>
+<tr><td>李四</td><td>P6</td><td>工程师</td></tr>
+<tr><td>孙七</td><td>P8</td><td>专家</td></tr>
+<tr><td>郑十</td><td>P7</td><td>高级工程师</td></tr>
+<tr><td>刘明</td><td>M1</td><td>技术经理</td></tr>
+<tr><td>黄华</td><td>P6</td><td>工程师</td></tr>
+<tr><td>彭磊</td><td>P7</td><td>高级工程师</td></tr>
+<tr><td>许静</td><td>P5</td><td>初级工程师</td></tr>
+</table>
+
+<h3>产品部（5人）</h3>
+<table>
+<tr><th>姓名</th><th>职级</th></tr>
+<tr><td>王五</td><td>P5</td></tr>
+<tr><td>钱十一</td><td>P8</td></tr>
+<tr><td>林小丽</td><td>P5</td></tr>
+<tr><td>沈洋</td><td>P6</td></tr>
+<tr><td>韩梅</td><td>M2</td></tr>
+</table>
+
+<h3>其他部门</h3>
+<ul>
+<li><strong>设计部</strong>（4人）：赵六、陈十二、杨青、朱雪</li>
+<li><strong>运营部</strong>（4人）：周八、何伟、秦朝、叶卉</li>
+<li><strong>市场部</strong>（4人）：吴九、高强、田亞、范雨</li>
+</ul>
+
+<h2>📋 调研案例分布</h2>
+
+<h3>按状态分布</h3>
+<table>
+<tr><th>状态</th><th>数量</th><th>ID示例</th></tr>
+<tr><td>已完成</td><td>4个</td><td>survey_completed_0~3</td></tr>
+<tr><td>进行中</td><td>5个</td><td>survey_active_0~4</td></tr>
+<tr><td>待审核</td><td>12个</td><td>survey_pending_0~11</td></tr>
+<tr><td>待推送</td><td>12个</td><td>survey_pushpool_0~11</td></tr>
+<tr><td>草稿</td><td>3个</td><td>survey_draft_0~2</td></tr>
+</table>
+
+<h3>待审核案例（12个）</h3>
+<table>
+<tr><th>序号</th><th>员工</th><th>场景</th><th>部门</th><th>职级</th></tr>
+<tr><td>0</td><td>钱十一</td><td>晋升评估</td><td>产品部</td><td>P8</td></tr>
+<tr><td>1</td><td>陈十二</td><td>新Leader考察</td><td>设计部</td><td>P5</td></tr>
+<tr><td>2</td><td>刘明</td><td>绩效考核</td><td>技术部</td><td>M1</td></tr>
+<tr><td>3</td><td>黄华</td><td>晋升评估</td><td>技术部</td><td>P6</td></tr>
+<tr><td>4</td><td>林小丽</td><td>转正评估</td><td>产品部</td><td>P5</td></tr>
+<tr><td>5</td><td>何伟</td><td>新Leader考察</td><td>运营部</td><td>P7</td></tr>
+<tr><td>6</td><td>高强</td><td>绩效考核</td><td>市场部</td><td>P6</td></tr>
+<tr><td>7</td><td>彭磊</td><td>晋升评估</td><td>技术部</td><td>P7</td></tr>
+<tr><td>8</td><td>许静</td><td>新Leader考察</td><td>技术部</td><td>P5</td></tr>
+<tr><td>9</td><td>沈洋</td><td>绩效考核</td><td>产品部</td><td>P6</td></tr>
+<tr><td>10</td><td>韩梅</td><td>晋升评估</td><td>产品部</td><td>M2</td></tr>
+<tr><td>11</td><td>杨青</td><td>转正评估</td><td>设计部</td><td>P7</td></tr>
+</table>
+
+<h3>待推送池案例（12个）</h3>
+<p>覆盖4种场景：</p>
+<ul>
+<li><strong>晋升评估</strong>：5个（张三、郑十、彭磊等）</li>
+<li><strong>新Leader考察</strong>：4个（王五、刘明、沈洋等）</li>
+<li><strong>转正评估</strong>：3个（孙七、黄华、杨青）</li>
+<li><strong>绩效考核</strong>：3个（周八、何伟、秦朝）</li>
+</ul>
+
+<h2>🔄 数据初始化</h2>
+
+<p>系统使用 <code>DataStore.initDemoData(true)</code> 强制刷新数据，确保所有页面数据一致。</p>
+
+<pre>
+// 清除旧数据
+localStorage.clear();
+
+// 刷新页面，自动加载最新36个案例
+</pre>
+                `
+            },
+            changelog: {
+                title: '更新日志',
+                meta: 'v1.0 → v1.5',
+                content: `
+<h1>更新日志</h1>
+
+<h2>🚀 v1.5 (2026-04-10)</h2>
+<h3>v1.5 新增功能</h3>
+<ul>
+<li><strong>双视角调研列表</strong> - 支持按被评估人/评估人视角切换查看</li>
+<li><strong>高级筛选</strong> - 状态、场景、截止日期（3天/7天/30天/已过期）筛选</li>
+<li><strong>报告预览整合</strong> - 报告功能合并到调研详情页，支持导出</li>
+<li><strong>员工界面优化</strong> - 底部按钮布局调整，支持草稿保存</li>
+<li><strong>菜单优化</strong> - 待推送池位置调整，移除报告中心独立入口</li>
+</ul>
+
+<h2>📦 v1.4 (2026-04-09)</h2>
+
+<h3>新增功能</h3>
+<ul>
+<li><strong>审核流程</strong> - 发起人提交 → 管理员二次确认 → 发起调研</li>
+<li><strong>待推送池</strong> - 批量合并推送，减少对同一评估人的重复消息打扰</li>
+<li><strong>双视角催办</strong> - 支持按被评估人和按评估人分别催办</li>
+<li><strong>连续填写</strong> - 提交后自动进入下一份待办</li>
+<li><strong>调研详情增强</strong> - 进度图表、快捷操作按钮、报告预览</li>
+<li><strong>文档中心</strong> - 在线查看 PRD、README、优化记录等文档</li>
+</ul>
+
+<h3>数据增强</h3>
+<ul>
+<li>员工池扩展至25人（5部门）</li>
+<li>调研案例增至36个（12待审核+12待推送）</li>
+<li>统一ID格式：survey_{status}_{index}</li>
+</ul>
+
+<h3>优化改进</h3>
+<ul>
+<li>审核中心列表与详情页数据一致性修复</li>
+<li>PC端表格布局优化，展示考核关系人名</li>
+<li>菜单栏统一，所有页面使用统一侧边栏</li>
+<li>数据初始化优化，支持forceRefresh强制刷新</li>
+</ul>
+
+<h2>📦 v1.3 (2026-03-25)</h2>
+
+<h3>新增功能</h3>
+<ul>
+<li>Step3 关系确认详情页 - 可视化评估关系矩阵</li>
+<li>Step4 通知配置页面 - 企微消息模板配置</li>
+<li>单/批量发起模式选择</li>
+<li>企微入口识别和横幅提示</li>
+<li>报告中心多维筛选（部门、职级、状态、权限）</li>
+<li>管理员系统管理页面</li>
+<li>报告在线编辑器（支持PDF/PNG/Word导出）</li>
+<li>管理员终止调研功能</li>
+</ul>
+
+<h3>优化改进</h3>
+<ul>
+<li>桌面端批量评估界面（Excel风格+快捷键）</li>
+<li>移动端批量评估界面（卡片+触摸优化）</li>
+<li>iPhone 兼容性优化</li>
+<li>催办管理整合到调研列表抽屉</li>
+<li>主观评价整合到评估表格</li>
+<li>员工界面导航简化（底部3项）</li>
+</ul>
+
+<h2>📦 v1.1 (2026-03-25)</h2>
+
+<h3>新增功能</h3>
+<ul>
+<li>报告中心页面</li>
+<li>模板中心页面</li>
+<li>仪表盘Chart.js图表</li>
+<li>待办列表筛选和搜索</li>
+</ul>
+
+<h2>🎯 v1.0 (基础版本)</h2>
+
+<h3>核心功能</h3>
+<ul>
+<li>仪表盘</li>
+<li>发起调研向导</li>
+<li>批量发起</li>
+<li>调研列表</li>
+<li>待办列表</li>
+<li>问卷填写</li>
+<li>企微消息预览</li>
+</ul>
+
+<h2>📈 版本演进</h2>
+
+<table>
+<tr><th>版本</th><th>核心特性</th><th>案例数</th></tr>
+<tr><td>v1.0</td><td>基础功能</td><td>-</td></tr>
+<tr><td>v1.1</td><td>报告中心、模板中心</td><td>-</td></tr>
+<tr><td>v1.3</td><td>审核流程、系统管理</td><td>11个</td></tr>
+<tr><td>v1.5</td><td>双视角列表、高级筛选、报告整合</td><td>36个</td></tr>
+<tr><td>v1.4</td><td>待推送池、双视角催办、连续填写</td><td>36个</td></tr>
+</table>
+                `
+            }
+        };
+
+        // 加载文档
+        function loadDoc(docId) {
+            const doc = docs[docId];
+            if (!doc) return;
+
+            // 更新标题
+            document.getElementById('docTitle').textContent = doc.title;
+            document.getElementById('docMeta').textContent = doc.meta;
+            document.getElementById('docContent').innerHTML = doc.content;
+
+            // 更新导航高亮
+            document.querySelectorAll('.doc-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.closest('.doc-link').classList.add('active');
+
+            // 更新URL
+            const url = new URL(window.location);
+            url.searchParams.set('doc', docId);
+            window.history.pushState({}, '', url);
+        }
+
+        // 页面加载时
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const docId = urlParams.get('doc') || 'readme';
+            
+            if (docs[docId]) {
+                document.getElementById('docTitle').textContent = docs[docId].title;
+                document.getElementById('docMeta').textContent = docs[docId].meta;
+                document.getElementById('docContent').innerHTML = docs[docId].content;
+                
+                // 高亮对应导航
+                document.querySelectorAll('.doc-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(docId)) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

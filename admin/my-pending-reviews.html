@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的待审核 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <style>
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .stat-icon.blue {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .stat-icon.orange {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .stat-icon.green {
+            background: #d1fae5;
+            color: var(--success);
+        }
+        
+        .stat-info h4 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin: 0;
+        }
+        
+        .stat-info p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        /* Pending List - Single Row Layout */
+        .pending-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .pending-item {
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .pending-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pending-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .pending-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .pending-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .pending-title-row h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .pending-meta {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .pending-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .pending-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        .pending-actions .btn {
+            padding: 0.5rem 0.875rem;
+            font-size: 0.8125rem;
+            white-space: nowrap;
+        }
+        
+        .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gray-100);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--gray-400);
+        }
+        
+        .empty-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-text {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Timeline */
+        .timeline-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .timeline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        
+        .timeline-step.active {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .timeline-step.completed {
+            color: var(--success);
+        }
+        
+        .timeline-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray-300);
+        }
+        
+        .timeline-dot.active {
+            background: var(--primary);
+        }
+        
+        .timeline-dot.completed {
+            background: var(--success);
+        }
+        
+        .timeline-line {
+            width: 30px;
+            height: 2px;
+            background: var(--gray-200);
+        }
+        
+        /* Reject Reason */
+        .reject-reason {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 0.8125rem;
+            color: #991b1b;
+        }
+        
+        .reject-reason strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container { grid-template-columns: 1fr; }
+            
+            .pending-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .pending-main {
+                width: 100%;
+            }
+            
+            .pending-title-row h4 {
+                white-space: normal;
+            }
+            
+            .pending-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .pending-actions .btn { 
+                flex: 1;
+                max-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+    
+    <!-- 侧边栏折叠按钮 -->
+    <div class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="折叠/展开侧边栏">
+        <i class="bi bi-chevron-left" id="toggleIcon"></i>
+    </div>
+
+    <!-- 主内容 -->
+    <main class="main-content" id="mainContent">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="page-title">
+                <div style="display: flex; align-items: center;">
+                    <a href="dashboard.html" class="back-to-home">
+                        <i class="bi bi-arrow-left"></i>
+                        返回首页
+                    </a>
+                    <h1>我的待审核</h1>
+                </div>
+                <p>查看已提交审核的调研进度，管理员处理前可撤回修改</p>
+            </div>
+            <a href="create-survey-step1.html" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i>
+                发起新调研
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 id="pendingCount">0</h4>
+                    <p>审核中</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 id="approvedCount">0</h4>
+                    <p>已通过</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 id="totalSubmitted">0</h4>
+                    <p>累计提交</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending List -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">待审核调研</div>
+                <span style="font-size: 0.875rem; color: var(--gray-600);">
+                    共 <strong id="totalCount" style="color: var(--gray-800);">0</strong> 个
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="pending-list" id="pendingList">
+                    <!-- Dynamic content will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script src="../demo-data.js"></script>
+    <script>
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item active">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        // Load pending reviews from localStorage
+        function loadPendingReviews() {
+            let myReviews;
+            if (typeof DataStore !== 'undefined') {
+                myReviews = DataStore.getMyPendingReviews();
+            } else {
+                myReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+            }
+            return myReviews.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+        }
+        
+        // Get status label
+        function getStatusLabel(status) {
+            const labels = {
+                'pending_review': '关系审核中',
+                'relation_approved': '消息配置中',
+                'active': '已发起',
+                'rejected': '已退回',
+                'completed': '已完成'
+            };
+            return labels[status] || '审核中';
+        }
+        
+        // Get step label based on status
+        function getStepLabel(status, step) {
+            if (step === 1) {
+                if (status === 'pending_review') return '关系审核中';
+                if (status === 'rejected') return '已退回';
+                return '关系已审核';
+            }
+            if (step === 2) {
+                if (status === 'relation_approved') return '消息配置中';
+                if (status === 'active') return '消息已配置';
+                return '等待配置';
+            }
+            return '';
+        }
+        
+        // Format time ago
+        function timeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 60) return `${minutes}分钟前`;
+            if (hours < 24) return `${hours}小时前`;
+            if (days < 30) return `${days}天前`;
+            return date.toLocaleDateString('zh-CN');
+        }
+        
+        // Render pending list
+        function renderPendingList() {
+            const reviews = loadPendingReviews();
+            const container = document.getElementById('pendingList');
+            
+            // Update stats
+            const pendingCount = reviews.filter(r => r.status === 'pending_review').length;
+            const approvedCount = reviews.filter(r => r.status === 'active' || r.status === 'completed').length;
+            
+            document.getElementById('pendingCount').textContent = pendingCount;
+            document.getElementById('approvedCount').textContent = approvedCount;
+            document.getElementById('totalSubmitted').textContent = reviews.length;
+            document.getElementById('totalCount').textContent = reviews.length;
+            
+            // Update badge
+            const badge = document.getElementById('pendingBadge');
+            if (pendingCount > 0) {
+                badge.textContent = pendingCount;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+            
+            if (reviews.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <div class="empty-title">暂无待审核调研</div>
+                        <div class="empty-text">您提交的调研将显示在这里，管理员审核通过后将自动发起</div>
+                        <a href="create-survey-step1.html" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i>
+                            发起调研
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 使用统一布局渲染
+            container.innerHTML = reviews.map(review => {
+                return renderPendingItemUnified(review);
+            }).join('');
+        }
+        
+        // 统一渲染待审核项
+        function renderPendingItemUnified(review) {
+            const isPending = review.status === 'pending_review';
+            const isRejected = review.status === 'rejected';
+            const sceneInfo = getSceneInfo(review.scene);
+            const dimensions = getSceneDimensions(review.scene);
+            const subjectCount = review.subjects ? review.subjects.length : 0;
+            
+            // 动态计算所有关系类型的评估人总数
+            const evaluatorCount = review.subjects ? review.subjects.reduce((sum, s) => {
+                if (!s.evaluators) return sum;
+                return sum + Object.values(s.evaluators).reduce((relSum, list) => 
+                    relSum + (list?.length || 0), 0);
+            }, 0) : 0;
+            
+            // 操作按钮
+            let actionBtns = '';
+            if (isPending) {
+                actionBtns = `
+                    <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); viewSurvey('${review.id}')">
+                        <i class="bi bi-eye"></i> 查看
+                    </button>
+                    ${review.submittedBy === 'current_user' ? `
+                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); withdrawSurvey('${review.id}')">
+                            <i class="bi bi-arrow-counterclockwise"></i> 撤回
+                        </button>
+                    ` : `
+                        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); reviewSurvey('${review.id}')">
+                            <i class="bi bi-check-circle"></i> 审核
+                        </button>
+                    `}`;
+            } else if (isRejected) {
+                actionBtns = `
+                    <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); editSurvey('${review.id}')">
+                        <i class="bi bi-pencil"></i> 修改
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); viewSurvey('${review.id}')">
+                        <i class="bi bi-eye"></i> 查看
+                    </button>`;
+            } else {
+                actionBtns = `
+                    <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); viewSurvey('${review.id}')">
+                        <i class="bi bi-eye"></i> 查看
+                    </button>`;
+            }
+            
+            return `
+                <div class="survey-item" data-id="${review.id}" style="border-bottom: 1px solid var(--gray-200);">
+                    <div class="survey-content">
+                        <!-- 左侧：基本信息 -->
+                        <div class="survey-left">
+                            <div class="survey-info">
+                                <div class="survey-title-row">
+                                    <span class="survey-title">${review.title || '未命名调研'}</span>
+                                    <span class="scene-tag ${sceneInfo.class}">${sceneInfo.name}</span>
+                                    <span class="status-badge ${isPending ? 'status-pending' : isRejected ? 'status-rejected' : 'status-completed'}" style="margin-left: auto;">
+                                        <i class="bi bi-${isPending ? 'hourglass-split' : isRejected ? 'x-circle' : 'check-circle'}"></i>
+                                        ${getStatusLabel(review.status)}
+                                    </span>
+                                </div>
+                                <div class="survey-meta">
+                                    <span><i class="bi bi-clock"></i> ${timeAgo(review.submittedAt)}</span>
+                                    <span><i class="bi bi-person"></i> ${subjectCount}位被评估人</span>
+                                    <span><i class="bi bi-people"></i> ${evaluatorCount}位评估人</span>
+                                </div>
+                                <div class="template-info">
+                                    <span class="template-label">模板：</span>
+                                    <span class="template-name">${sceneInfo.name}</span>
+                                    <span class="template-label">分类：</span>
+                                    <div class="category-list">${renderCategoryTags(dimensions)}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间：考核关系平铺 -->
+                        <div class="survey-relations">
+                            ${renderRelationsCompact(review.subjects, review.scene)}
+                        </div>
+                        
+                        <!-- 右侧：操作 -->
+                        <div class="survey-right">
+                            <div class="stat-badge">
+                                <div class="stat-value-small">${subjectCount}</div>
+                                <div class="stat-label-small">被评估人</div>
+                            </div>
+                            <div class="stat-badge" style="margin-top: 0.5rem;">
+                                <div class="stat-value-small">${evaluatorCount}</div>
+                                <div class="stat-label-small">评估人</div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.5rem;">
+                                ${actionBtns}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Get scene name
+        function getSceneName(scene) {
+            const sceneNames = {
+                'promotion': '晋升评估',
+                'probation': '转正评估',
+                'newleader': '新Leader考察',
+                'performance': '绩效考核'
+            };
+            return sceneNames[scene] || '其他';
+        }
+        
+        // View survey
+        function viewSurvey(surveyId) {
+            window.location.href = 'survey-detail.html?id=' + surveyId;
+        }
+        
+        // View progress
+        function viewProgress(surveyId) {
+            window.location.href = 'survey-list.html';
+        }
+        
+        // Review survey (admin)
+        function reviewSurvey(surveyId) {
+            window.location.href = 'create-survey-step4.html?surveyId=' + surveyId;
+        }
+        
+        // Edit survey
+        function editSurvey(surveyId) {
+            let survey;
+            if (typeof DataStore !== 'undefined') {
+                const surveyData = DataStore.getSurvey(surveyId);
+                if (surveyData) {
+                    survey = {...surveyData};
+                    DataStore.updateSurvey(surveyId, {status: 'draft'});
+                }
+            } else {
+                const myReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+                survey = myReviews.find(s => s.id === surveyId);
+                if (survey) {
+                    const updatedReviews = myReviews.filter(s => s.id !== surveyId);
+                    localStorage.setItem('myPendingReviews', JSON.stringify(updatedReviews));
+                }
+            }
+            if (survey) {
+                alert('跳转回编辑页面，预填充数据');
+                window.location.href = 'create-survey-step3.html';
+            }
+        }
+        
+        // Withdraw survey
+        function withdrawSurvey(surveyId) {
+            if (confirm('确认撤回？\n\n撤回后调研将回到编辑状态，您可以修改后重新提交审核。')) {
+                let survey;
+                if (typeof DataStore !== 'undefined') {
+                    survey = DataStore.getSurvey(surveyId);
+                    if (survey) {
+                        DataStore.updateSurvey(surveyId, {status: 'draft'});
+                    }
+                } else {
+                    const myReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+                    survey = myReviews.find(s => s.id === surveyId);
+                    
+                    if (survey) {
+                        const updatedReviews = myReviews.filter(s => s.id !== surveyId);
+                        localStorage.setItem('myPendingReviews', JSON.stringify(updatedReviews));
+                        
+                        let pendingReviews = JSON.parse(localStorage.getItem('pendingReviews') || '[]');
+                        pendingReviews = pendingReviews.filter(s => s.id !== surveyId);
+                        localStorage.setItem('pendingReviews', JSON.stringify(pendingReviews));
+                    }
+                }
+                
+                if (survey) {
+                    renderPendingList();
+                    alert('调研已撤回，您可以在发起调研页面重新编辑');
+                }
+            }
+        }
+        
+        // Load demo data - 强制刷新确保数据更新
+        function loadDemoData() {
+            if (typeof DataStore !== 'undefined') {
+                DataStore.initDemoData(true); // forceRefresh = true
+            } else if (typeof initDemoData === 'function') {
+                initDemoData();
+            }
+        }
+        
+        // 初始化
+        // 侧边栏折叠状态
+        let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        
+        // 切换侧边栏
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+            applySidebarState();
+        }
+        
+        // 应用侧边栏状态
+        function applySidebarState() {
+            const sidebar = document.getElementById('adminSidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (sidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                toggleIcon.classList.remove('bi-chevron-left');
+                toggleIcon.classList.add('bi-chevron-right');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                toggleIcon.classList.remove('bi-chevron-right');
+                toggleIcon.classList.add('bi-chevron-left');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            applySidebarState();
+            loadDemoData();
+            renderPendingList();
+        });
+    </script>
+</body>
+</html>

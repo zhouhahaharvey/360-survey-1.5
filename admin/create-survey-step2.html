@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导入人员 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <style>
+        /* Page Specific Styles */
+        .page-title {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .card {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .card-subtitle {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+        
+        /* Search Box */
+        .search-section {
+            margin-bottom: 2rem;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        /* Employee List */
+        .employee-list {
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .list-header {
+            display: grid;
+            grid-template-columns: 60px 1fr 150px 100px 80px;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+        
+        .employee-item {
+            display: grid;
+            grid-template-columns: 60px 1fr 150px 100px 80px;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            align-items: center;
+        }
+        
+        .employee-item:last-child {
+            border-bottom: none;
+        }
+        
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .employee-info h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.125rem;
+        }
+        
+        .employee-info p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        
+        .relation-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .relation-up { background: #dbeafe; color: #1e40af; }
+        .relation-peer { background: #d1fae5; color: #065f46; }
+        .relation-down { background: #ffedd5; color: #9a3412; }
+        .relation-cross_dept { background: #ede9fe; color: #7c3aed; }
+        .relation-hr_partner { background: #fce7f3; color: #db2777; }
+        .relation-project_lead { background: #e0f2fe; color: #0369a1; }
+        .relation-external { background: #f3f4f6; color: #6b7280; }
+        
+        /* Relations Section */
+        .relations-section {
+            margin-top: 2rem;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .relation-group {
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .relation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .relation-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .relation-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+        
+        .relation-list {
+            padding: 0.75rem 1rem;
+        }
+        
+        .relation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--gray-200);
+        }
+        
+        .relation-item:last-child {
+            border-bottom: none;
+        }
+        
+        .relation-person {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .mini-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        /* 统一的评估人标签样式 */
+        .evaluator-tag-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-700);
+            cursor: default;
+            transition: all 0.2s;
+        }
+        
+        .evaluator-tag-inline:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .evaluator-avatar-inline {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .evaluator-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        
+        .evaluator-name {
+            font-weight: 500;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .evaluator-title {
+            color: var(--gray-500);
+            font-size: 0.625rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .relation-person-info h5 {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-800);
+            margin-bottom: 0;
+        }
+        
+        .relation-person-info p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-bottom: 0;
+        }
+        
+        /* Card Footer */
+        .card-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        @media (max-width: 768px) {
+            .list-header, .employee-item {
+                grid-template-columns: 50px 1fr 80px;
+            }
+            .list-header > *:nth-child(4),
+            .list-header > *:nth-child(5),
+            .employee-item > *:nth-child(4),
+            .employee-item > *:nth-child(5) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <div class="page-title">
+                <a href="dashboard.html" class="back-to-home">
+                    <i class="bi bi-arrow-left"></i>
+                    返回首页
+                </a>
+                <h1>发起调研</h1>
+            </div>
+        </div>
+
+        <!-- Wizard Steps -->
+        <div class="wizard-steps">
+            <div class="step-item completed">
+                <div class="step-number"><i class="bi bi-check"></i></div>
+                <span class="step-label">选择场景</span>
+            </div>
+            <div class="step-divider completed"></div>
+            <div class="step-item active">
+                <div class="step-number">2</div>
+                <span class="step-label">导入人员</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item pending">
+                <div class="step-number">3</div>
+                <span class="step-label">配置通知</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item pending">
+                <div class="step-number">4</div>
+                <span class="step-label">确认发起</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">选择被评估人</h3>
+                <p class="card-subtitle">输入工号自动识别，系统将自动匹配评估关系</p>
+            </div>
+            <div class="card-body">
+                <!-- Alert -->
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <span>系统将根据HR系统中的汇报关系，自动识别上级、平级、下级</span>
+                </div>
+
+                <!-- Search -->
+                <div class="search-section">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="employeeInput" 
+                               placeholder="输入工号或姓名，如：10001 或 张三" 
+                               onkeypress="handleEnter(event)">
+                        <button class="btn btn-primary" onclick="searchEmployee()">
+                            <i class="bi bi-search"></i>
+                            搜索
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="bi bi-upload"></i>
+                            批量导入
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Selected Employee -->
+                <div id="employeeSection" style="display: none;">
+                    <div class="section-title">
+                        <i class="bi bi-person-check"></i>
+                        已选择被评估人
+                    </div>
+                    
+                    <div class="employee-list">
+                        <div class="list-header">
+                            <span></span>
+                            <span>员工信息</span>
+                            <span>部门</span>
+                            <span>职级</span>
+                            <span>操作</span>
+                        </div>
+                        <div id="employeeListBody">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+
+                    <!-- Auto-detected Relations -->
+                    <div class="relations-section">
+                        <div class="section-title">
+                            <i class="bi bi-people"></i>
+                            自动识别的评估关系
+                            <span style="font-size: 0.75rem; font-weight: normal; color: var(--gray-600);">
+                                (可调整)
+                            </span>
+                        </div>
+
+                        <!-- 上级 -->
+                        <div class="relation-group">
+                            <div class="relation-header">
+                                <div class="relation-title">
+                                    <span class="relation-badge relation-up" title="直属领导或更高层级管理者">
+                                        <span style="margin-right: 0.25rem;">↑</span> 上级
+                                    </span>
+                                    <span>直接汇报对象</span>
+                                </div>
+                                <span class="relation-count" id="upCount">0</span>
+                            </div>
+                            <div class="relation-list" id="upList">
+                                <div class="empty-state" style="padding: 1rem;">
+                                    <p style="font-size: 0.75rem; margin: 0;">请先添加被评估人</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 平级 -->
+                        <div class="relation-group">
+                            <div class="relation-header">
+                                <div class="relation-title">
+                                    <span class="relation-badge relation-peer" title="同部门或跨部门同级别同事">
+                                        <span style="margin-right: 0.25rem;">↔</span> 平级
+                                    </span>
+                                    <span>同上级同事</span>
+                                </div>
+                                <span class="relation-count" id="peerCount">0</span>
+                            </div>
+                            <div class="relation-list" id="peerList">
+                                <div class="empty-state" style="padding: 1rem;">
+                                    <p style="font-size: 0.75rem; margin: 0;">请先添加被评估人</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 下级 -->
+                        <div class="relation-group">
+                            <div class="relation-header">
+                                <div class="relation-title">
+                                    <span class="relation-badge relation-down" title="直接下属或团队成员">
+                                        <span style="margin-right: 0.25rem;">↓</span> 下级
+                                    </span>
+                                    <span>直接下属</span>
+                                </div>
+                                <span class="relation-count" id="downCount">0</span>
+                            </div>
+                            <div class="relation-list" id="downList">
+                                <div class="empty-state" style="padding: 1rem;">
+                                    <p style="font-size: 0.75rem; margin: 0;">请先添加被评估人</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h4>还没有选择被评估人</h4>
+                    <p>在上方输入工号或姓名开始添加</p>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <button class="btn btn-outline" onclick="history.back()">
+                    <i class="bi bi-arrow-left"></i>
+                    上一步
+                </button>
+                <button class="btn btn-primary" id="nextBtn" disabled onclick="goToStep3()">
+                    下一步：配置通知
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script>
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item active">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        // Page-specific script
+        const mockEmployees = {
+            '10001': { name: '张三', dept: '技术部', level: 'P7', title: '高级前端工程师', manager: '10010', peers: ['10002', '10003'], subordinates: ['10011', '10012'] },
+            '10002': { name: '李四', dept: '技术部', level: 'P6', title: '后端工程师', manager: '10010', peers: ['10001', '10003'], subordinates: ['10025'] },
+            '10003': { name: '王五', dept: '技术部', level: 'P6', title: '测试工程师', manager: '10010', peers: ['10001', '10002'], subordinates: ['10013'] },
+            '10010': { name: '赵经理', dept: '技术部', level: 'P8', title: '技术经理', manager: '10020', peers: ['10021'], subordinates: ['10001', '10002', '10003'] },
+            '10011': { name: '小明', dept: '技术部', level: 'P5', title: '初级工程师', manager: '10001', peers: ['10012'], subordinates: [] },
+            '10012': { name: '小红', dept: '技术部', level: 'P5', title: '初级工程师', manager: '10001', peers: ['10011'], subordinates: [] },
+            '10013': { name: '小华', dept: '技术部', level: 'P5', title: '初级工程师', manager: '10003', peers: [], subordinates: [] },
+            '10020': { name: '孙总监', dept: '技术部', level: 'P9', title: '技术总监', manager: null, peers: [], subordinates: ['10010'] },
+            '10021': { name: '周经理', dept: '产品部', level: 'P8', title: '产品总监', manager: '10022', peers: ['10010'], subordinates: [] },
+            '10022': { name: '吴主管', dept: '技术部', level: 'P7', title: '架构师', manager: '10010', peers: [], subordinates: ['10021'] },
+            '10025': { name: '冯助理', dept: '技术部', level: 'P4', title: '技术助理', manager: '10002', peers: [], subordinates: [] },
+        };
+        
+        // 获取员工姓名
+        function getEmployeeName(empId) {
+            return mockEmployees[empId]?.name || empId;
+        }
+
+        let selectedEmployee = null;
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                searchEmployee();
+            }
+        }
+
+        function searchEmployee() {
+            const input = document.getElementById('employeeInput');
+            const value = input.value.trim();
+            
+            if (!value) return;
+            
+            // Find employee (by ID or name)
+            let empId = value;
+            if (!mockEmployees[value]) {
+                // Try find by name
+                const found = Object.entries(mockEmployees).find(([id, emp]) => emp.name === value);
+                if (found) empId = found[0];
+            }
+            
+            if (mockEmployees[empId]) {
+                selectedEmployee = { id: empId, ...mockEmployees[empId] };
+                renderEmployee();
+                renderRelations();
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('employeeSection').style.display = 'block';
+                document.getElementById('nextBtn').disabled = false;
+                input.value = '';
+            } else {
+                alert('未找到该员工，请检查工号或姓名');
+            }
+        }
+
+        function renderEmployee() {
+            const managerName = selectedEmployee.manager ? getEmployeeName(selectedEmployee.manager) : '';
+            const tooltipContent = [
+                selectedEmployee.name,
+                `工号：${selectedEmployee.id}`,
+                selectedEmployee.title ? `岗位：${selectedEmployee.title}` : '',
+                selectedEmployee.level ? `职级：${selectedEmployee.level}` : '',
+                selectedEmployee.dept ? `部门：${selectedEmployee.dept}` : '',
+                managerName ? `汇报对象：${managerName}` : ''
+            ].filter(Boolean).join('\n');
+            
+            const html = `
+                <div class="employee-item" title="${tooltipContent}">
+                    <div class="employee-avatar" style="background: linear-gradient(135deg, var(--primary), #7c3aed); color: white;">${selectedEmployee.name[0]}</div>
+                    <div class="employee-info" style="flex: 1; min-width: 0;">
+                        <h4>${selectedEmployee.name} <span style="color: var(--gray-600); font-weight: normal;">(${selectedEmployee.id})</span>
+                            ${selectedEmployee.title ? `<span class="title-badge" style="background: var(--primary-light); color: var(--primary); padding: 0.125rem 0.375rem; border-radius: 4px; font-size: 0.6875rem; font-weight: 500;">${selectedEmployee.title}</span>` : ''}
+                        </h4>
+                        <p style="margin: 0; font-size: 0.75rem; color: var(--gray-600);">${selectedEmployee.dept} · ${selectedEmployee.level}${managerName ? ` · 汇报给：${managerName}` : ''}</p>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--gray-600);">${selectedEmployee.dept}</div>
+                    <div style="font-size: 0.875rem; color: var(--gray-600);">${selectedEmployee.level}</div>
+                    <div>
+                        <button class="btn btn-outline btn-sm" onclick="removeEmployee()">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('employeeListBody').innerHTML = html;
+        }
+
+        // 使用 common.js 中的 RELATION_TYPES
+        function getRelationConfig(type) {
+            return RELATION_TYPES[type] || { label: type, icon: '•', color: '#666' };
+        }
+        
+        // 渲染评估人标签（统一样式）
+        function renderEvaluatorTag(employee, empId) {
+            const title = employee.title || employee.role || '';
+            const tooltipContent = [
+                employee.name,
+                title ? `岗位：${title}` : '',
+                employee.level ? `职级：${employee.level}` : '',
+                employee.dept ? `部门：${employee.dept}` : '',
+                empId ? `工号：${empId}` : ''
+            ].filter(Boolean).join(' | ');
+            
+            return `
+                <span class="evaluator-tag-inline" title="${tooltipContent}">
+                    <span class="evaluator-avatar-inline">${employee.name.charAt(0)}</span>
+                    <span class="evaluator-info">
+                        <span class="evaluator-name">${employee.name}</span>
+                        ${title ? `<span class="evaluator-title">${title}</span>` : ''}
+                    </span>
+                </span>
+            `;
+        }
+        
+        function renderRelations() {
+            // 上级
+            const manager = mockEmployees[selectedEmployee.manager];
+            if (manager) {
+                document.getElementById('upList').innerHTML = `
+                    <div class="relation-item">
+                        <div class="relation-person">
+                            ${renderEvaluatorTag(manager, selectedEmployee.manager)}
+                        </div>
+                        <button class="btn btn-outline btn-sm">调整</button>
+                    </div>
+                `;
+                document.getElementById('upCount').textContent = '1';
+            }
+
+            // 平级
+            const peers = selectedEmployee.peers.map(pid => ({
+                id: pid, ...mockEmployees[pid]
+            })).filter(p => p.name);
+            
+            document.getElementById('peerList').innerHTML = peers.map(p => `
+                <div class="relation-item">
+                    <div class="relation-person">
+                        ${renderEvaluatorTag(p, p.id)}
+                    </div>
+                    <button class="btn btn-outline btn-sm">移除</button>
+                </div>
+            `).join('') + `
+                <div class="relation-item" style="justify-content: center;">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="bi bi-plus"></i> 添加平级
+                    </button>
+                </div>
+            `;
+            document.getElementById('peerCount').textContent = peers.length;
+
+            // 下级
+            const subs = selectedEmployee.subordinates.map(sid => ({
+                id: sid, ...mockEmployees[sid]
+            })).filter(s => s.name);
+            
+            document.getElementById('downList').innerHTML = subs.length > 0 ? subs.map(s => `
+                <div class="relation-item">
+                    <div class="relation-person">
+                        ${renderEvaluatorTag(s, s.id)}
+                    </div>
+                    <button class="btn btn-outline btn-sm">移除</button>
+                </div>
+            `).join('') : `
+                <div class="empty-state" style="padding: 1rem;">
+                    <p style="font-size: 0.75rem; margin: 0; color: var(--gray-600);">该员工暂无直接下属</p>
+                </div>
+            `;
+            document.getElementById('downCount').textContent = subs.length;
+        }
+
+        function removeEmployee() {
+            selectedEmployee = null;
+            document.getElementById('employeeSection').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        function goToStep3() {
+            window.location.href = 'create-survey-step3.html';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+        });
+    </script>
+</body>
+</html>

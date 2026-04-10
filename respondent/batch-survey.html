@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>批量评估 - 360调研</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/respondent.css">
+    <!-- 页面特有样式 -->
+    <style>
+        :root {
+            --cell-height: 80px;
+            --header-height: 50px;
+            --subject-col-width: 140px;
+            --rating-col-width: 110px;
+        }
+        
+        /* Override body for batch survey */
+        body.mobile {
+            padding-bottom: 80px;
+            background: var(--gray-100);
+        }
+        
+        /* App Header - White style for batch survey */
+        .app-header-white {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0.75rem 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 8px;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+        
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .header-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header-subtitle {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+        }
+        
+        .scenario-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: linear-gradient(135deg, var(--primary-light), #ede9fe);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .header-progress {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.375rem;
+        }
+        
+        .progress-text {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+        
+        .progress-text strong {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+        
+        .progress-bar {
+            width: 140px;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #7c3aed);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Main Container */
+        .main-container {
+            padding-top: 70px;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+        
+        /* Stats Panel */
+        .stats-panel {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .stats-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+        }
+        
+        .stat-value {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .stat-value.good { color: var(--success); }
+        .stat-value.warning { color: var(--warning); }
+        
+        .legend {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+        
+        .legend-dot.low { background: var(--danger); }
+        .legend-dot.medium { background: var(--warning); }
+        .legend-dot.high { background: var(--success); }
+        
+        /* Table Container */
+        .table-wrapper {
+            background: white;
+            margin: 1rem auto;
+            max-width: 1400px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .table-scroll-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        
+        .excel-table {
+            display: grid;
+            min-width: max-content;
+        }
+        
+        /* Table Header */
+        .table-header { display: contents; }
+        
+        .header-cell {
+            background: var(--gray-50);
+            border-bottom: 2px solid var(--gray-200);
+            border-right: 1px solid var(--gray-200);
+            padding: 0.75rem 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+        
+        .header-cell:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 101;
+            background: var(--gray-100);
+            border-right: 2px solid var(--gray-300);
+            width: var(--subject-col-width);
+        }
+        
+        .header-cell:last-child { border-right: none; }
+        
+        .header-cell .dimension-desc {
+            font-size: 0.6875rem;
+            color: var(--gray-500);
+            font-weight: 400;
+            margin-top: 0.125rem;
+        }
+        
+        /* Table Body */
+        .table-body { display: contents; }
+        .table-row { display: contents; }
+        
+        .row-cell {
+            border-bottom: 1px solid var(--gray-200);
+            border-right: 1px solid var(--gray-200);
+            min-height: var(--cell-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.15s ease;
+        }
+        
+        .row-cell:last-child { border-right: none; }
+        .table-row:last-child .row-cell { border-bottom: none; }
+        
+        /* Subject Column */
+        .subject-cell {
+            position: sticky;
+            left: 0;
+            width: var(--subject-col-width);
+            background: white;
+            border-right: 2px solid var(--gray-300);
+            z-index: 50;
+            padding: 0.75rem;
+            cursor: pointer;
+            justify-content: flex-start;
+            gap: 0.625rem;
+        }
+        
+        .subject-cell:hover { background: var(--gray-50); }
+        
+        .subject-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            overflow: hidden;
+        }
+        
+        .subject-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .subject-meta {
+            font-size: 0.6875rem;
+            color: var(--gray-500);
+            white-space: nowrap;
+        }
+        
+        .subject-progress-mini {
+            font-size: 0.625rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        /* Rating Cell */
+        .rating-cell {
+            width: var(--rating-col-width);
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .rating-cell:hover { background: var(--gray-50); }
+        .rating-cell.selected { background: var(--primary-light); }
+        .rating-cell.active { box-shadow: inset 0 0 0 2px var(--primary); }
+        
+        .rating-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.9375rem;
+            color: var(--gray-600);
+        }
+        
+        .rating-display .stars {
+            display: flex;
+            gap: 1px;
+            font-size: 0.75rem;
+        }
+        
+        .rating-display .stars .filled { color: #fbbf24; }
+        .rating-display .stars .empty { color: var(--gray-300); }
+        
+        /* Rating Dropdown */
+        .rating-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 200;
+            padding: 0.5rem;
+            min-width: 80px;
+            display: none;
+        }
+        
+        .rating-dropdown.show {
+            display: block;
+            animation: dropdownFadeIn 0.15s ease;
+        }
+        
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-5px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .rating-option {
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+            margin-bottom: 0.25rem;
+        }
+        
+        .rating-option:last-child { margin-bottom: 0; }
+        .rating-option:hover { background: var(--gray-100); }
+        .rating-option.selected { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+        
+        /* Rating Colors */
+        .rating-cell.score-1,
+        .rating-cell.score-2 { background: var(--danger-light); }
+        .rating-cell.score-3 { background: var(--warning-light); }
+        .rating-cell.score-4,
+        .rating-cell.score-5 { background: var(--success-light); }
+        
+        .rating-cell.score-1:hover,
+        .rating-cell.score-2:hover { background: #fecaca; }
+        .rating-cell.score-3:hover { background: #fde68a; }
+        .rating-cell.score-4:hover,
+        .rating-cell.score-5:hover { background: #a7f3d0; }
+        
+        .rating-cell.empty::before {
+            content: '-';
+            color: var(--gray-400);
+            font-size: 1.25rem;
+        }
+        
+        .rating-cell.batch-selected {
+            box-shadow: inset 0 0 0 2px var(--primary);
+            background: rgba(79, 70, 229, 0.1);
+        }
+        
+        /* Subjective Column */
+        .subjective-col {
+            min-width: 300px;
+            max-width: 350px;
+            padding: 0.5rem;
+        }
+        
+        .subjective-inputs-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+        
+        .subjective-field-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+        
+        .subjective-label-compact {
+            font-size: 0.6875rem;
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .subjective-label-compact i.like { color: var(--success); }
+        .subjective-label-compact i.suggest { color: var(--warning); }
+        
+        .subjective-textarea-compact {
+            width: 100%;
+            min-height: 36px;
+            height: 36px;
+            padding: 0.375rem 0.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-family: inherit;
+            resize: none;
+            transition: all 0.2s;
+            line-height: 1.4;
+        }
+        
+        .subjective-textarea-compact:hover { border-color: var(--gray-300); }
+        .subjective-textarea-compact:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+            height: 80px;
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .subjective-textarea-compact.has-content {
+            background: #f0fdf4;
+            border-color: var(--success);
+        }
+        
+        /* Bottom Actions */
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--gray-200);
+            padding: 0.875rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .bottom-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .progress-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .progress-center-text {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+        
+        .progress-center-bar {
+            width: 120px;
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-center-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #7c3aed);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--gray-800);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast-icon {
+            color: var(--success);
+            font-size: 1.125rem;
+        }
+        
+        /* Batch Action Bar */
+        .batch-action-bar {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-800);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 900;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .batch-action-bar.show { display: flex; }
+        
+        .batch-action-text { font-size: 0.875rem; }
+        
+        .batch-action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .batch-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .batch-btn.score-1 { background: var(--danger-light); color: var(--danger); }
+        .batch-btn.score-2 { background: #fecaca; color: #dc2626; }
+        .batch-btn.score-3 { background: var(--warning-light); color: var(--warning); }
+        .batch-btn.score-4 { background: #bbf7d0; color: #16a34a; }
+        .batch-btn.score-5 { background: var(--success-light); color: var(--success); }
+        .batch-btn:hover { transform: scale(1.1); }
+        
+        .batch-close {
+            background: transparent;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: 0.5rem;
+        }
+        
+        .batch-close:hover { color: white; }
+        
+        /* Subject Avatar with status */
+        .subject-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            position: relative;
+        }
+        
+        .subject-avatar.completed { background: var(--success); }
+        .subject-avatar.in-progress { background: var(--warning); }
+        
+        .subject-avatar .check-icon {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            border: 2px solid white;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            :root {
+                --subject-col-width: 110px;
+                --rating-col-width: 85px;
+                --cell-height: 70px;
+            }
+            
+            .header-title { font-size: 0.9375rem; }
+            .header-subtitle { display: none; }
+            
+            .stats-panel {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: flex-start;
+            }
+            
+            .stats-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .legend {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .bottom-actions {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8125rem;
+            }
+            
+            .progress-center {
+                order: -1;
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+                gap: 0.75rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid var(--gray-200);
+            }
+            
+            .subject-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.75rem;
+            }
+            
+            .subject-name { 
+                font-size: 0.875rem; 
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 90px;
+            }
+            .subject-meta { display: none; }
+            
+            .rating-option {
+                min-width: 44px;
+                min-height: 44px;
+            }
+            
+            .rating-option .label {
+                font-size: 0.625rem;
+            }
+        }
+    </style>
+</head>
+<body class="mobile">
+    <!-- Header -->
+    <header class="app-header-white">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="todo-list.html" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    返回待办
+                </a>
+                <a href="../index.html" class="back-btn" style="margin-left: 0.5rem;">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    原型导航
+                </a>
+                <div class="header-title-group">
+                    <div class="header-title">
+                        批量评估（3人）
+                        <span class="scenario-tag">
+                            <i class="bi bi-award"></i>
+                            晋升评估
+                        </span>
+                    </div>
+                    <div class="header-subtitle">Q2 2024 · 技术部360度调研</div>
+                </div>
+            </div>
+            <div class="header-progress">
+                <div class="progress-text">
+                    总体进度 <strong id="totalProgressText">12/15</strong>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="totalProgressBar" style="width: 80%"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stats-left">
+                <div class="stat-item">
+                    <span>平均分：</span>
+                    <span class="stat-value good" id="avgScore">4.2</span>
+                </div>
+                <div class="stat-item">
+                    <span>评分：</span>
+                    <span class="stat-value" id="completedCount">12/15</span>
+                </div>
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot low"></div>
+                    <span>1-2分 待提升</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot medium"></div>
+                    <span>3分 良好</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot high"></div>
+                    <span>4-5分 优秀</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="table-wrapper">
+            <div class="table-scroll-container">
+                <div class="excel-table" id="excelTable" style="grid-template-columns: var(--subject-col-width) repeat(5, var(--rating-col-width)) 300px;">
+                    <!-- Header -->
+                    <div class="table-header">
+                        <div class="header-cell" style="grid-column: 1;">被评估人</div>
+                        <div class="header-cell" style="grid-column: 2;">
+                            专业深度
+                            <div class="dimension-desc">技术能力</div>
+                        </div>
+                        <div class="header-cell" style="grid-column: 3;">
+                            技术影响力
+                            <div class="dimension-desc">团队贡献</div>
+                        </div>
+                        <div class="header-cell" style="grid-column: 4;">
+                            团队协作
+                            <div class="dimension-desc">沟通配合</div>
+                        </div>
+                        <div class="header-cell" style="grid-column: 5;">
+                            创新能力
+                            <div class="dimension-desc">解决问题</div>
+                        </div>
+                        <div class="header-cell" style="grid-column: 6;">
+                            执行力
+                            <div class="dimension-desc">结果导向</div>
+                        </div>
+                        <div class="header-cell subjective-col" style="grid-column: 7;">
+                            主观评价
+                            <div class="dimension-desc">优点/建议</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Body - Dynamically populated -->
+                    <div class="table-body" id="tableBody">
+                        <!-- Rows will be generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Batch Action Bar -->
+    <div class="batch-action-bar" id="batchActionBar">
+        <span class="batch-action-text">已选择 <strong id="batchCount">0</strong> 个单元格</span>
+        <div class="batch-action-buttons">
+            <button class="batch-btn score-1" onclick="applyBatchScore(1)">1</button>
+            <button class="batch-btn score-2" onclick="applyBatchScore(2)">2</button>
+            <button class="batch-btn score-3" onclick="applyBatchScore(3)">3</button>
+            <button class="batch-btn score-4" onclick="applyBatchScore(4)">4</button>
+            <button class="batch-btn score-5" onclick="applyBatchScore(5)">5</button>
+        </div>
+        <button class="batch-close" onclick="clearBatchSelection()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="bottom-actions">
+        <div class="bottom-left">
+            <button class="btn btn-secondary btn-sm" onclick="saveDraftManual()">
+                <i class="bi bi-save"></i>
+                保存草稿
+            </button>
+        </div>
+        <div class="progress-center">
+            <span class="progress-center-text">12/15 评分</span>
+            <div class="progress-center-bar">
+                <div class="progress-center-fill" style="width: 80%"></div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary btn-sm" onclick="submitWithConfirm()">
+                <i class="bi bi-check-lg"></i>
+                提交评估
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="bi bi-check-circle-fill toast-icon"></i>
+        <span id="toastMessage">草稿已自动保存</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../demo-data.js"></script>
+    <script>
+        // Data Structure
+        const surveyData = {
+            subjects: [
+                { id: 1, name: '张三', dept: '技术部', level: 'P7', role: '后端开发', avatar: '张', completed: true },
+                { id: 2, name: '李四', dept: '技术部', level: 'P6', role: '前端开发', avatar: '李', completed: false },
+                { id: 3, name: '王五', dept: '产品部', level: 'P6', role: '产品经理', avatar: '王', completed: false }
+            ],
+            dimensions: [
+                { id: 'depth', name: '专业深度', desc: '技术能力' },
+                { id: 'influence', name: '技术影响力', desc: '团队贡献' },
+                { id: 'collaboration', name: '团队协作', desc: '沟通配合' },
+                { id: 'innovation', name: '创新能力', desc: '解决问题' },
+                { id: 'execution', name: '执行力', desc: '结果导向' }
+            ],
+            ratings: {
+                0: { 0: 4, 1: 5, 2: 3, 3: 4, 4: 5 },
+                1: { 0: 3, 1: 4, 2: 5, 3: 3, 4: null },
+                2: { 0: 5, 1: 3, 2: 4, 3: 5, 4: 3 }
+            },
+            comments: {
+                0: { like: '张三技术能力扎实，架构设计优秀', suggest: '' },
+                1: { like: '李四跨团队协作主动，文档清晰', suggest: '' },
+                2: { like: '', suggest: '' }
+            }
+        };
+
+        // State Management
+        let state = {
+            currentCell: null,
+            batchSelection: new Set(),
+            isBatchMode: false,
+            lastSaved: null
+        };
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTable();
+            initRatingCells();
+            updateProgress();
+            loadDraft();
+        });
+
+        // Render Table
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            let html = '';
+            
+            surveyData.subjects.forEach((subject, subjectIdx) => {
+                const ratings = surveyData.ratings[subjectIdx] || {};
+                const comments = surveyData.comments[subjectIdx] || {};
+                let completedCount = 0;
+                
+                surveyData.dimensions.forEach((_, dimIdx) => {
+                    if (ratings[dimIdx] !== null && ratings[dimIdx] !== undefined) {
+                        completedCount++;
+                    }
+                });
+                
+                const isCompleted = completedCount === surveyData.dimensions.length;
+                const isInProgress = completedCount > 0 && !isCompleted;
+                
+                html += `
+                    <div class="table-row" data-subject-index="${subjectIdx}">
+                        <div class="row-cell subject-cell">
+                            <div class="subject-avatar ${isCompleted ? 'completed' : isInProgress ? 'in-progress' : ''}">
+                                ${subject.avatar}
+                                ${isCompleted ? '<span class="check-icon"><i class="bi bi-check"></i></span>' : ''}
+                            </div>
+                            <div class="subject-info">
+                                <div class="subject-name">${subject.name}</div>
+                                <div class="subject-meta">${subject.dept} ${subject.level}</div>
+                                <div class="subject-progress-mini">${isCompleted ? '已完成' : completedCount + '/' + surveyData.dimensions.length + ' 评分'}</div>
+                            </div>
+                        </div>
+                `;
+                
+                // Rating cells
+                surveyData.dimensions.forEach((_, dimIdx) => {
+                    const value = ratings[dimIdx];
+                    html += generateRatingCell(subjectIdx, dimIdx, value);
+                });
+                
+                // Subjective column
+                html += `
+                        <div class="row-cell subjective-col" data-subject="${subjectIdx}">
+                            <div class="subjective-inputs-compact">
+                                <div class="subjective-field-compact">
+                                    <div class="subjective-label-compact">
+                                        <i class="bi bi-hand-thumbs-up like"></i> 优点
+                                    </div>
+                                    <textarea class="subjective-textarea-compact ${comments.like ? 'has-content' : ''}" 
+                                        placeholder="点击输入..." data-subject="${subjectIdx}" data-field="like" 
+                                        oninput="updateCompactCharCount(this); autoSaveDraft();">${comments.like || ''}</textarea>
+                                </div>
+                                <div class="subjective-field-compact">
+                                    <div class="subjective-label-compact">
+                                        <i class="bi bi-lightbulb suggest"></i> 建议
+                                    </div>
+                                    <textarea class="subjective-textarea-compact ${comments.suggest ? 'has-content' : ''}" 
+                                        placeholder="点击输入..." data-subject="${subjectIdx}" data-field="suggest" 
+                                        oninput="updateCompactCharCount(this); autoSaveDraft();">${comments.suggest || ''}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        // Generate Rating Cell HTML
+        function generateRatingCell(subjectIdx, dimIdx, value) {
+            const scoreClass = value ? `score-${value}` : 'empty';
+            const stars = value ? generateStars(value) : '';
+            
+            return `
+                <div class="row-cell rating-cell ${scoreClass}" data-subject="${subjectIdx}" data-dimension="${dimIdx}" data-value="${value || ''}">
+                    ${value ? `
+                    <div class="rating-display">
+                        <span class="stars">${stars}</span>
+                        <span>${value}分</span>
+                    </div>
+                    ` : ''}
+                    <div class="rating-dropdown">
+                        <div class="rating-option score-5 ${value === 5 ? 'selected' : ''}" data-value="5">★★★★★ 5分</div>
+                        <div class="rating-option score-4 ${value === 4 ? 'selected' : ''}" data-value="4">★★★★☆ 4分</div>
+                        <div class="rating-option score-3 ${value === 3 ? 'selected' : ''}" data-value="3">★★★☆☆ 3分</div>
+                        <div class="rating-option score-2 ${value === 2 ? 'selected' : ''}" data-value="2">★★☆☆☆ 2分</div>
+                        <div class="rating-option score-1 ${value === 1 ? 'selected' : ''}" data-value="1">★☆☆☆☆ 1分</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generate Stars
+        function generateStars(count) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                html += i <= count 
+                    ? '<i class="bi bi-star-fill filled"></i>' 
+                    : '<i class="bi bi-star empty"></i>';
+            }
+            return html;
+        }
+
+        // Initialize Rating Cells
+        function initRatingCells() {
+            const cells = document.querySelectorAll('.rating-cell');
+            
+            cells.forEach(cell => {
+                cell.addEventListener('click', function(e) {
+                    if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                        toggleBatchSelection(this);
+                    } else {
+                        openRatingDropdown(this);
+                    }
+                });
+
+                const dropdown = cell.querySelector('.rating-dropdown');
+                if (dropdown) {
+                    dropdown.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+
+                const options = cell.querySelectorAll('.rating-option');
+                options.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const value = parseInt(this.dataset.value);
+                        
+                        if (state.isBatchMode && state.batchSelection.size > 0) {
+                            applyBatchScore(value);
+                        } else {
+                            setRating(cell, value);
+                            closeAllDropdowns();
+                        }
+                    });
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.rating-dropdown') && !e.target.closest('.rating-cell')) {
+                    closeAllDropdowns();
+                }
+            });
+        }
+
+        // Rating Functions
+        function openRatingDropdown(cell) {
+            closeAllDropdowns();
+            if (!state.isBatchMode) {
+                clearBatchSelection();
+            }
+            document.querySelectorAll('.rating-cell').forEach(c => c.classList.remove('active'));
+            cell.classList.add('active');
+            state.currentCell = cell;
+            const dropdown = cell.querySelector('.rating-dropdown');
+            if (dropdown) dropdown.classList.add('show');
+        }
+
+        function closeAllDropdowns() {
+            document.querySelectorAll('.rating-dropdown').forEach(d => d.classList.remove('show'));
+            document.querySelectorAll('.rating-cell').forEach(c => c.classList.remove('active'));
+        }
+
+        function setRating(cell, value) {
+            const subjectIdx = parseInt(cell.dataset.subject);
+            const dimensionIdx = parseInt(cell.dataset.dimension);
+            
+            if (!surveyData.ratings[subjectIdx]) {
+                surveyData.ratings[subjectIdx] = {};
+            }
+            surveyData.ratings[subjectIdx][dimensionIdx] = value;
+            
+            updateCellDisplay(cell, value);
+            updateProgress();
+            autoSaveDraft();
+        }
+
+        function updateCellDisplay(cell, value) {
+            cell.dataset.value = value;
+            cell.classList.remove('empty', 'score-1', 'score-2', 'score-3', 'score-4', 'score-5');
+            
+            if (value) {
+                cell.classList.add(`score-${value}`);
+                const stars = generateStars(value);
+                cell.innerHTML = `
+                    <div class="rating-display">
+                        <span class="stars">${stars}</span>
+                        <span>${value}分</span>
+                    </div>
+                    ${generateDropdownHtml(value)}
+                `;
+                // Re-bind events
+                const dropdown = cell.querySelector('.rating-dropdown');
+                if (dropdown) {
+                    dropdown.addEventListener('click', e => e.stopPropagation());
+                }
+                cell.querySelectorAll('.rating-option').forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const val = parseInt(this.dataset.value);
+                        if (state.isBatchMode && state.batchSelection.size > 0) {
+                            applyBatchScore(val);
+                        } else {
+                            setRating(cell, val);
+                            closeAllDropdowns();
+                        }
+                    });
+                });
+            }
+        }
+
+        function generateDropdownHtml(selectedValue) {
+            return `
+                <div class="rating-dropdown">
+                    <div class="rating-option score-5 ${selectedValue === 5 ? 'selected' : ''}" data-value="5">★★★★★ 5分</div>
+                    <div class="rating-option score-4 ${selectedValue === 4 ? 'selected' : ''}" data-value="4">★★★★☆ 4分</div>
+                    <div class="rating-option score-3 ${selectedValue === 3 ? 'selected' : ''}" data-value="3">★★★☆☆ 3分</div>
+                    <div class="rating-option score-2 ${selectedValue === 2 ? 'selected' : ''}" data-value="2">★★☆☆☆ 2分</div>
+                    <div class="rating-option score-1 ${selectedValue === 1 ? 'selected' : ''}" data-value="1">★☆☆☆☆ 1分</div>
+                </div>
+            `;
+        }
+
+        // Batch Selection
+        function toggleBatchSelection(cell) {
+            const key = `${cell.dataset.subject}-${cell.dataset.dimension}`;
+            
+            if (state.batchSelection.has(key)) {
+                state.batchSelection.delete(key);
+                cell.classList.remove('batch-selected');
+            } else {
+                state.batchSelection.add(key);
+                cell.classList.add('batch-selected');
+            }
+            
+            updateBatchUI();
+        }
+
+        function updateBatchUI() {
+            const batchBar = document.getElementById('batchActionBar');
+            const batchCount = document.getElementById('batchCount');
+            
+            if (state.batchSelection.size > 0) {
+                state.isBatchMode = true;
+                batchBar.classList.add('show');
+                batchCount.textContent = state.batchSelection.size;
+            } else {
+                state.isBatchMode = false;
+                batchBar.classList.remove('show');
+            }
+        }
+
+        function clearBatchSelection() {
+            state.batchSelection.clear();
+            state.isBatchMode = false;
+            document.querySelectorAll('.rating-cell.batch-selected').forEach(cell => {
+                cell.classList.remove('batch-selected');
+            });
+            updateBatchUI();
+        }
+
+        function applyBatchScore(score) {
+            state.batchSelection.forEach(key => {
+                const [subjectIdx, dimensionIdx] = key.split('-').map(Number);
+                const cell = document.querySelector(`.rating-cell[data-subject="${subjectIdx}"][data-dimension="${dimensionIdx}"]`);
+                if (cell) setRating(cell, score);
+            });
+            
+            showToast(`已为 ${state.batchSelection.size} 个单元格评分 ${score} 分`);
+            clearBatchSelection();
+        }
+
+        // Progress
+        function updateProgress() {
+            let total = 0;
+            let completed = 0;
+            let sum = 0;
+            let count = 0;
+
+            for (let subjectIdx in surveyData.ratings) {
+                const ratings = surveyData.ratings[subjectIdx];
+                for (let dimensionIdx in ratings) {
+                    total++;
+                    const value = ratings[dimensionIdx];
+                    if (value !== null && value !== undefined) {
+                        completed++;
+                        sum += value;
+                        count++;
+                    }
+                }
+            }
+
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
+            const avg = count > 0 ? (sum / count).toFixed(1) : '0.0';
+
+            document.getElementById('totalProgressText').textContent = `${completed}/${total}`;
+            document.getElementById('totalProgressBar').style.width = `${percentage}%`;
+            document.getElementById('avgScore').textContent = avg;
+            document.getElementById('completedCount').textContent = `${completed}/${total}`;
+            document.querySelector('.progress-center-text').textContent = `${completed}/${total} 已完成`;
+            document.querySelector('.progress-center-fill').style.width = `${percentage}%`;
+        }
+
+        // Compact textarea
+        function updateCompactCharCount(textarea) {
+            const count = textarea.value.length;
+            textarea.classList.toggle('has-content', count > 0);
+            
+            // Update comments data
+            const subjectIdx = textarea.dataset.subject;
+            const field = textarea.dataset.field;
+            if (!surveyData.comments[subjectIdx]) surveyData.comments[subjectIdx] = {};
+            surveyData.comments[subjectIdx][field] = textarea.value;
+        }
+
+        // Draft Management
+        function autoSaveDraft() {
+            const draft = {
+                ratings: surveyData.ratings,
+                comments: surveyData.comments,
+                savedAt: new Date().toISOString()
+            };
+            Utils.storage.set('batchSurveyDraft', draft);
+            state.lastSaved = new Date();
+        }
+
+        function saveDraftManual() {
+            autoSaveDraft();
+            showToast('草稿已保存');
+        }
+
+        function loadDraft() {
+            const draft = Utils.storage.get('batchSurveyDraft', null);
+            if (draft && draft.ratings) {
+                surveyData.ratings = { ...surveyData.ratings, ...draft.ratings };
+                if (draft.comments) {
+                    surveyData.comments = { ...surveyData.comments, ...draft.comments };
+                }
+                renderTable();
+                initRatingCells();
+                updateProgress();
+            }
+        }
+
+        // Submit
+        function submitWithConfirm() {
+            let incomplete = [];
+            for (let subjectIdx in surveyData.subjects) {
+                const ratings = surveyData.ratings[subjectIdx] || {};
+                for (let i = 0; i < surveyData.dimensions.length; i++) {
+                    if (ratings[i] === null || ratings[i] === undefined) {
+                        incomplete.push(`${surveyData.subjects[subjectIdx].name} - ${surveyData.dimensions[i].name}`);
+                    }
+                }
+            }
+
+            let confirmMessage = '确认提交当前评估？提交后将无法修改。';
+            if (incomplete.length > 0) {
+                confirmMessage += '\n\n注意：还有 ' + incomplete.length + ' 个评分未完成。';
+            }
+
+            if (confirm(confirmMessage)) {
+                Utils.storage.remove('batchSurveyDraft');
+                showToast('提交成功！');
+                setTimeout(() => {
+                    window.location.href = 'success.html';
+                }, 1500);
+            }
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Auto-save every 30 seconds
+        setInterval(autoSaveDraft, 30000);
+    </script>
+</body>
+</html>

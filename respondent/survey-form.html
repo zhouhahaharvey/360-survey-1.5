@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>填写评估 - 360调研</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/respondent.css">
+    <!-- 页面特有样式 -->
+    <style>
+        /* Survey Header */
+        .survey-header {
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            padding: 1rem;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.375rem 0.75rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.8125rem;
+            transition: all 0.2s;
+        }
+        
+        .home-btn:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+        
+        .scene-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.625rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+        
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .step-dot {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+        
+        .step-dot.completed { background: white; }
+        .step-dot.active { background: rgba(255,255,255,0.6); }
+        
+        /* Subject Card */
+        .subject-card {
+            background: white;
+            margin: -1.5rem 1rem 1rem;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .subject-avatar-large {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .subject-info h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.125rem;
+        }
+        
+        .subject-info p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        /* Info Panel */
+        .info-panel {
+            background: white;
+            margin: 0 1rem 1rem;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .info-row + .info-row {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--gray-100);
+        }
+        
+        .info-label {
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            min-width: 80px;
+        }
+        
+        .info-label i {
+            color: var(--primary);
+            font-size: 0.875rem;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+        
+        /* Instruction Card */
+        .instruction-card {
+            background: linear-gradient(135deg, #eff6ff, #e0e7ff);
+            margin: 0 1rem 1rem;
+            border-radius: 12px;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .instruction-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.625rem;
+        }
+        
+        .instruction-header i {
+            color: var(--primary);
+            font-size: 1.125rem;
+        }
+        
+        .instruction-title {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.9375rem;
+        }
+        
+        .instruction-content {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+        
+        /* Dimension Section */
+        .dimension-section {
+            margin: 0 1rem 1.5rem;
+        }
+        
+        .dimension-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0 0.25rem;
+        }
+        
+        .dimension-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dimension-counter {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            background: var(--gray-100);
+            padding: 0.25rem 0.625rem;
+            border-radius: 20px;
+        }
+        
+        .dimension-desc {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+            margin: -0.5rem 0.25rem 1rem;
+            padding: 0.75rem;
+            background: var(--gray-100);
+            border-radius: 8px;
+        }
+        
+        /* Question Card */
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .question-header {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .question-number {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .question-text {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--gray-800);
+            line-height: 1.5;
+            flex: 1;
+        }
+        
+        .question-context {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+            margin-bottom: 1rem;
+            padding-left: 2.25rem;
+        }
+        
+        /* Rating */
+        .rating-options {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding-left: 2.25rem;
+        }
+        
+        .rating-option {
+            flex: 1;
+            aspect-ratio: 1;
+            max-width: 56px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .rating-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        .rating-option .number {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--gray-600);
+        }
+        
+        .rating-option.selected .number {
+            color: var(--primary);
+        }
+        
+        .rating-option .label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.125rem;
+        }
+        
+        .rating-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            padding-left: 2.25rem;
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+        }
+        
+        /* Subjective Section */
+        .subjective-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px dashed var(--gray-200);
+        }
+        
+        .subjective-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .subjective-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .icon-like { background: var(--success-light); }
+        .icon-suggest { background: #dbeafe; }
+        
+        .subjective-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .subjective-desc {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Text Input */
+        .text-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .char-count {
+            text-align: right;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-top: 0.375rem;
+        }
+        
+        .char-count.warning { color: var(--warning); }
+        
+        /* Quick Tags */
+        .quick-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .quick-tag {
+            padding: 0.375rem 0.75rem;
+            background: var(--gray-100);
+            border-radius: 16px;
+            font-size: 0.8125rem;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .quick-tag:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        /* Bottom Action */
+        .bottom-action {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--gray-200);
+            padding: 1rem;
+            display: flex;
+            gap: 0.75rem;
+            z-index: 100;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .bottom-action .btn {
+            flex: 1;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .bottom-action .btn-outline {
+            border: 1.5px solid var(--gray-300);
+            color: var(--gray-600);
+            background: white;
+        }
+        
+        .bottom-action .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-sheet {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.show .modal-sheet {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-cancel {
+            background: transparent;
+            color: var(--gray-600);
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        /* Refuse Options */
+        .refuse-options {
+            margin-bottom: 1rem;
+        }
+        
+        .refuse-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .refuse-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+    </style>
+</head>
+<body class="mobile">
+    <!-- Survey Header -->
+    <header class="survey-header">
+        <div class="header-top">
+            <div>
+                <a href="todo-list.html" class="home-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    返回待办
+                </a>
+                <a href="../index.html" class="home-btn" style="margin-left: 0.5rem;">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    原型导航
+                </a>
+            </div>
+            <span class="scene-badge" id="sceneBadge">🔷 晋升评估</span>
+        </div>
+        <div class="progress-steps">
+            <div class="step-dot completed"></div>
+            <div class="step-dot completed"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+        </div>
+    </header>
+
+    <!-- Subject Card -->
+    <div class="subject-card">
+        <div class="subject-avatar-large" id="subjectAvatar">张</div>
+        <div class="subject-info">
+            <h2 id="subjectName">张三</h2>
+            <p id="subjectInfo">技术部 · P7 · 后端专家 · 入职3年</p>
+        </div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="info-panel">
+        <div class="info-row">
+            <span class="info-label">
+                <i class="bi bi-layers"></i>
+                评估场景
+            </span>
+            <span class="info-value" id="sceneValue">🔷 晋升评估</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">
+                <i class="bi bi-person-badge"></i>
+                评估关系
+            </span>
+            <span class="info-value" id="relationValue">👔 上级评估</span>
+        </div>
+    </div>
+
+    <!-- Instruction Card -->
+    <div class="instruction-card" id="instructionCard">
+        <div class="instruction-header">
+            <i class="bi bi-info-circle-fill"></i>
+            <span class="instruction-title">填写说明</span>
+        </div>
+        <div class="instruction-content" id="instructionContent">
+            您的反馈将帮助被评估人了解自己在：<br>
+            • 专业技能方面的优势与提升空间<br>
+            • 领导力发展的建议与方向<br>
+            • 团队协作中的表现与改进点<br><br>
+            请基于实际观察，提供真实、客观的反馈。
+        </div>
+    </div>
+
+    <!-- All Dimensions -->
+    <div id="dimensionsContainer">
+        <!-- Dynamic content -->
+    </div>
+
+    <!-- Bottom Action -->
+    <div class="bottom-action" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1rem;">
+        <!-- 无法填写 - 最小化，放在左边避免误触 -->
+        <button class="btn btn-text" onclick="showRefuseModal()" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--gray-400); background: transparent; border: none;">
+            无法填写
+        </button>
+        
+        <!-- 保存 - 次要按钮 -->
+        <button class="btn btn-outline" id="saveBtn" onclick="saveSurvey()" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; height: 40px; border-radius: 8px;">
+            <i class="bi bi-save"></i>
+            保存
+        </button>
+        
+        <!-- 提交 - 主要按钮 -->
+        <button class="btn btn-primary" id="submitBtn" onclick="submitSurvey()" style="padding: 0.5rem 1.5rem; font-size: 0.875rem; font-weight: 600; height: 40px; border-radius: 8px;">
+            提交
+            <i class="bi bi-check-lg"></i>
+        </button>
+    </div>
+
+    <!-- Refuse Modal -->
+    <div class="modal-overlay" id="refuseModal">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <h3 class="modal-title">拒绝填写</h3>
+                <p style="font-size: 0.875rem; color: var(--gray-600);">请选择拒绝原因</p>
+            </div>
+            <div class="refuse-options">
+                <label class="refuse-option" onclick="selectRefuseOption(this)">
+                    <input type="radio" name="refuse-reason" value="unknown">
+                    <span>不了解被评估人，无法给出评价</span>
+                </label>
+                <label class="refuse-option" onclick="selectRefuseOption(this)">
+                    <input type="radio" name="refuse-reason" value="conflict">
+                    <span>与被评估人存在利益冲突</span>
+                </label>
+                <label class="refuse-option" onclick="selectRefuseOption(this)">
+                    <input type="radio" name="refuse-reason" value="busy">
+                    <span>近期工作繁忙，确实没有时间</span>
+                </label>
+            </div>
+            <button class="btn btn-danger" onclick="submitRefuse()">确认拒绝</button>
+            <button class="btn btn-cancel" onclick="hideRefuseModal()">取消</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../demo-data.js"></script>
+    <script>
+        // Data Definitions
+        const surveyData = {
+            scenes: {
+                promotion: {
+                    name: '晋升评估',
+                    icon: '🔷',
+                    instruction: '您的反馈将帮助 {name} 了解自己在：\n• 专业技能方面的优势与提升空间\n• 领导力发展的建议与方向\n• 团队协作中的表现与改进点\n\n请基于实际观察，提供真实、客观的反馈。',
+                    dimensions: {
+                        professional: {
+                            name: '专业技能',
+                            icon: '💻',
+                            desc: '评估被评估人在专业领域的技术深度和影响力',
+                            questions: [
+                                { id: 'p1', text: '技术深度：被评估人在专业领域的深度和广度', context: '如：技术栈掌握程度、架构设计能力' },
+                                { id: 'p2', text: '技术影响力：对团队技术选型和标准制定的影响', context: '如：Code Review质量、技术方案评审贡献' },
+                                { id: 'p3', text: '问题解决能力：面对复杂技术问题的分析和解决', context: '如：线上故障处理、技术难题攻关' }
+                            ]
+                        },
+                        leadership: {
+                            name: '领导力',
+                            icon: '🎯',
+                            desc: '评估被评估人的团队管理和项目推动能力',
+                            questions: [
+                                { id: 'l1', text: '团队管理：团队建设、人才培养和绩效管理', context: '如：新人带教、团队氛围营造' },
+                                { id: 'l2', text: '项目推动：跨团队项目协调和资源整合能力', context: '如：项目进度把控、风险预警' },
+                                { id: 'l3', text: '决策能力：关键决策的准确性和果断性', context: '如：技术方案决策、资源分配' }
+                            ]
+                        },
+                        culture: {
+                            name: '文化契合',
+                            icon: '🌟',
+                            desc: '评估被评估人与公司价值观的契合度',
+                            questions: [
+                                { id: 'c1', text: '价值观践行：对公司核心价值观的践行程度', context: '如：用户导向、结果导向' },
+                                { id: 'c2', text: '协作精神：与跨团队、跨部门的协作表现', context: '如：接口配合、信息共享' }
+                            ]
+                        }
+                    }
+                },
+                probation: {
+                    name: '转正评估',
+                    icon: '🟢',
+                    instruction: '您的反馈将帮助 {name} 顺利转正，了解其在试用期的：\n• 岗位胜任程度\n• 团队协作表现\n• 学习成长速度\n\n请客观评价，帮助TA更好地融入团队。',
+                    dimensions: {
+                        competency: {
+                            name: '岗位胜任',
+                            icon: '✅',
+                            desc: '评估被评估人是否具备岗位所需的核心能力',
+                            questions: [
+                                { id: 'pc1', text: '工作质量：交付物质量和完成度', context: '如：代码质量、文档完整性' },
+                                { id: 'pc2', text: '工作效率：任务完成的及时性和效率', context: '如：需求交付周期、Bug修复速度' },
+                                { id: 'pc3', text: '学习能力：新知识、新技能的掌握速度', context: '如：业务熟悉程度、技术学习' }
+                            ]
+                        },
+                        teamwork: {
+                            name: '团队协作',
+                            icon: '🤝',
+                            desc: '评估被评估人的团队融入和协作表现',
+                            questions: [
+                                { id: 'pt1', text: '沟通表达：与团队成员的沟通效率和效果', context: '如：需求沟通、技术讨论' },
+                                { id: 'pt2', text: '团队融入：与团队的融合度和适应性', context: '如：参与团队活动、协作配合' }
+                            ]
+                        }
+                    }
+                },
+                newleader: {
+                    name: '新Leader考察',
+                    icon: '🔶',
+                    instruction: '您的反馈将作为 {name} 新任管理者考察的重要参考，帮助了解：\n• 管理潜质和发展空间\n• 团队反馈和接受度\n• 需要支持和提升的方向\n\n您的意见对TA的成长非常重要。',
+                    dimensions: {
+                        management: {
+                            name: '管理能力',
+                            icon: '📊',
+                            desc: '评估被评估人的管理意识和能力展现',
+                            questions: [
+                                { id: 'nm1', text: '团队关怀：对团队成员的关心和支持', context: '如：了解成员状态、情绪关注' },
+                                { id: 'nm2', text: '目标管理：目标分解和执行跟进能力', context: '如：目标沟通、进度跟踪' }
+                            ]
+                        },
+                        influence: {
+                            name: '团队影响',
+                            icon: '✨',
+                            desc: '评估被评估人在团队中的影响力和认可度',
+                            questions: [
+                                { id: 'ni1', text: '团队信任：团队成员对其的信任程度', context: '如：承诺兑现、公平公正' },
+                                { id: 'ni2', text: '凝聚力：团队在其带领下的凝聚力', context: '如：团队士气、向心力' }
+                            ]
+                        }
+                    }
+                },
+                performance: {
+                    name: '绩效考核',
+                    icon: '📊',
+                    instruction: '您的反馈将作为 {name} 绩效考核的参考依据，帮助了解：\n• 目标达成情况\n• 能力和行为表现\n• 发展潜力评估\n\n请基于本考核周期的实际表现进行评价。',
+                    dimensions: {
+                        achievement: {
+                            name: '目标达成',
+                            icon: '🎯',
+                            desc: '评估被评估人本期目标的完成情况',
+                            questions: [
+                                { id: 'pa1', text: '关键目标：KPI/OKR的关键目标完成情况', context: '如：项目交付、业绩指标' },
+                                { id: 'pa2', text: '工作质量：交付物的质量和专业度', context: '如：代码质量、方案设计' }
+                            ]
+                        },
+                        behavior: {
+                            name: '行为表现',
+                            icon: '🎭',
+                            desc: '评估被评估人的工作行为和协作表现',
+                            questions: [
+                                { id: 'pb1', text: '协作配合：跨团队、跨部门的协作表现', context: '如：接口配合、资源协调' },
+                                { id: 'pb2', text: '价值观行为：公司价值观的行为体现', context: '如：用户导向、追求极致' }
+                            ]
+                        }
+                    }
+                }
+            },
+            relations: {
+                superior: { name: '上级评估', icon: '👔' },
+                peer: { name: '平级评估', icon: '🤝' },
+                down: { name: '下级评估', icon: '👥' },
+                cross: { name: '跨部门评估', icon: '🔗' }
+            }
+        };
+
+        // State
+        let currentState = {
+            scene: 'promotion',
+            relation: 'superior',
+            answers: {},
+            subjective: { like: '', suggest: '' }
+        };
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromUrlParams();
+            loadSurveyData();
+            loadDraft(); // Load saved draft if exists
+        });
+
+        // Load from URL Params
+        function loadFromUrlParams() {
+            const urlParams = Utils.parseUrlParams();
+            const scene = urlParams.scene;
+            const relation = urlParams.relation;
+            const subject = urlParams.subject;
+            
+            if (scene && surveyData.scenes[scene]) {
+                currentState.scene = scene;
+            }
+            if (relation && surveyData.relations[relation]) {
+                currentState.relation = relation;
+            }
+            if (subject) {
+                document.getElementById('subjectName').textContent = subject;
+                document.getElementById('subjectAvatar').textContent = subject.charAt(0);
+            }
+            
+            const sceneData = surveyData.scenes[currentState.scene];
+            const relationData = surveyData.relations[currentState.relation];
+            
+            document.getElementById('sceneValue').innerHTML = `${sceneData.icon} ${sceneData.name}`;
+            document.getElementById('relationValue').innerHTML = `${relationData.icon} ${relationData.name}`;
+            document.getElementById('sceneBadge').textContent = `${sceneData.icon} ${sceneData.name}`;
+        }
+
+        // Load Survey Data
+        function loadSurveyData() {
+            const sceneData = surveyData.scenes[currentState.scene];
+            const subjectName = document.getElementById('subjectName').textContent;
+            
+            document.getElementById('instructionContent').innerHTML = 
+                sceneData.instruction.replace('{name}', `<strong>${subjectName}</strong>`).replace(/\n/g, '<br>');
+            
+            generateAllDimensions(sceneData.dimensions);
+            restoreAnswers();
+        }
+
+        // Generate All Dimensions
+        function generateAllDimensions(dimensions) {
+            const container = document.getElementById('dimensionsContainer');
+            container.innerHTML = '';
+            
+            Object.entries(dimensions).forEach(([key, dim], index) => {
+                const section = document.createElement('div');
+                section.className = 'dimension-section';
+                section.dataset.dimension = key;
+                
+                let questionsHtml = '';
+                dim.questions.forEach((q, qIndex) => {
+                    questionsHtml += generateQuestionHtml(q, qIndex + 1, key);
+                });
+                
+                section.innerHTML = `
+                    <div class="dimension-header">
+                        <h3 class="dimension-title">${dim.icon} ${dim.name}</h3>
+                        <span class="dimension-counter" data-dim="${key}">0/${dim.questions.length} 已完成</span>
+                    </div>
+                    <div class="dimension-desc">${dim.desc}</div>
+                    ${questionsHtml}
+                `;
+                
+                container.appendChild(section);
+            });
+            
+            // Add subjective section
+            const subjectiveSection = document.createElement('div');
+            subjectiveSection.className = 'dimension-section';
+            subjectiveSection.innerHTML = generateSubjectiveHtml();
+            container.appendChild(subjectiveSection);
+            
+            bindRatingEvents();
+        }
+
+        // Generate Question HTML
+        function generateQuestionHtml(question, index, dimensionKey) {
+            return `
+                <div class="question-card" data-question="${question.id}" data-dim="${dimensionKey}">
+                    <div class="question-header">
+                        <span class="question-number">${index}</span>
+                        <span class="question-text">${question.text}</span>
+                    </div>
+                    <div class="question-context">${question.context}</div>
+                    <div class="rating-options">
+                        <div class="rating-option" data-score="1" onclick="selectRating(this, '${question.id}')">
+                            <span class="number">1</span>
+                            <span class="label">不足</span>
+                        </div>
+                        <div class="rating-option" data-score="2" onclick="selectRating(this, '${question.id}')">
+                            <span class="number">2</span>
+                            <span class="label">一般</span>
+                        </div>
+                        <div class="rating-option" data-score="3" onclick="selectRating(this, '${question.id}')">
+                            <span class="number">3</span>
+                            <span class="label">良好</span>
+                        </div>
+                        <div class="rating-option" data-score="4" onclick="selectRating(this, '${question.id}')">
+                            <span class="number">4</span>
+                            <span class="label">优秀</span>
+                        </div>
+                        <div class="rating-option" data-score="5" onclick="selectRating(this, '${question.id}')">
+                            <span class="number">5</span>
+                            <span class="label">卓越</span>
+                        </div>
+                    </div>
+                    <div class="rating-labels">
+                        <span>需改进</span>
+                        <span>超出预期</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generate Subjective HTML
+        function generateSubjectiveHtml() {
+            return `
+                <div class="subjective-section">
+                    <div class="subjective-header">
+                        <span class="subjective-icon icon-like">👍</span>
+                        <span class="subjective-title">优点/亮点</span>
+                    </div>
+                    <div class="subjective-desc">请分享被评估人令您印象深刻的优点或具体事例</div>
+                    <textarea class="text-input" id="subjectiveLike" placeholder="例如：在技术方案评审时总能提出独到见解..." 
+                        oninput="updateSubjective('like', this)">${currentState.subjective.like}</textarea>
+                    <div class="quick-tags">
+                        <span class="quick-tag" onclick="addTag('like', '技术能力强')">技术能力强</span>
+                        <span class="quick-tag" onclick="addTag('like', '沟通顺畅')">沟通顺畅</span>
+                        <span class="quick-tag" onclick="addTag('like', '文档优秀')">文档优秀</span>
+                        <span class="quick-tag" onclick="addTag('like', '积极主动')">积极主动</span>
+                    </div>
+                </div>
+                
+                <div class="subjective-section">
+                    <div class="subjective-header">
+                        <span class="subjective-icon icon-suggest">💡</span>
+                        <span class="subjective-title">建议/改进点</span>
+                    </div>
+                    <div class="subjective-desc">请提出您认为被评估人可以提升的方面（选填，但对TA很有价值）</div>
+                    <textarea class="text-input" id="subjectiveSuggest" placeholder="例如：建议可以更主动地向上同步进展..." 
+                        oninput="updateSubjective('suggest', this)">${currentState.subjective.suggest}</textarea>
+                    <div class="quick-tags">
+                        <span class="quick-tag" onclick="addTag('suggest', '向上管理')">向上管理</span>
+                        <span class="quick-tag" onclick="addTag('suggest', '时间管理')">时间管理</span>
+                        <span class="quick-tag" onclick="addTag('suggest', '决策果断')">决策果断</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Rating Selection
+        function selectRating(element, questionId) {
+            element.parentElement.querySelectorAll('.rating-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            currentState.answers[questionId] = parseInt(element.dataset.score);
+            updateDimensionCounter();
+        }
+
+        // Update Dimension Counter
+        function updateDimensionCounter() {
+            const counters = document.querySelectorAll('.dimension-counter');
+            counters.forEach(counter => {
+                const dimKey = counter.dataset.dim;
+                const questions = document.querySelectorAll(`[data-dim="${dimKey}"].question-card`);
+                let answered = 0;
+                questions.forEach(q => {
+                    const qid = q.dataset.question;
+                    if (currentState.answers[qid]) answered++;
+                });
+                counter.textContent = `${answered}/${questions.length} 已完成`;
+            });
+        }
+
+        // Subjective Update
+        function updateSubjective(type, textarea) {
+            currentState.subjective[type] = textarea.value;
+        }
+
+        // Add Tag
+        function addTag(type, tagText) {
+            const textarea = document.getElementById(`subjective${type === 'like' ? 'Like' : 'Suggest'}`);
+            if (textarea && !textarea.value.includes(tagText)) {
+                textarea.value += (textarea.value ? '，' : '') + tagText;
+                currentState.subjective[type] = textarea.value;
+            }
+        }
+
+        // Restore Answers
+        function restoreAnswers() {
+            Object.entries(currentState.answers).forEach(([questionId, score]) => {
+                const option = document.querySelector(`[data-question="${questionId}"] .rating-option[data-score="${score}"]`);
+                if (option) option.classList.add('selected');
+            });
+            updateDimensionCounter();
+        }
+
+        // Bind Rating Events
+        function bindRatingEvents() {
+            // Already handled via onclick
+        }
+
+        // Check if has next pending survey
+        function hasNextSurvey() {
+            const tasks = Utils.storage.get('evaluatorTasks') || [];
+            const currentParams = Utils.parseUrlParams();
+            const pendingTasks = tasks.filter(t => t.status === 'pending' && t.id !== currentParams.taskId);
+            return pendingTasks.length > 0 ? pendingTasks[0] : null;
+        }
+        
+        // Check if has next survey (for auto redirect after submit)
+        function checkNextSurvey() {
+            return hasNextSurvey();
+        }
+        
+        // Save Survey (Draft)
+        function saveSurvey() {
+            const params = Utils.parseUrlParams();
+            const taskId = params.taskId || '';
+            
+            // Save current progress
+            const draftKey = `surveyDraft_${taskId}`;
+            const draftData = {
+                taskId: taskId,
+                answers: currentState.answers,
+                savedAt: new Date().toISOString(),
+                subject: currentState.subject,
+                scene: currentState.scene
+            };
+            
+            Utils.storage.set(draftKey, draftData);
+            
+            // Show success feedback
+            const saveBtn = document.getElementById('saveBtn');
+            const originalHtml = saveBtn.innerHTML;
+            saveBtn.innerHTML = `<i class="bi bi-check"></i> 已保存`;
+            saveBtn.style.color = 'var(--success)';
+            saveBtn.style.borderColor = 'var(--success)';
+            
+            UI.toast('进度已保存', 'success');
+            
+            setTimeout(() => {
+                saveBtn.innerHTML = originalHtml;
+                saveBtn.style.color = '';
+                saveBtn.style.borderColor = '';
+            }, 2000);
+        }
+        
+        // Load saved draft if exists
+        function loadDraft() {
+            const params = Utils.parseUrlParams();
+            const taskId = params.taskId || '';
+            const draftKey = `surveyDraft_${taskId}`;
+            const draft = Utils.storage.get(draftKey);
+            
+            if (draft && draft.answers) {
+                currentState.answers = { ...currentState.answers, ...draft.answers };
+                // Restore UI state
+                Object.entries(currentState.answers).forEach(([qid, value]) => {
+                    const radios = document.querySelectorAll(`input[name="${qid}"]`);
+                    radios.forEach(radio => {
+                        if (radio.value === value) {
+                            radio.checked = true;
+                            radio.closest('.option-card')?.classList.add('selected');
+                        }
+                    });
+                });
+                updateProgress();
+                
+                const timeAgo = Utils.timeAgo(new Date(draft.savedAt));
+                UI.toast(`已恢复${timeAgo}的进度`, 'info');
+            }
+        }
+        
+        // Submit Survey
+        function submitSurvey() {
+            const totalQuestions = document.querySelectorAll('.question-card').length;
+            const answeredQuestions = Object.keys(currentState.answers).length;
+            
+            if (answeredQuestions < totalQuestions) {
+                UI.toast(`还有 ${totalQuestions - answeredQuestions} 道题未填写，请完成后再提交`, 'warning');
+                return;
+            }
+            
+            Utils.storage.set('surveyDraft', currentState);
+            
+            const params = Utils.parseUrlParams();
+            const scene = params.scene || 'promotion';
+            const relation = params.relation || 'superior';
+            const subject = params.subject || '';
+            const taskId = params.taskId || '';
+            
+            // Mark current task as completed
+            let tasks = Utils.storage.get('evaluatorTasks') || [];
+            const taskIndex = tasks.findIndex(t => t.id === taskId);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].status = 'completed';
+                tasks[taskIndex].submittedAt = new Date().toISOString();
+                Utils.storage.set('evaluatorTasks', tasks);
+            }
+            
+            // Clear draft after successful submission
+            const draftKey = `surveyDraft_${taskId}`;
+            localStorage.removeItem(draftKey);
+            
+            // Auto redirect to next survey if available
+            const nextTask = hasNextSurvey();
+            if (nextTask) {
+                UI.toast('评估提交成功！正在进入下一份...', 'success');
+                setTimeout(() => {
+                    window.location.href = `survey-form.html?taskId=${nextTask.id}&scene=${nextTask.scene}&subject=${nextTask.subjectId}&relation=${nextTask.relation}`;
+                }, 1000);
+                return;
+            }
+            
+            // No more surveys, go to success page
+            UI.toast('评估提交成功！感谢您的反馈。', 'success');
+            setTimeout(() => {
+                window.location.href = `success.html?scene=${scene}&relation=${relation}&subject=${subject}`;
+            }, 1500);
+        }
+
+        // Refuse Modal
+        function showRefuseModal() {
+            document.getElementById('refuseModal').classList.add('show');
+        }
+
+        function hideRefuseModal() {
+            document.getElementById('refuseModal').classList.remove('show');
+        }
+
+        function selectRefuseOption(label) {
+            document.querySelectorAll('.refuse-option').forEach(opt => opt.classList.remove('selected'));
+            label.classList.add('selected');
+            label.querySelector('input').checked = true;
+        }
+
+        function submitRefuse() {
+            const reason = document.querySelector('input[name="refuse-reason"]:checked');
+            if (!reason) {
+                UI.toast('请选择拒绝原因', 'warning');
+                return;
+            }
+            UI.toast('已提交拒绝申请', 'info');
+            hideRefuseModal();
+            setTimeout(() => {
+                window.location.href = 'todo-list.html';
+            }, 1000);
+        }
+
+        // Close modal on overlay click
+        document.getElementById('refuseModal').addEventListener('click', function(e) {
+            if (e.target === this) hideRefuseModal();
+        });
+    </script>
+</body>
+</html>

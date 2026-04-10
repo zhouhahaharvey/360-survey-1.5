@@ -1,0 +1,3017 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调研管理 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    
+    <!-- 页面特定样式 -->
+    <style>
+        /* Reminder Card */
+        .reminder-card {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: 1px solid #fed7aa;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .reminder-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .reminder-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--warning);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .reminder-text h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.125rem;
+        }
+        
+        .reminder-text p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        .reminder-count {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        .reminder-urgent {
+            color: var(--warning);
+            font-weight: 600;
+        }
+        
+        .btn-reminder-view {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            color: var(--gray-800);
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-reminder-view:hover {
+            background: var(--warning);
+            color: white;
+            border-color: var(--warning);
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .filter-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .filter-select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-600);
+        }
+        
+        /* Table - PC Optimized */
+        .survey-table {
+            width: 100%;
+            min-width: 1200px; /* Ensure PC width */
+        }
+        
+        .table-header {
+            display: grid;
+            grid-template-columns: 280px 360px 100px 120px 100px 140px;
+            gap: 1rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        
+        .table-row {
+            display: grid;
+            grid-template-columns: 280px 360px 100px 120px 100px 140px;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            align-items: center;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        .table-row:hover {
+            background: var(--gray-50);
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        /* Urgent row indicator */
+        .table-row.row-urgent::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--warning);
+        }
+        
+        /* Survey Info */
+        .survey-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .survey-scene-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .scene-promotion { background: #dbeafe; }
+        .scene-probation { background: #d1fae5; }
+        .scene-newleader { background: #ffedd5; }
+        .scene-performance { background: #f3e8ff; }
+        
+        .survey-details h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+        
+        .survey-details p {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        /* Evaluator Relations - PC Optimized */
+        .evaluator-relations {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .subject-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.375rem 0;
+        }
+        
+        .subject-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .subject-name {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--gray-800);
+            min-width: 60px;
+        }
+        
+        .relation-groups {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        
+        .relation-group {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--gray-100);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: help;
+            position: relative;
+        }
+        
+        .relation-group:hover {
+            background: var(--primary-light);
+        }
+        
+        .relation-label {
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+        
+        .relation-names {
+            color: var(--gray-700);
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Tooltip for full names */
+        .relation-group:hover::after {
+            content: attr(data-full);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-800);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 100;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .relation-group:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--gray-800);
+            margin-bottom: -0.25rem;
+            z-index: 100;
+        }
+        
+        /* Compact mode for multiple subjects */
+        .subject-compact {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+        }
+        
+        .subject-compact-avatars {
+            display: flex;
+        }
+        
+        .subject-compact-avatars .subject-avatar {
+            width: 24px;
+            height: 24px;
+            font-size: 0.625rem;
+            margin-left: -8px;
+            border: 2px solid white;
+        }
+        
+        .subject-compact-avatars .subject-avatar:first-child {
+            margin-left: 0;
+        }
+        
+        /* Scroll container for table */
+        .table-scroll-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            background: white;
+        }
+        
+        .table-scroll-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .table-scroll-container::-webkit-scrollbar-track {
+            background: var(--gray-100);
+        }
+        
+        .table-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 4px;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-draft {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .status-terminated {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        /* Admin Styles */
+        .admin-only {
+            display: none;
+        }
+        
+        .admin-mode .admin-only {
+            display: inline-flex;
+        }
+        
+        .btn-terminate {
+            padding: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: #fee2e2;
+            color: #dc2626;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .btn-terminate:hover {
+            background: #fecaca;
+        }
+        
+        /* Progress */
+        .progress-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        
+        .progress-text strong {
+            color: var(--primary);
+        }
+        
+        .progress-bar {
+            width: 80px;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .progress-fill.high { background: var(--success); }
+        .progress-fill.medium { background: var(--warning); }
+        .progress-fill.low { background: var(--danger); }
+        
+        /* Deadline */
+        .deadline {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .deadline.urgent {
+            color: var(--danger);
+            font-weight: 500;
+        }
+        
+        /* Urge Column */
+        .urge-cell {
+            display: flex;
+            align-items: center;
+        }
+        
+        .urge-dropdown {
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .action-btns .urge-dropdown {
+            display: inline-flex;
+        }
+        
+        .btn-urge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            border: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .btn-urge-urgent {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+        }
+        
+        .btn-urge-urgent:hover {
+            background: #fed7aa;
+        }
+        
+        .btn-urge-normal {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .btn-urge-normal:hover {
+            background: var(--gray-200);
+        }
+        
+        .urge-complete {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+        
+        .urge-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 0.25rem;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            min-width: 160px;
+            z-index: 50;
+            display: none;
+        }
+        
+        .urge-menu.show {
+            display: block;
+        }
+        
+        .urge-menu-item {
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            color: var(--gray-800);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+        
+        .urge-menu-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .urge-menu-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .urge-menu-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+        
+        /* Actions */
+        .action-btns {
+            display: flex;
+            gap: 0.375rem;
+            flex-wrap: nowrap;
+            align-items: center;
+        }
+        
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            background: white;
+            color: var(--gray-600);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        
+        .btn-icon:hover {
+            background: var(--gray-50);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            background: white;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .page-btn:hover, .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: var(--gray-200);
+        }
+        
+        .modal-body {
+            padding: 1.25rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        /* Evaluator List */
+        .evaluator-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .evaluator-section h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.75rem;
+        }
+        
+        .evaluator-select-all {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+        
+        .evaluator-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+        }
+        
+        .evaluator-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .evaluator-item:last-child {
+            border-bottom: none;
+        }
+        
+        .evaluator-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .evaluator-info {
+            flex: 1;
+        }
+        
+        .evaluator-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+        
+        .evaluator-dept {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        
+        .evaluator-type {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 4px;
+        }
+        
+        /* Message Preview */
+        .message-section h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.75rem;
+        }
+        
+        .message-preview {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.875rem;
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+        
+        .message-preview textarea {
+            width: 100%;
+            min-height: 100px;
+            border: none;
+            background: transparent;
+            resize: vertical;
+            font-size: 0.875rem;
+            color: var(--gray-800);
+            line-height: 1.6;
+            font-family: inherit;
+        }
+        
+        .message-preview textarea:focus {
+            outline: none;
+        }
+        
+        /* Drawer */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            display: none;
+        }
+        
+        .drawer-overlay.show {
+            display: block;
+        }
+        
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -480px;
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            background: white;
+            box-shadow: -10px 0 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 201;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s ease;
+        }
+        
+        .drawer.show {
+            right: 0;
+        }
+        
+        .drawer-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .drawer-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+        
+        .drawer-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .drawer-close:hover {
+            background: var(--gray-200);
+        }
+        
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .drawer-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Pending Survey Item */
+        .pending-item {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .pending-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pending-item.urgent {
+            border-left: 3px solid var(--danger);
+        }
+        
+        .pending-item.warning {
+            border-left: 3px solid var(--warning);
+        }
+        
+        .pending-item.selected {
+            background: #eff6ff;
+            border-color: var(--primary);
+        }
+        
+        .pending-checkbox {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-300);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .pending-checkbox:hover {
+            border-color: var(--primary);
+        }
+        
+        .pending-checkbox.checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .pending-checkbox.checked::after {
+            content: '\\2713';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .drawer-batch-bar {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .drawer-batch-bar.show {
+            display: flex;
+        }
+        
+        .pending-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .pending-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .pending-subtitle {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+        
+        .pending-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .pending-badge.urgent {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .pending-badge.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .pending-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .pending-progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .pending-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        .pending-progress-text {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            white-space: nowrap;
+        }
+        
+        .pending-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-pending {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+        
+        .btn-pending-urge {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-pending-urge:hover {
+            background: #4338ca;
+        }
+        
+        .btn-pending-view {
+            background: var(--gray-100);
+            color: var(--gray-800);
+        }
+        
+        .btn-pending-view:hover {
+            background: var(--gray-200);
+        }
+        
+        .drawer-batch-btn {
+            padding: 0.625rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .drawer-batch-btn:hover {
+            background: #4338ca;
+        }
+
+        /* Drawer Tabs */
+        .drawer-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+        
+        .drawer-tab {
+            flex: 1;
+            padding: 0.875rem;
+            border: none;
+            background: transparent;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+        
+        .drawer-tab.active {
+            color: var(--primary);
+            background: white;
+        }
+        
+        .drawer-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+        
+        .merge-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 0.625rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 10px;
+            margin-left: 0.25rem;
+        }
+        
+        /* Merge Notice */
+        .merge-notice {
+            background: #eff6ff;
+            border-bottom: 1px solid #dbeafe;
+            padding: 0.625rem 1rem;
+            font-size: 0.8125rem;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Urge View */
+        .urge-view {
+            padding: 1rem;
+        }
+        
+        /* Urge Item */
+        .urge-item {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .urge-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .urge-item.urgent {
+            border-left: 3px solid var(--danger);
+        }
+        
+        .urge-item.warning {
+            border-left: 3px solid var(--warning);
+        }
+        
+        .urge-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-300);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+            transition: all 0.2s;
+        }
+        
+        .urge-checkbox:hover {
+            border-color: var(--primary);
+        }
+        
+        .urge-checkbox.checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .urge-checkbox.checked::after {
+            content: '\2713';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .urge-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .urge-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .urge-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .urge-avatar.small {
+            width: 32px;
+            height: 32px;
+            font-size: 0.875rem;
+        }
+        
+        .urge-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .urge-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.125rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .urge-tag {
+            font-size: 0.6875rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .urge-tag.promotion { background: #dbeafe; color: #1e40af; }
+        .urge-tag.probation { background: #d1fae5; color: #065f46; }
+        .urge-tag.performance { background: #f3e8ff; color: #7c3aed; }
+        
+        .urge-subtitle {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+        }
+        
+        .urge-evaluators {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .evaluator-group {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.8125rem;
+        }
+        
+        .group-label {
+            color: var(--gray-500);
+        }
+        
+        .pending-count {
+            color: var(--danger);
+            font-weight: 500;
+        }
+        
+        .completed {
+            color: var(--success);
+        }
+        
+        .btn-urge-single {
+            padding: 0.5rem 0.875rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        
+        .btn-urge-single:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Smart Merge Card */
+        .smart-merge-card {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 1px solid #fcd34d;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .smart-merge-card:hover {
+            border-color: #f59e0b;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+        }
+        
+        .smart-merge-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .smart-merge-info {
+            flex: 1;
+        }
+        
+        .smart-merge-title {
+            font-weight: 600;
+            color: #92400e;
+            font-size: 0.9375rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .smart-merge-desc {
+            font-size: 0.8125rem;
+            color: #b45309;
+        }
+        
+        .merge-hint {
+            font-size: 0.6875rem;
+            padding: 0.125rem 0.375rem;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .urge-surveys {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin-top: 0.5rem;
+        }
+        
+        .survey-chip {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            border-radius: 4px;
+        }
+        
+        /* Footer Merge Toggle */
+        .footer-merge-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--gray-100);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            margin-right: auto;
+        }
+        
+        .footer-merge-toggle.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        @media (max-width: 1024px) {
+            .table-header, .table-row {
+                grid-template-columns: 2fr 80px 100px 100px 120px;
+            }
+            .table-header > *:nth-child(4),
+            .table-row > *:nth-child(4) {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 1rem; }
+            .table-header { display: none; }
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            .drawer { max-width: 100%; }
+            .urge-evaluators { gap: 0.5rem; }
+            .urge-header { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+    
+    <!-- Sidebar Toggle Button -->
+    <div class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="折叠/展开侧边栏">
+        <i class="bi bi-chevron-left" id="toggleIcon"></i>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="page-header">
+            <div class="page-title">
+                <a href="dashboard.html" class="back-to-home">
+                    <i class="bi bi-arrow-left"></i>
+                    返回首页
+                </a>
+                <h1>调研管理</h1>
+            </div>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+                <a href="create-survey-step1.html" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    发起调研
+                </a>
+            </div>
+        </div>
+
+        <!-- Admin Action Bar -->
+        <div class="admin-action-bar" id="adminActionBar" style="display: none;">
+            <div class="admin-action-content">
+                <div class="admin-action-info">
+                    <i class="bi bi-shield-lock" style="color: #dc2626; font-size: 1.25rem;"></i>
+                    <span style="font-weight: 600; color: #991b1b;">管理员模式</span>
+                    <span class="admin-divider">|</span>
+                    <span>待审核调研: <strong id="adminPendingCount" style="color: #dc2626;">0</strong> 个</span>
+                </div>
+                <div class="admin-action-btns">
+                    <a href="create-survey-step4.html" class="btn btn-danger btn-sm" style="background: #dc2626; border-color: #dc2626;">
+                        <i class="bi bi-inbox"></i>
+                        进入审核中心
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <style>
+            .admin-action-bar {
+                background: linear-gradient(135deg, #fef2f2, #fee2e2);
+                border: 1px solid #fecaca;
+                border-radius: 10px;
+                padding: 1rem 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+            .admin-action-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .admin-action-info {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-size: 0.9375rem;
+                color: #7f1d1d;
+            }
+            .admin-divider {
+                color: #fca5a5;
+            }
+            .admin-action-btns {
+                display: flex;
+                gap: 0.5rem;
+            }
+            @media (max-width: 768px) {
+                .admin-action-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            }
+        </style>
+
+        <!-- Filters -->
+        <!-- 视角切换和筛选栏 -->
+        <div class="view-toggle-bar" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap;">
+            <div class="view-toggle" style="display: flex; background: var(--gray-100); border-radius: 8px; padding: 4px;">
+                <button class="view-btn active" id="subjectViewBtn" onclick="switchView('subject')" style="padding: 0.5rem 1rem; border: none; background: white; border-radius: 6px; font-size: 0.875rem; font-weight: 500; color: var(--gray-800); box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s;">
+                    <i class="bi bi-person"></i> 被评估人视角
+                </button>
+                <button class="view-btn" id="evaluatorViewBtn" onclick="switchView('evaluator')" style="padding: 0.5rem 1rem; border: none; background: transparent; border-radius: 6px; font-size: 0.875rem; font-weight: 500; color: var(--gray-600); cursor: pointer; transition: all 0.2s;">
+                    <i class="bi bi-people"></i> 评估人视角
+                </button>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span id="currentViewLabel" style="font-size: 0.875rem; color: var(--gray-600);">共 <strong id="totalCount">0</strong> 条记录</span>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label">状态：</span>
+                <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+                    <option value="all">全部</option>
+                    <option value="pending_review">待审核</option>
+                    <option value="active">收集中</option>
+                    <option value="completed">已完成</option>
+                    <option value="draft">草稿</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">场景：</span>
+                <select class="filter-select" id="sceneFilter" onchange="applyFilters()">
+                    <option value="all">全部</option>
+                    <option value="promotion">晋升评估</option>
+                    <option value="probation">转正评估</option>
+                    <option value="newleader">新Leader</option>
+                    <option value="performance">绩效考核</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">截止日期：</span>
+                <select class="filter-select" id="deadlineFilter" onchange="applyFilters()">
+                    <option value="all">全部</option>
+                    <option value="3days">未来3天内</option>
+                    <option value="7days">未来7天内</option>
+                    <option value="30days">未来30天内</option>
+                    <option value="overdue">已过期</option>
+                </select>
+            </div>
+            <div class="search-box" style="position: relative;">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="搜索姓名、工号..." oninput="applyFilters()" style="padding-right: 80px;">
+                <span id="searchTypeLabel" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: var(--gray-500); background: var(--gray-100); padding: 2px 6px; border-radius: 4px;">被评估人</span>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="resetFilters()" style="margin-left: auto;">
+                <i class="bi bi-arrow-counterclockwise"></i> 重置
+            </button>
+        </div>
+
+        <!-- Survey List (Unified Layout) -->
+        <div class="card">
+            <div class="card-body" style="padding: 0;">
+                <!-- Toolbar -->
+                <!-- Survey List Container -->
+                <div class="survey-list" id="surveyListContainer">
+                    <!-- 动态数据将由 renderDemoSurveys() 函数从 DataStore 加载 -->
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn"><i class="bi bi-chevron-left"></i></button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn"><i class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Urge Modal -->
+    <div class="modal-overlay" id="urgeModal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modalTitle">催办</h3>
+                <button class="modal-close" onclick="closeUrgeModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="evaluator-section">
+                    <h4>未提交评估人 <span style="color: var(--gray-500); font-weight: normal;">(3人)</span></h4>
+                    <label class="evaluator-select-all">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                        <span>全选</span>
+                    </label>
+                    <div class="evaluator-list">
+                        <div class="evaluator-item">
+                            <input type="checkbox" class="evaluator-checkbox" checked>
+                            <div class="evaluator-info">
+                                <div class="evaluator-name">李明 (10005)</div>
+                                <div class="evaluator-dept">技术部 · 高级工程师</div>
+                            </div>
+                            <span class="evaluator-type">上级</span>
+                        </div>
+                        <div class="evaluator-item">
+                            <input type="checkbox" class="evaluator-checkbox" checked>
+                            <div class="evaluator-info">
+                                <div class="evaluator-name">陈小红 (10012)</div>
+                                <div class="evaluator-dept">产品部 · 产品经理</div>
+                            </div>
+                            <span class="evaluator-type">同事</span>
+                        </div>
+                        <div class="evaluator-item">
+                            <input type="checkbox" class="evaluator-checkbox" checked>
+                            <div class="evaluator-info">
+                                <div class="evaluator-name">刘芳 (10018)</div>
+                                <div class="evaluator-dept">设计部 · UI设计师</div>
+                            </div>
+                            <span class="evaluator-type">同事</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-section">
+                    <h4>催办消息预览</h4>
+                    <div class="message-preview">
+                        <textarea id="urgeMessage" placeholder="请输入催办消息...">您好！您有待完成的360评估调研「张三-晋升评估」，截止时间为2026-03-27，请尽快完成评估提交。如有疑问，请联系HR。</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUrgeModal()">取消</button>
+                <button class="btn btn-primary" onclick="sendUrge()">
+                    <i class="bi bi-send-fill"></i>
+                    发送催办
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Drawer with Dual Perspective -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="drawer" id="pendingDrawer">
+        <div class="drawer-header">
+            <h3>待催办列表</h3>
+            <button class="drawer-close" onclick="closeDrawer()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <!-- View Toggle Tabs -->
+        <div class="drawer-tabs">
+            <button class="drawer-tab active" id="tabBySubject" onclick="switchUrgeView('subject')">
+                <i class="bi bi-person"></i>
+                按被考评人
+            </button>
+            <button class="drawer-tab" id="tabByEvaluator" onclick="switchUrgeView('evaluator')">
+                <i class="bi bi-people"></i>
+                按考评人
+                <span class="merge-badge">可合并</span>
+            </button>
+        </div>
+        
+        <!-- Merge Notice (shown in evaluator view) -->
+        <div class="merge-notice" id="mergeNotice" style="display: none;">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>同一考评人的多条待办将自动合并为一条消息发送</span>
+        </div>
+        
+        <div class="drawer-body">
+            <!-- By Subject View -->
+            <div id="subjectView" class="urge-view">
+                <!-- Batch Select Bar -->
+                <div class="drawer-batch-bar" id="subjectBatchBar">
+                    <span style="font-size: 0.875rem; color: #1e40af; font-weight: 500;">
+                        <i class="bi bi-check-square-fill"></i>
+                        已选择 <strong id="subjectSelectedCount">0</strong> 个被考评人
+                    </span>
+                    <button class="btn btn-outline btn-sm" onclick="clearSubjectSelection()">
+                        取消选择
+                    </button>
+                </div>
+                
+                <!-- Subject Items -->
+                <div class="urge-item urgent" data-subject-id="zhangsan">
+                    <div class="urge-checkbox" onclick="toggleSubjectItem(this, 'zhangsan')"></div>
+                    <div class="urge-content">
+                        <div class="urge-header">
+                            <div class="urge-avatar">张</div>
+                            <div class="urge-info">
+                                <div class="urge-title">张三 <span class="urge-tag promotion">晋升评估</span></div>
+                                <div class="urge-subtitle">技术部 P7 · 剩2天截止</div>
+                            </div>
+                        </div>
+                        <div class="urge-evaluators">
+                            <div class="evaluator-group">
+                                <span class="group-label">上级</span>
+                                <span class="pending-count">1人待评</span>
+                            </div>
+                            <div class="evaluator-group">
+                                <span class="group-label">平级</span>
+                                <span class="pending-count">2人待评</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-urge-single" onclick="urgeBySubject('zhangsan', '张三')">
+                        <i class="bi bi-bell-fill"></i>
+                        催办
+                    </button>
+                </div>
+                
+                <div class="urge-item warning" data-subject-id="lisi">
+                    <div class="urge-checkbox" onclick="toggleSubjectItem(this, 'lisi')"></div>
+                    <div class="urge-content">
+                        <div class="urge-header">
+                            <div class="urge-avatar">李</div>
+                            <div class="urge-info">
+                                <div class="urge-title">李四 <span class="urge-tag probation">转正评估</span></div>
+                                <div class="urge-subtitle">运营部 P4 · 剩3天截止</div>
+                            </div>
+                        </div>
+                        <div class="urge-evaluators">
+                            <div class="evaluator-group">
+                                <span class="group-label">上级</span>
+                                <span class="pending-count">1人待评</span>
+                            </div>
+                            <div class="evaluator-group">
+                                <span class="group-label">平级</span>
+                                <span class="pending-count">3人待评</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-urge-single" onclick="urgeBySubject('lisi', '李四')">
+                        <i class="bi bi-bell-fill"></i>
+                        催办
+                    </button>
+                </div>
+                
+                <div class="urge-item" data-subject-id="wangwu">
+                    <div class="urge-checkbox" onclick="toggleSubjectItem(this, 'wangwu')"></div>
+                    <div class="urge-content">
+                        <div class="urge-header">
+                            <div class="urge-avatar">王</div>
+                            <div class="urge-info">
+                                <div class="urge-title">王五 <span class="urge-tag performance">绩效考核</span></div>
+                                <div class="urge-subtitle">产品部 P5 · 剩7天截止</div>
+                            </div>
+                        </div>
+                        <div class="urge-evaluators">
+                            <div class="evaluator-group">
+                                <span class="group-label">上级</span>
+                                <span class="completed">✓ 已完成</span>
+                            </div>
+                            <div class="evaluator-group">
+                                <span class="group-label">平级</span>
+                                <span class="pending-count">1人待评</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-urge-single" onclick="urgeBySubject('wangwu', '王五')">
+                        <i class="bi bi-bell-fill"></i>
+                        催办
+                    </button>
+                </div>
+            </div>
+            
+            <!-- By Evaluator View -->
+            <div id="evaluatorView" class="urge-view" style="display: none;">
+                <!-- Batch Select Bar -->
+                <div class="drawer-batch-bar" id="evaluatorBatchBar">
+                    <span style="font-size: 0.875rem; color: #1e40af; font-weight: 500;">
+                        <i class="bi bi-check-square-fill"></i>
+                        已选择 <strong id="evaluatorSelectedCount">0</strong> 位考评人
+                    </span>
+                    <button class="btn btn-outline btn-sm" onclick="clearEvaluatorSelection()">
+                        取消选择
+                    </button>
+                </div>
+                
+                <!-- Smart Merge Card -->
+                <div class="smart-merge-card" onclick="toggleMergeAll()">
+                    <div class="smart-merge-icon">
+                        <i class="bi bi-magic"></i>
+                    </div>
+                    <div class="smart-merge-info">
+                        <div class="smart-merge-title">智能合并催办</div>
+                        <div class="smart-merge-desc">王评审、李评审等有多个待办，合并发送更高效</div>
+                    </div>
+                    <div class="smart-merge-toggle" id="mergeToggle">
+                        <i class="bi bi-toggle-off" style="font-size: 1.5rem; color: var(--gray-400);"></i>
+                    </div>
+                </div>
+                
+                <!-- Evaluator Items -->
+                <div class="urge-item evaluator-item" data-evaluator-id="reviewer1">
+                    <div class="urge-checkbox" onclick="toggleEvaluatorItem(this, 'reviewer1')"></div>
+                    <div class="urge-content">
+                        <div class="urge-header">
+                            <div class="urge-avatar small">王</div>
+                            <div class="urge-info">
+                                <div class="urge-title">王评审 <span class="merge-hint">3个待办可合并</span></div>
+                                <div class="urge-subtitle">技术部 · 上级评估人</div>
+                            </div>
+                        </div>
+                        <div class="urge-surveys">
+                            <span class="survey-chip">张三-晋升评估</span>
+                            <span class="survey-chip">李四-转正评估</span>
+                            <span class="survey-chip">王五-绩效考核</span>
+                        </div>
+                    </div>
+                    <button class="btn-urge-single" onclick="urgeByEvaluator('reviewer1', '王评审')">
+                        <i class="bi bi-bell-fill"></i>
+                        催办
+                    </button>
+                </div>
+                
+                <div class="urge-item evaluator-item" data-evaluator-id="reviewer2">
+                    <div class="urge-checkbox" onclick="toggleEvaluatorItem(this, 'reviewer2')"></div>
+                    <div class="urge-content">
+                        <div class="urge-header">
+                            <div class="urge-avatar small">李</div>
+                            <div class="urge-info">
+                                <div class="urge-title">李评审 <span class="merge-hint">2个待办可合并</span></div>
+                                <div class="urge-subtitle">运营部 · 平级评估人</div>
+                            </div>
+                        </div>
+                        <div class="urge-surveys">
+                            <span class="survey-chip">张三-晋升评估</span>
+                            <span class="survey-chip">赵六-新Leader</span>
+                        </div>
+                    </div>
+                    <button class="btn-urge-single" onclick="urgeByEvaluator('reviewer2', '李评审')">
+                        <i class="bi bi-bell-fill"></i>
+                        催办
+                    </button>
+                </div>
+                
+                <div class="urge-item evaluator-item" data-evaluator-id="reviewer3">
+                    <div class="urge-checkbox" onclick="toggleEvaluatorItem(this, 'reviewer3')"></div>
+                    <div class="urge-content">
+                        <div class="urge-header">
+                            <div class="urge-avatar small">张</div>
+                            <div class="urge-info">
+                                <div class="urge-title">张评审</div>
+                                <div class="urge-subtitle">产品部 · 平级评估人</div>
+                            </div>
+                        </div>
+                        <div class="urge-surveys">
+                            <span class="survey-chip">王五-绩效考核</span>
+                        </div>
+                    </div>
+                    <button class="btn-urge-single" onclick="urgeByEvaluator('reviewer3', '张评审')">
+                        <i class="bi bi-bell-fill"></i>
+                        催办
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="drawer-footer" id="subjectFooter">
+            <span style="font-size: 0.875rem; color: var(--gray-600);">
+                已选择 <strong id="subjectSelectedCountFooter" style="color: var(--primary);">0</strong> 个被考评人
+            </span>
+            <button class="drawer-batch-btn" id="subjectBatchBtn" onclick="batchUrgeBySubject()">
+                <i class="bi bi-lightning-fill"></i>
+                批量催办
+            </button>
+        </div>
+        
+        <div class="drawer-footer" id="evaluatorFooter" style="display: none;">
+            <div class="footer-merge-toggle" onclick="toggleMergeMode()">
+                <span id="mergeModeIcon"><i class="bi bi-toggle-off"></i></span>
+                <span>智能合并</span>
+            </div>
+            <span style="font-size: 0.875rem; color: var(--gray-600);">
+                已选择 <strong id="evaluatorSelectedCountFooter" style="color: var(--primary);">0</strong> 位考评人
+            </span>
+            <button class="drawer-batch-btn" id="evaluatorBatchBtn" onclick="batchUrgeByEvaluator()">
+                <i class="bi bi-lightning-fill"></i>
+                批量催办
+            </button>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script src="../demo-data.js"></script>
+    
+    <!-- 页面特定脚本 -->
+    <script>
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item active">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        // Toggle urge menu
+        function toggleUrgeMenu(btn, id) {
+            event.stopPropagation();
+            const menu = document.getElementById('urge-menu-' + id);
+            const allMenus = document.querySelectorAll('.urge-menu');
+            
+            allMenus.forEach(m => {
+                if (m !== menu) m.classList.remove('show');
+            });
+            
+            menu.classList.toggle('show');
+        }
+        
+        // Close menus when clicking outside
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.urge-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        });
+        
+        // Open/Close Modal
+        function openUrgeModal(id, title) {
+            document.getElementById('modalTitle').textContent = title + ' - 催办';
+            document.getElementById('urgeModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeUrgeModal() {
+            document.getElementById('urgeModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        
+        function closeModalOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeUrgeModal();
+            }
+        }
+        
+        // Select all evaluators
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.evaluator-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+        
+        // Send urge
+        function sendUrge() {
+            const checkedBoxes = document.querySelectorAll('.evaluator-checkbox:checked');
+            if (checkedBoxes.length === 0) {
+                alert('请至少选择一位评估人');
+                return;
+            }
+            
+            const message = document.getElementById('urgeMessage').value;
+            if (!message.trim()) {
+                alert('请输入催办消息');
+                return;
+            }
+            
+            // Simulate sending
+            const btn = event.target.closest('.btn-primary');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> 发送中...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert('催办消息已发送给 ' + checkedBoxes.length + ' 位评估人');
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                closeUrgeModal();
+            }, 1000);
+        }
+        
+        // Show unsubmitted list
+        function showUnsubmittedList(id) {
+            openUrgeModal(id, '未提交名单');
+        }
+        
+        // Drawer functions
+        function openDrawer() {
+            document.getElementById('drawerOverlay').classList.add('show');
+            document.getElementById('pendingDrawer').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeDrawer() {
+            document.getElementById('drawerOverlay').classList.remove('show');
+            document.getElementById('pendingDrawer').classList.remove('show');
+            document.body.style.overflow = '';
+            // Clear selection when closing drawer
+            clearDrawerSelection();
+        }
+        
+        // Drawer pending items selection
+        let drawerSelectedItems = new Set();
+        
+        function togglePendingItem(checkbox, itemId) {
+            checkbox.classList.toggle('checked');
+            const item = checkbox.closest('.pending-item');
+            
+            if (checkbox.classList.contains('checked')) {
+                drawerSelectedItems.add(itemId);
+                item.classList.add('selected');
+            } else {
+                drawerSelectedItems.delete(itemId);
+                item.classList.remove('selected');
+            }
+            
+            updateDrawerBatchBar();
+        }
+        
+        function updateDrawerBatchBar() {
+            const batchBar = document.getElementById('drawerBatchBar');
+            const selectedCountEl = document.getElementById('drawerSelectedCount');
+            const batchBtn = document.getElementById('drawerBatchBtn');
+            
+            // 检查元素是否存在
+            if (!batchBar || !selectedCountEl || !batchBtn) return;
+            
+            selectedCountEl.textContent = drawerSelectedItems.size;
+            
+            if (drawerSelectedItems.size > 0) {
+                batchBar.classList.add('show');
+                batchBtn.style.opacity = '1';
+                batchBtn.style.pointerEvents = 'auto';
+            } else {
+                batchBar.classList.remove('show');
+                batchBtn.style.opacity = '0.5';
+                batchBtn.style.pointerEvents = 'none';
+            }
+        }
+        
+        function clearDrawerSelection() {
+            drawerSelectedItems.clear();
+            document.querySelectorAll('.pending-checkbox').forEach(cb => {
+                cb.classList.remove('checked');
+            });
+            document.querySelectorAll('.pending-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            updateDrawerBatchBar();
+        }
+        
+        function batchUrgeFromDrawer() {
+            if (drawerSelectedItems.size === 0) {
+                alert('请至少选择一个调研');
+                return;
+            }
+            
+            if (confirm(`确定要对选中的 ${drawerSelectedItems.size} 个调研进行批量催办吗？\n\n将发送催办消息给所有未提交的评估人。`)) {
+                alert(`✅ 批量催办已发送\n\n已通知 ${drawerSelectedItems.size} 个调研的未提交评估人。`);
+                clearDrawerSelection();
+                closeDrawer();
+            }
+        }
+        
+        // Admin Mode Functions
+        let isAdmin = false;
+        let isAdminMode = false;
+        
+        // Check if user is admin (mock)
+        function checkAdminRole() {
+            // In real app, this would check user role from backend
+            // Mock: URL parameter ?admin=true enables admin features
+            // OR filter=pending_review also shows admin features
+            const urlParams = new URLSearchParams(window.location.search);
+            isAdmin = urlParams.get('admin') === 'true' || urlParams.get('filter') === 'pending_review';
+            
+            if (isAdmin) {
+                document.getElementById('adminBtn').style.display = 'inline-flex';
+                document.getElementById('adminMenu').style.display = 'block';
+                document.getElementById('adminActionBar').style.display = 'block';
+                
+                // Update pending count
+                let pendingCount = 0;
+                if (typeof DataStore !== 'undefined') {
+                    pendingCount = DataStore.getPendingReviews().length;
+                } else {
+                    const pendingReviews = JSON.parse(localStorage.getItem('pendingReviews') || '[]');
+                    pendingCount = pendingReviews.length;
+                }
+                document.getElementById('adminPendingCount').textContent = pendingCount;
+            }
+        }
+        
+        // Toggle admin mode
+        function toggleAdminMode() {
+            isAdminMode = !isAdminMode;
+            document.body.classList.toggle('admin-mode', isAdminMode);
+            document.getElementById('adminBtnText').textContent = isAdminMode ? '退出管理' : '管理员模式';
+            document.getElementById('adminBtn').style.background = isAdminMode ? '#fef3c7' : '';
+            document.getElementById('adminBtn').style.borderColor = isAdminMode ? '#f59e0b' : '';
+            document.getElementById('adminBtn').style.color = isAdminMode ? '#92400e' : '';
+        }
+        
+        // Terminate survey
+        function confirmTerminate(id, surveyName) {
+            if (!confirm('⚠️ 确定要终止调研【' + surveyName + '】吗？\n\n终止后：\n- 该调研将立即结束，不再接收新的评估\n- 已收集的评估数据仍可查看和导出\n- 此操作不可撤销')) {
+                return;
+            }
+            
+            const reason = prompt('请输入终止原因（可选，会记录在操作日志中）：');
+            
+            // Mock termination
+            alert('✅ 调研【' + surveyName + '】已终止\n原因：' + (reason || '未填写') + '\n\n操作已记录到管理员日志。');
+            
+            // In real app, would refresh the list or update the row status
+            location.reload();
+        }
+        
+        // Current view mode
+        let currentViewMode = 'subject'; // 'subject' or 'evaluator'
+        
+        // Switch between subject and evaluator view
+        function switchView(mode) {
+            currentViewMode = mode;
+            
+            // Update button styles
+            const subjectBtn = document.getElementById('subjectViewBtn');
+            const evaluatorBtn = document.getElementById('evaluatorViewBtn');
+            const searchLabel = document.getElementById('searchTypeLabel');
+            
+            if (mode === 'subject') {
+                subjectBtn.classList.add('active');
+                subjectBtn.style.background = 'white';
+                subjectBtn.style.color = 'var(--gray-800)';
+                subjectBtn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+                evaluatorBtn.classList.remove('active');
+                evaluatorBtn.style.background = 'transparent';
+                evaluatorBtn.style.color = 'var(--gray-600)';
+                evaluatorBtn.style.boxShadow = 'none';
+                if (searchLabel) searchLabel.textContent = '被评估人';
+            } else {
+                evaluatorBtn.classList.add('active');
+                evaluatorBtn.style.background = 'white';
+                evaluatorBtn.style.color = 'var(--gray-800)';
+                evaluatorBtn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+                subjectBtn.classList.remove('active');
+                subjectBtn.style.background = 'transparent';
+                subjectBtn.style.color = 'var(--gray-600)';
+                subjectBtn.style.boxShadow = 'none';
+                if (searchLabel) searchLabel.textContent = '评估人';
+            }
+            
+            // Re-render with new view mode
+            renderDemoSurveys();
+        }
+        
+        // Apply all filters
+        function applyFilters() {
+            renderDemoSurveys();
+        }
+        
+        // Reset all filters
+        function resetFilters() {
+            document.getElementById('statusFilter').value = 'all';
+            document.getElementById('sceneFilter').value = 'all';
+            document.getElementById('deadlineFilter').value = 'all';
+            document.getElementById('searchInput').value = '';
+            renderDemoSurveys();
+        }
+        
+        // Filter by status (legacy, redirect to applyFilters)
+        function filterByStatus(status) {
+            applyFilters();
+        }
+        
+        // Check URL params for filter on load
+        function checkFilterOnLoad() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter');
+            const scene = urlParams.get('scene');
+            
+            if (filter) {
+                document.getElementById('statusFilter').value = filter;
+            }
+            if (scene) {
+                document.getElementById('sceneFilter').value = scene;
+            }
+            // If pending_review filter, show pending review rows
+            if (filter === 'pending_review') {
+                showPendingReviewRows();
+            }
+        }
+        
+        // Show pending review rows
+        function showPendingReviewRows() {
+            // Use DataStore if available
+            let uniquePending;
+            if (typeof DataStore !== 'undefined') {
+                uniquePending = DataStore.getPendingReviews();
+            } else {
+                // Fallback: deduplicate from multiple sources
+                const pendingReviews = JSON.parse(localStorage.getItem('pendingReviews') || '[]');
+                const myReviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+                const allPending = [...pendingReviews, ...myReviews.filter(r => r.status === 'pending_review')];
+                uniquePending = allPending.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+            }
+            
+            if (uniquePending.length > 0) {
+                const tableBody = document.querySelector('.survey-table');
+                // Keep header, remove existing rows
+                const header = tableBody.querySelector('.table-header');
+                tableBody.innerHTML = '';
+                tableBody.appendChild(header);
+                
+                // Add pending review rows
+                uniquePending.forEach(survey => {
+                    const row = createSurveyRow(survey);
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+        
+        function getSceneName(scene) {
+            const names = {
+                'promotion': '晋升评估',
+                'probation': '转正评估',
+                'newleader': '新Leader考察',
+                'performance': '绩效考核'
+            };
+            return names[scene] || '其他';
+        }
+        
+        function viewSurveyDetail(surveyId) {
+            window.location.href = 'survey-detail.html?id=' + surveyId;
+        }
+        
+        function reviewSurvey(surveyId) {
+            window.location.href = 'create-survey-step4.html?mode=review&surveyId=' + surveyId;
+        }
+        
+        function viewEvaluatorDetail(evaluatorId) {
+            // For now, show a simple alert. Can be enhanced to open a modal
+            alert('评估人详情功能开发中... (ID: ' + evaluatorId + ')');
+        }
+        
+        // Load demo data and render table
+        function loadDemoData() {
+            if (typeof DataStore !== 'undefined') {
+                DataStore.initDemoData(true); // forceRefresh = true
+            } else if (typeof DEMO_SURVEYS !== 'undefined') {
+                // Fallback: store directly
+                localStorage.setItem('allSurveys', JSON.stringify(DEMO_SURVEYS));
+            }
+            renderDemoSurveys();
+        }
+        
+        function renderDemoSurveys() {
+            const container = document.getElementById('surveyListContainer');
+            if (!container) return;
+            
+            // Get filter values
+            const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+            const sceneFilter = document.getElementById('sceneFilter')?.value || 'all';
+            const deadlineFilter = document.getElementById('deadlineFilter')?.value || 'all';
+            const searchQuery = document.getElementById('searchInput')?.value?.toLowerCase()?.trim() || '';
+            
+            // Use DataStore if available, fallback to DEMO_SURVEYS
+            let surveys;
+            if (typeof DataStore !== 'undefined') {
+                surveys = DataStore.getAllSurveys();
+            } else {
+                surveys = DEMO_SURVEYS || [];
+            }
+            
+            // Apply status filter
+            if (statusFilter !== 'all') {
+                surveys = surveys.filter(s => s.status === statusFilter);
+            }
+            
+            // Apply scene filter
+            if (sceneFilter !== 'all') {
+                surveys = surveys.filter(s => s.scene === sceneFilter);
+            }
+            
+            // Apply deadline filter
+            if (deadlineFilter !== 'all') {
+                const now = new Date();
+                surveys = surveys.filter(s => {
+                    if (!s.deadline) return false;
+                    const deadline = new Date(s.deadline);
+                    const daysDiff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+                    
+                    switch(deadlineFilter) {
+                        case '3days': return daysDiff >= 0 && daysDiff <= 3;
+                        case '7days': return daysDiff >= 0 && daysDiff <= 7;
+                        case '30days': return daysDiff >= 0 && daysDiff <= 30;
+                        case 'overdue': return daysDiff < 0;
+                        default: return true;
+                    }
+                });
+            }
+            
+            // Apply search filter based on current view mode
+            if (searchQuery) {
+                if (currentViewMode === 'subject') {
+                    // Search by subject name/empId
+                    surveys = surveys.filter(s => {
+                        if (!s.subjects) return false;
+                        return s.subjects.some(sub => 
+                            (sub.name && sub.name.toLowerCase().includes(searchQuery)) ||
+                            (sub.empId && sub.empId.toLowerCase().includes(searchQuery))
+                        );
+                    });
+                } else {
+                    // Search by evaluator name/empId
+                    surveys = surveys.filter(s => {
+                        if (!s.subjects) return false;
+                        return s.subjects.some(sub => {
+                            if (!sub.evaluators) return false;
+                            return Object.values(sub.evaluators).some(list => 
+                                list && list.some(ev => 
+                                    (ev.name && ev.name.toLowerCase().includes(searchQuery)) ||
+                                    (ev.empId && ev.empId.toLowerCase().includes(searchQuery))
+                                )
+                            );
+                        });
+                    });
+                }
+            }
+            
+            // Update total count
+            const totalCount = currentViewMode === 'subject' 
+                ? surveys.reduce((sum, s) => sum + (s.subjects?.length || 0), 0)
+                : surveys.reduce((sum, s) => sum + countTotalEvaluators(s), 0);
+            document.getElementById('totalCount').textContent = totalCount;
+            
+            // Render based on view mode
+            if (currentViewMode === 'subject') {
+                container.innerHTML = surveys.slice(0, 20).map(survey => {
+                    return renderSurveyListItemUnified(survey);
+                }).join('');
+            } else {
+                container.innerHTML = renderEvaluatorView(surveys);
+            }
+        }
+        
+        // Count total evaluators in a survey
+        function countTotalEvaluators(survey) {
+            if (!survey.subjects) return 0;
+            return survey.subjects.reduce((sum, sub) => {
+                if (!sub.evaluators) return sum;
+                return sum + Object.values(sub.evaluators).reduce((relSum, list) => 
+                    relSum + (list?.length || 0), 0);
+            }, 0);
+        }
+        
+        // Render evaluator view
+        function renderEvaluatorView(surveys) {
+            // Build evaluator map: evaluator -> list of subjects they evaluate
+            const evaluatorMap = new Map();
+            
+            surveys.forEach(survey => {
+                if (!survey.subjects) return;
+                survey.subjects.forEach(subject => {
+                    if (!subject.evaluators) return;
+                    Object.entries(subject.evaluators).forEach(([relType, evalList]) => {
+                        if (!evalList) return;
+                        evalList.forEach(evaluator => {
+                            const key = evaluator.empId || evaluator.name;
+                            if (!evaluatorMap.has(key)) {
+                                evaluatorMap.set(key, {
+                                    evaluator: evaluator,
+                                    assignments: []
+                                });
+                            }
+                            evaluatorMap.get(key).assignments.push({
+                                survey: survey,
+                                subject: subject,
+                                relationType: relType
+                            });
+                        });
+                    });
+                });
+            });
+            
+            // Convert to array and sort by name
+            const evaluatorList = Array.from(evaluatorMap.values()).sort((a, b) => 
+                (a.evaluator.name || '').localeCompare(b.evaluator.name || '')
+            );
+            
+            return evaluatorList.slice(0, 30).map(item => renderEvaluatorListItem(item)).join('');
+        }
+        
+        // Render single evaluator item
+        function renderEvaluatorListItem(item) {
+            const ev = item.evaluator;
+            const assignments = item.assignments;
+            const subjectCount = new Set(assignments.map(a => a.subject.empId)).size;
+            
+            // Group by survey
+            const surveyGroups = {};
+            assignments.forEach(a => {
+                if (!surveyGroups[a.survey.id]) {
+                    surveyGroups[a.survey.id] = {
+                        survey: a.survey,
+                        subjects: []
+                    };
+                }
+                surveyGroups[a.survey.id].subjects.push(a.subject);
+            });
+            
+            return `
+                <div class="survey-item" style="border-bottom: 1px solid var(--gray-200);">
+                    <div class="survey-content">
+                        <!-- 左侧：评估人信息 -->
+                        <div class="survey-left" style="width: 260px; min-width: 260px;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem;">
+                                    ${(ev.name || '?').charAt(0)}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--gray-900);">${ev.name || '未知'}</div>
+                                    <div style="font-size: 0.75rem; color: var(--gray-500);">${ev.empId || '-'} · ${ev.dept || '-'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间：被评估人列表 -->
+                        <div class="survey-relations" style="flex: 1; min-width: 0;">
+                            <div style="font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.5rem;">需评估 <strong>${subjectCount}</strong> 位同事</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                ${assignments.slice(0, 8).map(a => `
+                                    <span class="badge badge-gray" style="font-size: 0.75rem;">
+                                        ${a.subject.name}
+                                        <span style="color: var(--gray-400); margin-left: 4px;">${RELATION_TYPES[a.relationType]?.label || a.relationType}</span>
+                                    </span>
+                                `).join('')}
+                                ${assignments.length > 8 ? `<span class="badge badge-gray" style="font-size: 0.75rem;">+${assignments.length - 8} 更多</span>` : ''}
+                            </div>
+                        </div>
+                        
+                        <!-- 右侧：统计和操作 -->
+                        <div class="survey-right">
+                            <div class="stat-badge">
+                                <div class="stat-value-small">${Object.keys(surveyGroups).length}</div>
+                                <div class="stat-label-small">调研任务</div>
+                            </div>
+                            <div class="stat-badge" style="margin-top: 0.5rem;">
+                                <div class="stat-value-small">${subjectCount}</div>
+                                <div class="stat-label-small">待评估</div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.5rem;">
+                                <button class="btn btn-outline btn-sm" onclick="viewEvaluatorDetail('${ev.empId}')">
+                                    <i class="bi bi-eye"></i> 详情
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 统一渲染调研列表项（参考我的待审核界面样式）
+        function renderSurveyListItemUnified(survey) {
+            const sceneInfo = getSceneInfo(survey.scene);
+            const dimensions = getSceneDimensions(survey.scene);
+            const subjectCount = survey.subjects ? survey.subjects.length : 0;
+            
+            // 动态计算所有关系类型的评估人总数
+            const evaluatorCount = survey.subjects ? survey.subjects.reduce((sum, s) => {
+                if (!s.evaluators) return sum;
+                return sum + Object.values(s.evaluators).reduce((relSum, evalList) => 
+                    relSum + (evalList?.length || 0), 0);
+            }, 0) : 0;
+            
+            // 操作按钮
+            let actionBtns = '';
+            if (survey.status === 'completed') {
+                actionBtns = `<button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); viewSurveyDetail('${survey.id}')">
+                    <i class="bi bi-eye"></i> 查看
+                </button>`;
+            } else if (survey.status === 'pending_review') {
+                actionBtns = `<button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); viewSurveyDetail('${survey.id}')">
+                    <i class="bi bi-eye"></i> 查看
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); reviewSurvey('${survey.id}')">
+                    <i class="bi bi-check-circle"></i> 审核
+                </button>`;
+            } else {
+                actionBtns = `<button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); viewSurveyDetail('${survey.id}')">
+                    <i class="bi bi-eye"></i> 查看
+                </button>`;
+            }
+            
+            // 状态标签样式
+            const statusClass = survey.status === 'completed' ? 'status-completed' : 
+                               survey.status === 'pending_review' ? 'status-pending' : 
+                               survey.status === 'active' ? 'status-active' : 'status-draft';
+            const statusIcon = survey.status === 'completed' ? 'check-circle' : 
+                              survey.status === 'pending_review' ? 'hourglass-split' : 
+                              survey.status === 'active' ? 'play-circle' : 'file-earmark';
+            const statusText = survey.statusText || getStatusLabel(survey.status);
+            
+            return `
+                <div class="survey-item" data-id="${survey.id}" style="border-bottom: 1px solid var(--gray-200);">
+                    <div class="survey-content">
+                        <!-- 左侧：基本信息 -->
+                        <div class="survey-left">
+                            <div class="survey-info">
+                                <div class="survey-title-row">
+                                    <span class="survey-title">${survey.title || '未命名调研'}</span>
+                                    <span class="scene-tag ${sceneInfo.class}">${sceneInfo.name}</span>
+                                    <span class="status-badge ${statusClass}" style="margin-left: auto;">
+                                        <i class="bi bi-${statusIcon}"></i> ${statusText}
+                                    </span>
+                                </div>
+                                <div class="survey-meta">
+                                    <span><i class="bi bi-clock"></i> ${timeAgo(survey.submittedAt || survey.createdAt)}</span>
+                                    <span><i class="bi bi-person"></i> ${subjectCount}位被评估人</span>
+                                    <span><i class="bi bi-people"></i> ${evaluatorCount}位评估人</span>
+                                </div>
+                                <div class="template-info">
+                                    <span class="template-label">模板：</span>
+                                    <span class="template-name">${sceneInfo.name}</span>
+                                    <span class="template-label">分类：</span>
+                                    <div class="category-list">${renderCategoryTags(dimensions)}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间：考核关系平铺 -->
+                        <div class="survey-relations">
+                            ${renderRelationsCompact(survey.subjects, survey.scene)}
+                        </div>
+                        
+                        <!-- 右侧：统计和操作 -->
+                        <div class="survey-right">
+                            <div class="stat-badge">
+                                <div class="stat-value-small">${subjectCount}</div>
+                                <div class="stat-label-small">被评估人</div>
+                            </div>
+                            <div class="stat-badge" style="margin-top: 0.5rem;">
+                                <div class="stat-value-small">${evaluatorCount}</div>
+                                <div class="stat-label-small">评估人</div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.5rem;">
+                                ${actionBtns}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 获取状态标签
+        function getStatusLabel(status) {
+            const labels = {
+                'completed': '已完成',
+                'active': '收集中',
+                'pending_review': '待审核',
+                'draft': '草稿',
+                'rejected': '已退回',
+                'relation_approved': '已审核'
+            };
+            return labels[status] || status;
+        }
+        
+        // 格式化相对时间
+        function timeAgo(dateString) {
+            if (!dateString) return '未知时间';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (seconds < 60) return '刚刚';
+            if (minutes < 60) return `${minutes}分钟前`;
+            if (hours < 24) return `${hours}小时前`;
+            if (days < 30) return `${days}天前`;
+            return date.toLocaleDateString('zh-CN');
+        }
+        
+        function createSurveyRow(survey) {
+            const row = document.createElement('div');
+            row.className = `table-row ${survey.urgency && survey.urgency.level === 'urgent' ? 'row-urgent' : ''}`;
+            row.style.cursor = 'pointer';
+            row.onclick = () => viewSurveyDetail(survey.id);
+            
+            const isCompleted = survey.status === 'completed';
+            const isPending = survey.status === 'pending_review';
+            
+            let actionBtns = '';
+            if (isCompleted) {
+                actionBtns = `
+                    <div class="action-btns" onclick="event.stopPropagation();">
+                        <button class="btn-icon" title="报告" onclick="event.stopPropagation(); viewSurveyDetail('${survey.id}');">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </button>
+                        <button class="btn-icon" title="查看" onclick="event.stopPropagation(); viewSurveyDetail('${survey.id}');">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>`;
+            } else if (isPending) {
+                actionBtns = `
+                    <div class="action-btns" onclick="event.stopPropagation();">
+                        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); reviewSurvey('${survey.id}');" style="background: #dc2626; border-color: #dc2626;">
+                            <i class="bi bi-check-circle"></i>
+                            批量审核
+                        </button>
+                        <button class="btn-icon" title="查看详情" onclick="event.stopPropagation(); viewSurveyDetail('${survey.id}');">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>`;
+            } else {
+                actionBtns = `
+                    <div class="action-btns" onclick="event.stopPropagation();">
+                        ${survey.progress < 100 && survey.progress > 0 ? `
+                        <div class="urge-dropdown" onclick="event.stopPropagation();">
+                            <button class="btn-urge btn-urge-normal" onclick="event.stopPropagation(); toggleUrgeMenu(this, '${survey.id}');">
+                                <i class="bi bi-bell"></i>
+                                提醒
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </div>` : ''}
+                        <button class="btn-icon" title="查看" onclick="event.stopPropagation(); viewSurveyDetail('${survey.id}');">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>`;
+            }
+            
+            // 生成考核关系HTML
+            const relationsHtml = generateRelationsHtml(survey.subjects);
+            
+            row.innerHTML = `
+                <div class="survey-info">
+                    <div class="survey-scene-icon scene-${survey.scene}">${survey.sceneIcon || '🔷'}</div>
+                    <div class="survey-details">
+                        <h4>${survey.title}</h4>
+                        <p style="font-size: 0.75rem; color: var(--gray-500);">${survey.sceneName || ''} · ${survey.subjectCount || 1}位被评估人 · ${survey.evaluatorCount || 0}位评估人</p>
+                    </div>
+                </div>
+                <div class="evaluator-relations">
+                    ${relationsHtml}
+                </div>
+                <div class="progress-cell">
+                    <span class="progress-text"><strong>${survey.progress || 0}%</strong> (${survey.submittedCount || 0}/${survey.evaluatorCount || 0})</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${(survey.progress || 0) >= 70 ? 'high' : (survey.progress || 0) >= 40 ? 'medium' : 'low'}" style="width: ${survey.progress || 0}%"></div>
+                    </div>
+                </div>
+                <span class="deadline ${survey.urgency ? survey.urgency.class : 'normal'}">${survey.urgency ? survey.urgency.text : '-'}</span>
+                <span class="status-badge status-${survey.status}">
+                    <i class="bi ${survey.status === 'completed' ? 'bi-check-circle-fill' : survey.status === 'active' ? 'bi-circle-fill' : 'bi-hourglass-split'}" style="font-size: 6px;"></i>
+                    ${survey.statusText || survey.status}
+                </span>
+                ${actionBtns}
+            `;
+            
+            return row;
+        }
+        
+        // 生成考核关系HTML
+        function generateRelationsHtml(subjects) {
+            if (!subjects || subjects.length === 0) {
+                return '<span style="color: var(--gray-400); font-size: 0.75rem;">暂无数据</span>';
+            }
+            
+            // 如果只有1个被评估人，详细展示
+            if (subjects.length === 1) {
+                const subject = subjects[0];
+                const upNames = subject.evaluators?.up?.map(e => e.name).join(', ') || '-';
+                const peerNames = subject.evaluators?.peer?.map(e => e.name).join(', ') || '-';
+                const downNames = subject.evaluators?.down?.map(e => e.name).join(', ') || '-';
+                
+                return `
+                    <div class="subject-row">
+                        <div class="subject-avatar">${subject.name ? subject.name[0] : '?'}</div>
+                        <span class="subject-name">${subject.name}</span>
+                        <div class="relation-groups">
+                            ${subject.evaluators?.up?.length > 0 ? `
+                            <div class="relation-group" data-full="上级：${upNames}">
+                                <span class="relation-label">上</span>
+                                <span class="relation-names">${upNames}</span>
+                            </div>` : ''}
+                            ${subject.evaluators?.peer?.length > 0 ? `
+                            <div class="relation-group" data-full="平级：${peerNames}">
+                                <span class="relation-label">平</span>
+                                <span class="relation-names">${peerNames}</span>
+                            </div>` : ''}
+                            ${subject.evaluators?.down?.length > 0 ? `
+                            <div class="relation-group" data-full="下级：${downNames}">
+                                <span class="relation-label">下</span>
+                                <span class="relation-names">${downNames}</span>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 多个被评估人，紧凑展示
+            return `
+                <div class="subject-compact">
+                    <div class="subject-compact-avatars">
+                        ${subjects.slice(0, 3).map(s => `<div class="subject-avatar">${s.name ? s.name[0] : '?'}</div>`).join('')}
+                        ${subjects.length > 3 ? `<div class="subject-avatar" style="background: var(--gray-400);">+${subjects.length - 3}</div>` : ''}
+                    </div>
+                    <span style="color: var(--gray-600);">${subjects.length}位被评估人</span>
+                </div>
+            `;
+        }
+        
+        // 侧边栏折叠状态
+        let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        
+        // 切换侧边栏
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+            applySidebarState();
+        }
+        
+        // 应用侧边栏状态
+        function applySidebarState() {
+            const sidebar = document.getElementById('adminSidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (sidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                toggleIcon.classList.remove('bi-chevron-left');
+                toggleIcon.classList.add('bi-chevron-right');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                toggleIcon.classList.remove('bi-chevron-right');
+                toggleIcon.classList.add('bi-chevron-left');
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            checkAdminRole();
+            checkFilterOnLoad();
+            applySidebarState();
+        });
+        
+        // Load demo data when script is ready
+        window.addEventListener('load', function() {
+            loadDemoData();
+        });
+        
+        // Initialize drawer batch button state
+        updateDrawerBatchBar();
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeUrgeModal();
+                closeDrawer();
+            }
+        });
+        
+        // ============================================
+        // 双视角催办功能
+        // ============================================
+        
+        let currentUrgeView = 'subject';
+        let subjectSelectedItems = new Set();
+        let evaluatorSelectedItems = new Set();
+        let mergeMode = false;
+        
+        // 切换催办视角
+        function switchUrgeView(view) {
+            currentUrgeView = view;
+            
+            // Update tabs
+            document.querySelectorAll('.drawer-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(view === 'subject' ? 'tabBySubject' : 'tabByEvaluator').classList.add('active');
+            
+            // Show/hide views
+            document.getElementById('subjectView').style.display = view === 'subject' ? 'block' : 'none';
+            document.getElementById('evaluatorView').style.display = view === 'evaluator' ? 'block' : 'none';
+            
+            // Show/hide footers
+            document.getElementById('subjectFooter').style.display = view === 'subject' ? 'flex' : 'none';
+            document.getElementById('evaluatorFooter').style.display = view === 'evaluator' ? 'flex' : 'none';
+            
+            // Show/hide merge notice
+            document.getElementById('mergeNotice').style.display = view === 'evaluator' ? 'flex' : 'none';
+        }
+        
+        // 按被考评人 - 切换选择
+        function toggleSubjectItem(checkbox, subjectId) {
+            checkbox.classList.toggle('checked');
+            const item = checkbox.closest('.urge-item');
+            
+            if (checkbox.classList.contains('checked')) {
+                subjectSelectedItems.add(subjectId);
+                item.classList.add('selected');
+            } else {
+                subjectSelectedItems.delete(subjectId);
+                item.classList.remove('selected');
+            }
+            
+            updateSubjectBatchBar();
+        }
+        
+        // 按考评人 - 切换选择
+        function toggleEvaluatorItem(checkbox, evaluatorId) {
+            checkbox.classList.toggle('checked');
+            const item = checkbox.closest('.urge-item');
+            
+            if (checkbox.classList.contains('checked')) {
+                evaluatorSelectedItems.add(evaluatorId);
+                item.classList.add('selected');
+            } else {
+                evaluatorSelectedItems.delete(evaluatorId);
+                item.classList.remove('selected');
+            }
+            
+            updateEvaluatorBatchBar();
+        }
+        
+        // 更新被考评人批量栏
+        function updateSubjectBatchBar() {
+            const batchBar = document.getElementById('subjectBatchBar');
+            const count = subjectSelectedItems.size;
+            
+            document.getElementById('subjectSelectedCount').textContent = count;
+            document.getElementById('subjectSelectedCountFooter').textContent = count;
+            
+            if (count > 0) {
+                batchBar.classList.add('show');
+                document.getElementById('subjectBatchBtn').style.opacity = '1';
+                document.getElementById('subjectBatchBtn').style.pointerEvents = 'auto';
+            } else {
+                batchBar.classList.remove('show');
+                document.getElementById('subjectBatchBtn').style.opacity = '0.5';
+                document.getElementById('subjectBatchBtn').style.pointerEvents = 'none';
+            }
+        }
+        
+        // 更新考评人批量栏
+        function updateEvaluatorBatchBar() {
+            const batchBar = document.getElementById('evaluatorBatchBar');
+            const count = evaluatorSelectedItems.size;
+            
+            document.getElementById('evaluatorSelectedCount').textContent = count;
+            document.getElementById('evaluatorSelectedCountFooter').textContent = count;
+            
+            if (count > 0) {
+                batchBar.classList.add('show');
+                document.getElementById('evaluatorBatchBtn').style.opacity = '1';
+                document.getElementById('evaluatorBatchBtn').style.pointerEvents = 'auto';
+            } else {
+                batchBar.classList.remove('show');
+                document.getElementById('evaluatorBatchBtn').style.opacity = '0.5';
+                document.getElementById('evaluatorBatchBtn').style.pointerEvents = 'none';
+            }
+        }
+        
+        // 清除被考评人选择
+        function clearSubjectSelection() {
+            subjectSelectedItems.clear();
+            document.querySelectorAll('#subjectView .urge-checkbox').forEach(cb => cb.classList.remove('checked'));
+            document.querySelectorAll('#subjectView .urge-item').forEach(item => item.classList.remove('selected'));
+            updateSubjectBatchBar();
+        }
+        
+        // 清除考评人选择
+        function clearEvaluatorSelection() {
+            evaluatorSelectedItems.clear();
+            document.querySelectorAll('#evaluatorView .urge-checkbox').forEach(cb => cb.classList.remove('checked'));
+            document.querySelectorAll('#evaluatorView .urge-item').forEach(item => item.classList.remove('selected'));
+            updateEvaluatorBatchBar();
+        }
+        
+        // 切换合并模式
+        function toggleMergeMode() {
+            mergeMode = !mergeMode;
+            const toggle = document.querySelector('.footer-merge-toggle');
+            const icon = document.getElementById('mergeModeIcon');
+            
+            if (mergeMode) {
+                toggle.classList.add('active');
+                icon.innerHTML = '<i class="bi bi-toggle-on"></i>';
+                UI.toast('已开启智能合并模式', 'info');
+            } else {
+                toggle.classList.remove('active');
+                icon.innerHTML = '<i class="bi bi-toggle-off"></i>';
+                UI.toast('已关闭智能合并模式', 'info');
+            }
+        }
+        
+        // 智能合并全部
+        function toggleMergeAll() {
+            toggleMergeMode();
+        }
+        
+        // 按被考评人催办
+        function urgeBySubject(subjectId, subjectName) {
+            const msg = `您好！\n\n您作为「${subjectName}」的评估人，尚有未完成的360评估任务。\n\n请及时登录系统完成评估，您的反馈对被评估人的发展非常重要。\n\n如有疑问，请联系HR。`;
+            
+            document.getElementById('urgeMessage').value = msg;
+            openUrgeModal(subjectId, `${subjectName} 的评估人`);
+        }
+        
+        // 按考评人催办
+        function urgeByEvaluator(evaluatorId, evaluatorName) {
+            let msg;
+            if (mergeMode) {
+                // 合并消息
+                msg = `您好 ${evaluatorName}！\n\n您当前有多个待完成的360评估任务，我们将它们合并提醒：\n\n• 张三-晋升评估（上级评估）\n• 李四-转正评估（平级评估）\n• 王五-绩效考核（平级评估）\n\n请点击链接查看全部待办并逐一完成。感谢您的配合！`;
+            } else {
+                msg = `您好 ${evaluatorName}！\n\n您有待完成的360评估任务，请尽快登录系统完成。\n\n如有疑问，请联系HR。`;
+            }
+            
+            document.getElementById('urgeMessage').value = msg;
+            openUrgeModal(evaluatorId, evaluatorName);
+        }
+        
+        // 批量按被考评人催办
+        function batchUrgeBySubject() {
+            if (subjectSelectedItems.size === 0) {
+                UI.toast('请至少选择一个被考评人', 'warning');
+                return;
+            }
+            
+            const msg = `【批量催办】\n\n您选中的 ${subjectSelectedItems.size} 个被考评人尚有未完成的评估任务。\n\n催办消息将发送给这些被考评人的所有待提交评估人。`;
+            
+            if (confirm(msg)) {
+                UI.toast(`✅ 已发送催办给 ${subjectSelectedItems.size} 个被考评人的评估人`, 'success');
+                clearSubjectSelection();
+            }
+        }
+        
+        // 批量按考评人催办
+        function batchUrgeByEvaluator() {
+            if (evaluatorSelectedItems.size === 0) {
+                UI.toast('请至少选择一位考评人', 'warning');
+                return;
+            }
+            
+            let msg;
+            if (mergeMode) {
+                msg = `【智能合并催办】\n\n您选中的 ${evaluatorSelectedItems.size} 位考评人有多个待办任务。\n\n系统将自动合并同一考评人的多条待办，发送一条汇总消息。\n\n这样可避免信息轰炸，提高沟通效率。`;
+            } else {
+                msg = `【批量催办】\n\n确定要对选中的 ${evaluatorSelectedItems.size} 位考评人发送催办消息吗？`;
+            }
+            
+            if (confirm(msg)) {
+                UI.toast(`✅ 已发送催办给 ${evaluatorSelectedItems.size} 位考评人${mergeMode ? '（已合并）' : ''}`, 'success');
+                clearEvaluatorSelection();
+            }
+        }
+        
+        // Override closeDrawer to clear all selections
+        const originalCloseDrawer = closeDrawer;
+        closeDrawer = function() {
+            originalCloseDrawer();
+            clearSubjectSelection();
+            clearEvaluatorSelection();
+        };
+    </script>
+</body>
+</html>

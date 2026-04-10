@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+    
+    <!-- 侧边栏折叠按钮 -->
+    <div class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="折叠/展开侧边栏">
+        <i class="bi bi-chevron-left" id="toggleIcon"></i>
+    </div>
+
+    <!-- 主内容 -->
+    <main class="main-content" id="mainContent">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="d-flex align-items-center gap-3">
+                <a href="../index.html" class="back-to-home">
+                    <i class="bi bi-arrow-left"></i>
+                    返回首页
+                </a>
+                <div class="page-title">
+                    <h1>首页</h1>
+                    <p>欢迎回来，查看今日的调研动态</p>
+                </div>
+            </div>
+            <a href="create-survey-step1.html" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-lg me-2"></i>发起新调研
+            </a>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card" onclick="location.href='my-pending-reviews.html'" style="position: relative; cursor: pointer;">
+                <div class="stat-header">
+                    <div class="stat-icon orange">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="pendingReviewCount" style="color: #d97706;">0</div>
+                <div class="stat-label">我提交的待审核</div>
+                <span class="badge badge-orange" id="pendingReviewBadge" style="position: absolute; top: 0.75rem; right: 0.75rem; display: none;">待处理</span>
+            </div>
+            
+            <div class="stat-card" onclick="location.href='create-survey-step4.html'" style="position: relative; cursor: pointer;">
+                <div class="stat-header">
+                    <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="adminReviewCount" style="color: #dc2626;">0</div>
+                <div class="stat-label">待我审核</div>
+                <span class="badge badge-red" id="adminReviewBadge" style="position: absolute; top: 0.75rem; right: 0.75rem; display: none;">待审核</span>
+            </div>
+            
+            <div class="stat-card" onclick="location.href='survey-list.html'" style="cursor: pointer;">
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                    <span class="stat-badge up">+12%</span>
+                </div>
+                <div class="stat-value">24</div>
+                <div class="stat-label">本月发起调研</div>
+            </div>
+            
+            <div class="stat-card" onclick="location.href='survey-list.html?filter=completed'" style="cursor: pointer;">
+                <div class="stat-header">
+                    <div class="stat-icon green">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <span class="stat-badge up">+8%</span>
+                </div>
+                <div class="stat-value">89%</div>
+                <div class="stat-label">平均完成率</div>
+            </div>
+            
+            <div class="stat-card" onclick="location.href='survey-list.html?filter=completed'" style="cursor: pointer;">
+                <div class="stat-header">
+                    <div class="stat-icon purple">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <span class="stat-badge up">+23</span>
+                </div>
+                <div class="stat-value">156</div>
+                <div class="stat-label">本月参与评估人数</div>
+            </div>
+        </div>
+
+        <!-- 本月概览 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="bi bi-info-circle text-primary"></i>
+                    本月概览
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col cursor-pointer p-2 rounded" onclick="location.href='survey-list.html?scene=promotion'" style="cursor: pointer;">
+                        <div class="text-muted small mb-1">晋升评估</div>
+                        <div class="fs-5 fw-bold">8<small class="text-muted fw-normal"> 场</small></div>
+                    </div>
+                    <div class="col cursor-pointer p-2 rounded" onclick="location.href='survey-list.html?scene=probation'" style="cursor: pointer;">
+                        <div class="text-muted small mb-1">转正评估</div>
+                        <div class="fs-5 fw-bold">5<small class="text-muted fw-normal"> 场</small></div>
+                    </div>
+                    <div class="col cursor-pointer p-2 rounded" onclick="location.href='survey-list.html?scene=newleader'" style="cursor: pointer;">
+                        <div class="text-muted small mb-1">新Leader考察</div>
+                        <div class="fs-5 fw-bold">3<small class="text-muted fw-normal"> 场</small></div>
+                    </div>
+                    <div class="col cursor-pointer p-2 rounded" onclick="location.href='survey-list.html?scene=performance'" style="cursor: pointer;">
+                        <div class="text-muted small mb-1">绩效考核</div>
+                        <div class="fs-5 fw-bold">8<small class="text-muted fw-normal"> 场</small></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容网格 -->
+        <div class="content-grid">
+            <!-- 进行中的调研 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title" style="cursor: pointer;" onclick="location.href='survey-list.html'">
+                        <i class="bi bi-activity"></i>
+                        进行中的调研
+                    </div>
+                    <a href="survey-list.html" class="btn btn-outline">查看全部</a>
+                </div>
+                <div class="card-body no-padding">
+                    <div class="survey-list" id="surveyList">
+                        <!-- 动态加载 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="bi bi-lightning"></i>
+                        快捷操作
+                    </div>
+                </div>
+                <div class="card-body action-list">
+                    <div class="action-item" onclick="location.href='create-survey-step1.html'">
+                        <div class="action-icon">
+                            <i class="bi bi-plus-lg"></i>
+                        </div>
+                        <div class="action-info">
+                            <h4>发起晋升评估</h4>
+                            <p>快速发起晋升场景调研</p>
+                        </div>
+                    </div>
+                    <div class="action-item" onclick="location.href='templates.html'">
+                        <div class="action-icon">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                        <div class="action-info">
+                            <h4>复制模板</h4>
+                            <p>基于已有模板快速创建</p>
+                        </div>
+                    </div>
+                    <div class="action-item" onclick="location.href='survey-list.html?filter=completed'">
+                        <div class="action-icon">
+                            <i class="bi bi-download"></i>
+                        </div>
+                        <div class="action-info">
+                            <h4>导出报告</h4>
+                            <p>批量下载已完成报告</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script src="../demo-data.js"></script>
+    <script>
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item active">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        // 渲染调研列表 - 使用统一布局
+        function renderSurveyList() {
+            // 从 DataStore 获取进行中的调研
+            let surveys = [];
+            if (typeof DataStore !== 'undefined') {
+                const allSurveys = DataStore.getAllSurveys();
+                surveys = allSurveys.filter(s => s.status === 'active').slice(0, 5);
+            }
+            
+            // 如果 DataStore 没有数据，使用内置数据与 demo-data 保持一致
+            if (surveys.length === 0) {
+                surveys = getDemoActiveSurveys();
+            }
+
+            const container = document.getElementById('surveyList');
+            if (surveys.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 2rem; text-align: center; color: var(--gray-500);">
+                        <i class="bi bi-inbox" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                        暂无进行中的调研
+                    </div>
+                `;
+                return;
+            }
+            
+            // 使用统一布局渲染（简化版，适合首页展示）
+            container.innerHTML = surveys.map(survey => {
+                return renderSurveyItemDashboard(survey);
+            }).join('');
+        }
+        
+        // 首页调研项渲染（使用统一的考核关系展示）
+        function renderSurveyItemDashboard(survey) {
+            const sceneInfo = getSceneInfo(survey.scene);
+            const dimensions = getSceneDimensions(survey.scene);
+            const deadlineStr = survey.deadline ? new Date(survey.deadline).toLocaleDateString('zh-CN', {month: '2-digit', day: '2-digit'}) : '-';
+            const progress = survey.progress || 0;
+            const subjectCount = survey.subjects ? survey.subjects.length : 0;
+            
+            // 计算评估人总数
+            const evaluatorCount = survey.subjects ? survey.subjects.reduce((sum, s) => {
+                if (!s.evaluators) return sum;
+                return sum + Object.values(s.evaluators).reduce((relSum, list) => 
+                    relSum + (list?.length || 0), 0);
+            }, 0) : (survey.evaluatorCount || 0);
+            
+            return `
+                <div class="survey-item" onclick="location.href='survey-detail.html?id=${survey.id}'" style="cursor: pointer;">
+                    <div class="survey-content" style="padding: 1rem;">
+                        <!-- 左侧：基本信息 -->
+                        <div class="survey-left" style="width: 260px;">
+                            <div class="survey-info">
+                                <div class="survey-title-row">
+                                    <span class="survey-title">${survey.title || '未命名调研'}</span>
+                                    <span class="scene-tag ${sceneInfo.class}">${sceneInfo.name}</span>
+                                </div>
+                                <div class="survey-meta">
+                                    <span><i class="bi bi-person"></i> ${subjectCount}位被评估人</span>
+                                    <span><i class="bi bi-people"></i> ${evaluatorCount}位评估人</span>
+                                </div>
+                                <div class="template-info">
+                                    <span class="template-label">模板：</span>
+                                    <span class="template-name">${sceneInfo.name}</span>
+                                    <span class="template-label">分类：</span>
+                                    <div class="category-list">${renderCategoryTags(dimensions.slice(0, 3))}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间：考核关系平铺（参考我的待审核界面） -->
+                        <div class="survey-relations" style="flex: 1; min-width: 0; border-left: 1px solid var(--gray-200); border-right: 1px solid var(--gray-200); padding: 0 1rem;">
+                            ${renderRelationsCompact(survey.subjects, survey.scene)}
+                        </div>
+                        
+                        <!-- 右侧：进度和状态 -->
+                        <div class="survey-right" style="align-items: center; width: 100px;">
+                            <div class="stat-badge">
+                                <div class="stat-value-small">${progress}%</div>
+                                <div class="stat-label-small">收集进度</div>
+                            </div>
+                            <span class="badge badge-blue" style="margin-top: 0.5rem;">收集中</span>
+                            <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.5rem;">
+                                <i class="bi bi-calendar"></i> ${deadlineStr}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 与 demo-data.js createActiveStory 保持一致的内置数据
+        function getDemoActiveSurveys() {
+            return [
+                {
+                    id: 'survey_active_0',
+                    title: '周八-绩效考核',
+                    scene: 'performance',
+                    sceneName: '绩效考核',
+                    evaluatorCount: 3,
+                    submittedCount: 2,
+                    progress: 67,
+                    deadline: '2026-04-16'
+                },
+                {
+                    id: 'survey_active_1',
+                    title: '吴九-转正评估',
+                    scene: 'probation',
+                    sceneName: '转正评估',
+                    evaluatorCount: 3,
+                    submittedCount: 1,
+                    progress: 33,
+                    deadline: '2026-04-16'
+                },
+                {
+                    id: 'survey_active_2',
+                    title: '郑十-晋升评估',
+                    scene: 'promotion',
+                    sceneName: '晋升评估',
+                    evaluatorCount: 6,
+                    submittedCount: 4,
+                    progress: 67,
+                    deadline: '2026-04-16'
+                },
+                {
+                    id: 'survey_active_3',
+                    title: '何伟-绩效考核',
+                    scene: 'performance',
+                    sceneName: '绩效考核',
+                    evaluatorCount: 3,
+                    submittedCount: 2,
+                    progress: 67,
+                    deadline: '2026-04-16'
+                },
+                {
+                    id: 'survey_active_4',
+                    title: '高强-转正评估',
+                    scene: 'probation',
+                    sceneName: '转正评估',
+                    evaluatorCount: 3,
+                    submittedCount: 1,
+                    progress: 33,
+                    deadline: '2026-04-16'
+                }
+            ];
+        }
+
+        // 更新统计
+        function updateStats() {
+            const myPendingCount = typeof DataStore !== 'undefined' 
+                ? DataStore.getMyPendingReviews().length 
+                : 0;
+            const adminReviewCount = typeof DataStore !== 'undefined'
+                ? DataStore.getPendingReviews().length
+                : 0;
+
+            document.getElementById('pendingReviewCount').textContent = myPendingCount;
+            document.getElementById('adminReviewCount').textContent = adminReviewCount;
+
+            const pendingBadge = document.getElementById('pendingReviewBadge');
+            if (pendingBadge) pendingBadge.style.display = myPendingCount > 0 ? 'inline-flex' : 'none';
+
+            const adminBadge = document.getElementById('adminReviewBadge');
+            if (adminBadge) adminBadge.style.display = adminReviewCount > 0 ? 'inline-flex' : 'none';
+
+            const sidebarPending = document.getElementById('pendingBadge');
+            if (sidebarPending && myPendingCount > 0) {
+                sidebarPending.textContent = myPendingCount;
+                sidebarPending.style.display = 'inline-flex';
+            }
+
+            const sidebarAdmin = document.getElementById('adminBadge');
+            if (sidebarAdmin && adminReviewCount > 0) {
+                sidebarAdmin.style.display = 'inline-flex';
+            }
+        }
+
+        // 侧边栏折叠状态
+        let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        
+        // 切换侧边栏
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+            applySidebarState();
+        }
+        
+        // 应用侧边栏状态
+        function applySidebarState() {
+            const sidebar = document.getElementById('adminSidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (sidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                toggleIcon.classList.remove('bi-chevron-left');
+                toggleIcon.classList.add('bi-chevron-right');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                toggleIcon.classList.remove('bi-chevron-right');
+                toggleIcon.classList.add('bi-chevron-left');
+            }
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化 Demo 数据
+            if (typeof DataStore !== 'undefined') {
+                DataStore.initDemoData(true);
+            }
+            
+            renderSidebar();
+            applySidebarState();
+            renderSurveyList();
+            updateStats();
+        });
+    </script>
+</body>
+</html>

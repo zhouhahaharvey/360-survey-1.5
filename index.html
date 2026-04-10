@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360调研系统 v1.5 - 原型导航</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --gray-50: #f9fafb;
+            --gray-800: #1f2937;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: #6b7280;
+        }
+        
+        .section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .subsection-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 1.5rem 0 1rem;
+            padding-left: 0.75rem;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        
+        .link-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .link-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .link-card h3 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .link-card p {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.75rem;
+        }
+        
+        .tag-hrbp { background: #dbeafe; color: #1e40af; }
+        .tag-admin { background: #fee2e2; color: #991b1b; }
+        .tag-respondent { background: #d1fae5; color: #065f46; }
+        .tag-public { background: #f3e8ff; color: #6b21a8; }
+        .tag-process { background: #fef3c7; color: #92400e; }
+        
+        /* Expandable Card */
+        .expandable-card {
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.375rem;
+        }
+        
+        .card-header-row h3 {
+            margin: 0;
+        }
+        
+        .expand-icon {
+            color: var(--primary);
+            transition: transform 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .expandable-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 0;
+        }
+        
+        .expandable-card.expanded .submenu {
+            max-height: 200px;
+            margin-top: 0.75rem;
+        }
+        
+        .submenu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+        }
+        
+        .submenu-item:hover {
+            background: var(--gray-50);
+            color: var(--primary);
+        }
+        
+        .submenu-item i {
+            font-size: 0.875rem;
+        }
+        
+        .version-badge {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .workflow-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+        
+        .workflow-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+        }
+        
+        .workflow-steps {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .workflow-step {
+            padding: 0.5rem 1rem;
+            background: var(--gray-50);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        
+        .workflow-arrow {
+            color: var(--primary);
+        }
+        
+        .highlight-card {
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+        
+        .highlight-badge {
+            position: absolute;
+            top: -10px;
+            right: 12px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.625rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .section-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .section-nav a {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .section-nav a:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 2.5rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .link-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔷 360调研系统原型 v1.5</h1>
+            <p>双视角调研列表 · 高级筛选 · 报告预览整合</p>
+        </div>
+
+        <!-- Version Badge -->
+        <div class="version-badge">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🚀</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.25rem;">360调研系统 v1.5</div>
+                    <div style="font-size: 0.875rem; opacity: 0.9;">新增双视角调研列表、高级筛选、报告预览整合</div>
+                </div>
+                <span style="background: rgba(255,255,255,0.2); padding: 0.375rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 500;">最新版本</span>
+            </div>
+        </div>
+
+        <!-- Quick Navigation -->
+        <div class="section-nav">
+            <a href="#hrbp"><i class="bi bi-person-workspace"></i> HRBP工作台</a>
+            <a href="#admin"><i class="bi bi-shield-lock"></i> 管理员工作台</a>
+            <a href="#respondent"><i class="bi bi-phone"></i> 员工填写端</a>
+            <a href="#process"><i class="bi bi-diagram-3"></i> 流程页面</a>
+            <a href="docs.html" style="background: var(--primary); color: white; border-color: var(--primary);"><i class="bi bi-book"></i> 文档中心</a>
+        </div>
+
+        <!-- ==================== HRBP Section ==================== -->
+        <div class="section" id="hrbp">
+            <h2 class="section-title">
+                <i class="bi bi-person-workspace"></i>
+                HRBP 工作台
+            </h2>
+            
+            <div class="workflow-card">
+                <div class="workflow-title">👇 HRBP 工作流程</div>
+                <div class="workflow-steps">
+                    <span class="workflow-step">1. 发起调研</span>
+                    <i class="bi bi-arrow-right workflow-arrow"></i>
+                    <span class="workflow-step">2. 确认关系</span>
+                    <i class="bi bi-arrow-right workflow-arrow"></i>
+                    <span class="workflow-step">3. 提交审核</span>
+                    <i class="bi bi-arrow-right workflow-arrow"></i>
+                    <span class="workflow-step">4. 等待管理员确认</span>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">核心功能</h3>
+            <div class="link-grid">
+                <a href="admin/dashboard.html" class="link-card">
+                    <h3><i class="bi bi-house-door" style="color: #4f46e5;"></i> 仪表盘</h3>
+                    <p>数据统计、快捷入口、进行中的调研</p>
+                    <span class="tag tag-hrbp">HRBP</span>
+                </a>
+                <a href="admin/create-survey-step1.html" class="link-card highlight-card">
+                    <span class="highlight-badge">START</span>
+                    <h3><i class="bi bi-plus-circle" style="color: #10b981;"></i> 发起调研</h3>
+                    <p>选择评估场景，开始创建调研（Step1-Step3）</p>
+                    <span class="tag tag-process">4步向导</span>
+                </a>
+                <a href="admin/create-survey-batch.html" class="link-card">
+                    <h3><i class="bi bi-people" style="color: #8b5cf6;"></i> 批量发起</h3>
+                    <p>一次选择多人，自动识别评估关系</p>
+                    <span class="tag tag-hrbp">HRBP</span>
+                </a>
+                <a href="admin/my-pending-reviews.html" class="link-card">
+                    <h3><i class="bi bi-hourglass-split" style="color: #f59e0b;"></i> 我的待审核</h3>
+                    <p>查看已提交审核的调研，可撤回修改</p>
+                    <span class="tag tag-process">v1.4 新增</span>
+                </a>
+            </div>
+
+            <h3 class="subsection-title">调研管理</h3>
+            <div class="link-grid">
+                <a href="admin/survey-list.html" class="link-card" style="border-color: #4f46e5;">
+                    <span class="highlight-badge" style="background: #4f46e5;">v1.5更新</span>
+                    <h3><i class="bi bi-clipboard-check" style="color: #4f46e5;"></i> 调研列表</h3>
+                    <p>双视角切换、高级筛选（状态/场景/截止日期）</p>
+                    <span class="tag tag-hrbp">HRBP</span>
+                </a>
+                <a href="admin/templates.html" class="link-card">
+                    <h3><i class="bi bi-file-earmark-text" style="color: #06b6d4;"></i> 模板中心</h3>
+                    <p>场景模板、快速创建、自定义模板</p>
+                    <span class="tag tag-hrbp">HRBP</span>
+                </a>
+                
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ==================== Admin Section ==================== -->
+        <div class="section" id="admin">
+            <h2 class="section-title" style="border-color: #ef4444;">
+                <i class="bi bi-shield-lock"></i>
+                管理员工作台
+            </h2>
+            
+            <div class="workflow-card" style="background: linear-gradient(135deg, #fef2f2, #fff5f5);">
+                <div class="workflow-title" style="color: #991b1b;">🛡️ 管理员工作流程</div>
+                <div class="workflow-steps">
+                    <span class="workflow-step" style="background: #fee2e2;">1. 查看待审核</span>
+                    <i class="bi bi-arrow-right workflow-arrow" style="color: #ef4444;"></i>
+                    <span class="workflow-step" style="background: #fee2e2;">2. 确认考核模板、考核关系</span>
+                    <i class="bi bi-arrow-right workflow-arrow" style="color: #ef4444;"></i>
+                    <span class="workflow-step" style="background: #fee2e2;">3. 发起评估</span>
+                </div>
+            </div>
+
+            <h3 class="subsection-title" style="border-color: #ef4444;">审核管理（核心）</h3>
+            <div class="link-grid">
+                <a href="admin/create-survey-step4.html" class="link-card highlight-card" style="border-color: #ef4444;">
+                    <span class="highlight-badge" style="background: #ef4444;">IMPORTANT</span>
+                    <h3><i class="bi bi-inbox" style="color: #ef4444;"></i> 审核中心</h3>
+                    <p>查看所有待审核的调研，进行最终确认和发起</p>
+                    <span class="tag tag-admin">管理员</span>
+                </a>
+                <a href="admin/create-survey-step4.html?mode=review" class="link-card">
+                    <h3><i class="bi bi-pencil-square" style="color: #f59e0b;"></i> 审核模式（Step4）</h3>
+                    <p>二次修改考核人、模板、考核关系后发起</p>
+                    <span class="tag tag-admin">v1.4 新增</span>
+                </a>
+                <a href="admin/survey-detail.html" class="link-card" style="border-color: #8b5cf6;">
+                    <span class="highlight-badge" style="background: #8b5cf6;">v1.5更新</span>
+                    <h3><i class="bi bi-file-text" style="color: #8b5cf6;"></i> 调研详情</h3>
+                    <p>报告预览、导出功能（PDF/Excel/Word）</p>
+                    <span class="tag tag-admin">v1.5 优化</span>
+                </a>
+            </div>
+
+            <h3 class="subsection-title" style="border-color: #ef4444;">系统管理</h3>
+            <div class="link-grid">
+                <a href="admin/admin-management.html" class="link-card">
+                    <h3><i class="bi bi-shield-lock" style="color: #ef4444;"></i> 系统管理</h3>
+                    <p>管理员权限、全局调研管理、操作日志</p>
+                    <span class="tag tag-admin">管理员</span>
+                </a>
+                <a href="admin/survey-list.html?admin=true" class="link-card">
+                    <h3><i class="bi bi-list-check" style="color: #4f46e5;"></i> 全部调研管理</h3>
+                    <p>查看/终止所有调研，批量操作</p>
+                    <span class="tag tag-admin">管理员</span>
+                </a>
+                <a href="admin/report-editor.html" class="link-card">
+                    <h3><i class="bi bi-pencil" style="color: #06b6d4;"></i> 报告编辑器</h3>
+                    <p>在线编辑报告，导出PDF/PNG/Word</p>
+                    <span class="tag tag-admin">管理员</span>
+                </a>
+                <a href="public/wecom-messages.html" class="link-card">
+                    <h3><i class="bi bi-chat-dots" style="color: #10b981;"></i> 企微消息配置</h3>
+                    <p>消息模板预览、技术规格说明</p>
+                    <span class="tag tag-admin">管理员</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ==================== Respondent Section ==================== -->
+        <div class="section" id="respondent">
+            <h2 class="section-title" style="border-color: #10b981;">
+                <i class="bi bi-phone"></i>
+                员工填写端（移动端）
+            </h2>
+            
+            <div class="workflow-card" style="background: linear-gradient(135deg, #f0fdf4, #f0fdf4);">
+                <div class="workflow-title" style="color: #065f46;">📱 员工使用流程（两步直达）</div>
+                <div class="workflow-steps">
+                    <span class="workflow-step" style="background: #d1fae5;"><i class="bi bi-chat-dots"></i> 企微消息</span>
+                    <i class="bi bi-arrow-right workflow-arrow" style="color: #10b981;"></i>
+                    <span class="workflow-step" style="background: #d1fae5;"><i class="bi bi-clipboard-check"></i> 待办列表</span>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--gray-600); margin-top: 0.5rem;">
+                    点击企微推送消息 → 直接进入待办列表 → 选择评估卡片填写
+                </p>
+            </div>
+
+            <h3 class="subsection-title" style="border-color: #10b981;">员工入口（企微 → 待办）</h3>
+            <div class="link-grid">
+                <a href="respondent/wecom-message-detail.html?scene=promotion&subject=张三&relation=peer&deadline=2026-04-15&count=3" class="link-card highlight-card" style="border-color: #10b981;">
+                    <span class="highlight-badge" style="background: #10b981;">第1入口</span>
+                    <h3><i class="bi bi-chat-dots" style="color: #10b981;"></i> 企微消息推送</h3>
+                    <p>员工收到企微推送，点击进入消息详情页，再进入待办列表</p>
+                    <span class="tag tag-respondent">员工入口</span>
+                </a>
+                <a href="respondent/todo-list.html" class="link-card highlight-card" style="border-color: #4f46e5;">
+                    <span class="highlight-badge" style="background: #4f46e5;">第2入口</span>
+                    <h3><i class="bi bi-clipboard-check" style="color: #4f46e5;"></i> 待办列表</h3>
+                    <p>场景化卡片、平铺填写、无tab切换</p>
+                    <span class="tag tag-respondent">员工入口</span>
+                </a>
+                <a href="respondent/history.html" class="link-card">
+                    <h3><i class="bi bi-clock-history" style="color: #8b5cf6;"></i> 历史记录</h3>
+                    <p>独立历史页面、按月分类、场景筛选</p>
+                    <span class="tag tag-respondent">员工端</span>
+                </a>
+                <a href="respondent/profile.html" class="link-card">
+                    <h3><i class="bi bi-person" style="color: #f59e0b;"></i> 个人中心</h3>
+                    <p>信息、统计、徽章、证书、组织贡献</p>
+                    <span class="tag tag-respondent">员工端</span>
+                </a>
+                <a href="respondent/batch-survey.html" class="link-card">
+                    <h3><i class="bi bi-table" style="color: #06b6d4;"></i> 批量填写</h3>
+                    <p>Excel风格表格/卡片列表、主观评价整合</p>
+                    <span class="tag tag-respondent">员工端</span>
+                </a>
+                <a href="respondent/survey-form.html" class="link-card" style="border-color: #10b981;">
+                    <span class="highlight-badge" style="background: #10b981;">v1.5更新</span>
+                    <h3><i class="bi bi-file-text" style="color: #4f46e5;"></i> 问卷填写</h3>
+                    <p>底部按钮优化、草稿保存、自动进入下一份</p>
+                    <span class="tag tag-respondent">员工端</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ==================== Process Section ==================== -->
+        <div class="section" id="process">
+            <h2 class="section-title">
+                <i class="bi bi-diagram-3"></i>
+                流程页面（向导步骤）
+            </h2>
+
+            <h3 class="subsection-title">发起人流程</h3>
+            <div class="link-grid">
+                <a href="admin/create-survey-step1.html" class="link-card">
+                    <h3>Step 1 - 选择场景</h3>
+                    <p>晋升/转正/新Leader/绩效</p>
+                    <span class="tag tag-process">流程</span>
+                </a>
+                <a href="admin/create-survey-step2.html" class="link-card">
+                    <h3>Step 2 - 批量导入</h3>
+                    <p>工号输入、智能解析</p>
+                    <span class="tag tag-process">流程</span>
+                </a>
+                <a href="admin/create-survey-step3.html" class="link-card">
+                    <h3>Step 3 - 确认关系 🆕</h3>
+                    <p>可视化评估关系矩阵，提交审核</p>
+                    <span class="tag tag-process">v1.4 更新</span>
+                </a>
+                <a href="admin/submit-for-review.html" class="link-card">
+                    <h3>提交成功页 🆕</h3>
+                    <p>提交审核后的提示页面</p>
+                    <span class="tag tag-process">v1.4 新增</span>
+                </a>
+            </div>
+
+            <h3 class="subsection-title" style="border-color: #ef4444;">管理员审核流程</h3>
+            <div class="link-grid">
+                <a href="admin/create-survey-step4.html?mode=review" class="link-card">
+                    <h3>Step 4 - 审核关系</h3>
+                    <p>管理员审核考核关系</p>
+                    <span class="tag tag-admin">管理员</span>
+                </a>
+                <a href="admin/create-survey-step5.html" class="link-card">
+                    <h3>Step 5 - 配置消息</h3>
+                    <p>配置推送消息并发起</p>
+                    <span class="tag tag-admin">管理员</span>
+                </a>
+                <a href="admin/pending-push-pool.html" class="link-card" style="border-color: #8b5cf6;">
+                    <h3><i class="bi bi-stack" style="color: #8b5cf6;"></i> 待推送池 🆕</h3>
+                    <p>批量合并后统一推送，减少消息打扰</p>
+                    <span class="tag tag-admin">v1.4 新增</span>
+                </a>
+                <a href="admin/survey-detail.html" class="link-card">
+                    <h3>调研详情页</h3>
+                    <p>查看提交详情和审核进度</p>
+                    <span class="tag tag-process">v1.4 新增</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
+            <p style="font-size: 0.875rem; color: #6b7280;">
+                <strong>标签说明：</strong>
+                <span class="tag tag-hrbp" style="margin-left: 0.5rem;">HRBP</span> HRBP日常工作
+                <span class="tag tag-admin" style="margin-left: 0.5rem;">管理员</span> 管理员权限功能
+                <span class="tag tag-respondent" style="margin-left: 0.5rem;">员工端</span> 评估人移动端
+                <span class="tag tag-process" style="margin-left: 0.5rem;">流程</span> 向导流程页面
+            </p>
+            <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.75rem;">
+                <strong>文档：</strong>
+                <a href="docs.html" style="color: var(--primary); text-decoration: none;"><i class="bi bi-book"></i> 访问文档中心</a> 查看 PRD、README、优化记录等详细文档
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Navigation smooth scroll
+        document.querySelectorAll('.section-nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

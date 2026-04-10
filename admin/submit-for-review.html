@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提交成功 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .success-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
+            max-width: 560px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        
+        .success-header {
+            background: linear-gradient(135deg, var(--success), #059669);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: white;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+        }
+        
+        .success-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .success-header p {
+            font-size: 0.9375rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .success-body {
+            padding: 2rem;
+        }
+        
+        .next-steps-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .next-steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 10px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .step-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .step-icon.blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .step-icon.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .step-icon.orange {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .step-icon.purple {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+        
+        .step-content h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-content p {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        .success-footer {
+            padding: 0 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .timeline-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .timeline-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+        }
+        
+        .timeline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0.5rem;
+        }
+        
+        .timeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gray-200);
+        }
+        
+        .timeline-dot.active {
+            background: var(--success);
+            box-shadow: 0 0 0 4px #d1fae5;
+        }
+        
+        .timeline-dot.pending {
+            background: var(--warning);
+        }
+        
+        .timeline-label {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        
+        .timeline-line {
+            flex: 1;
+            height: 2px;
+            background: var(--gray-200);
+            margin: 0 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .wecom-preview {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .wecom-preview-title {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .wecom-card {
+            background: white;
+            border-radius: 8px;
+            padding: 0.875rem;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .wecom-card-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .wecom-card-content {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-card">
+        <div class="success-header">
+            <div class="success-icon">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <h1>提交成功</h1>
+            <p>您的调研已提交审核</p>
+        </div>
+        
+        <div class="success-body">
+            <div class="next-steps-title">
+                <i class="bi bi-list-check" style="color: var(--primary);"></i>
+                接下来将发生什么
+            </div>
+            
+            <div class="next-steps-list">
+                <div class="step-item">
+                    <div class="step-icon blue">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>管理员审核</h4>
+                        <p>管理员将对考核关系进行最终确认，如有需要会进行调整</p>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-icon green">
+                        <i class="bi bi-send"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>自动发起调研</h4>
+                        <p>审核通过后，调研将自动发起，评估人会收到通知</p>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-icon orange">
+                        <i class="bi bi-bell"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>实时通知</h4>
+                        <p>您会收到企业微信通知，告知审核结果和调研进度</p>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-icon purple">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>可随时撤回</h4>
+                        <p>在管理员审核前，您可以在"我的待审核"中撤回并修改</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timeline -->
+            <div class="timeline-section">
+                <div class="timeline-title">当前进度</div>
+                <div class="timeline">
+                    <div class="timeline-step">
+                        <div class="timeline-dot active"></div>
+                        <span class="timeline-label">已提交</span>
+                    </div>
+                    <div class="timeline-line"></div>
+                    <div class="timeline-step">
+                        <div class="timeline-dot pending"></div>
+                        <span class="timeline-label">审核中</span>
+                    </div>
+                    <div class="timeline-line"></div>
+                    <div class="timeline-step">
+                        <div class="timeline-dot"></div>
+                        <span class="timeline-label">已发起</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- WeCom Message Preview -->
+            <div class="wecom-preview">
+                <div class="wecom-preview-title">
+                    <i class="bi bi-phone"></i>
+                    您将收到的通知预览
+                </div>
+                <div class="wecom-card">
+                    <div class="wecom-card-title">
+                        <i class="bi bi-check-circle-fill" style="color: var(--success);"></i>
+                        调研提交成功
+                    </div>
+                    <div class="wecom-card-content">
+                        您发起的【张三-晋升评估】已提交审核，管理员确认后将自动发起。
+                        <br><br>
+                        您可以在"我的待审核"中查看进度。
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="success-footer">
+            <a href="my-pending-reviews.html" class="btn btn-primary">
+                <i class="bi bi-hourglass-split"></i>
+                查看我的待审核
+            </a>
+            <a href="dashboard.html" class="btn btn-outline">
+                <i class="bi bi-house-door"></i>
+                返回首页
+            </a>
+            <a href="../index.html" class="btn btn-outline">
+                <i class="bi bi-grid-3x3-gap"></i>
+                原型导航
+            </a>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+</body>
+</html>

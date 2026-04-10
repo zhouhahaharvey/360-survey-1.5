@@ -1,0 +1,642 @@
+/* ============================================
+   360调研系统 - 员工端（移动端）特有样式
+   ============================================ */
+
+/* Mobile Base */
+body.mobile {
+    padding-bottom: 80px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* App Header */
+.app-header {
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    padding: var(--space-5);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.logo i {
+    font-size: 1.5rem;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.header-stats {
+    display: flex;
+    gap: var(--space-6);
+}
+
+.header-stat {
+    text-align: center;
+}
+
+.header-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.header-stat-label {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+/* Mobile Content */
+.mobile-content {
+    padding: var(--space-4);
+}
+
+/* Section Title */
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+}
+
+.section-title h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0;
+}
+
+.section-title span {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+}
+
+/* Filter Chips */
+.filter-chips {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+    scrollbar-width: none;
+}
+
+.filter-chips::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-chip {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.filter-chip.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Survey Cards */
+.survey-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-3);
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid transparent;
+}
+
+.survey-card.urgent {
+    border-left-color: var(--danger);
+}
+
+.survey-card.warning {
+    border-left-color: var(--warning);
+}
+
+.survey-card.normal {
+    border-left-color: var(--success);
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-3);
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.card-title h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0;
+}
+
+.card-meta {
+    display: flex;
+    gap: var(--space-3);
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-top: var(--space-2);
+}
+
+.card-progress {
+    margin-top: var(--space-3);
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: var(--space-2);
+}
+
+.progress-bar-mobile {
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar-mobile .fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-around;
+    padding: var(--space-2) 0;
+    z-index: 100;
+}
+
+.nav-item-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: var(--space-2) var(--space-4);
+    color: var(--gray-500);
+    text-decoration: none;
+    font-size: 0.625rem;
+    transition: color var(--transition-normal);
+}
+
+.nav-item-mobile i {
+    font-size: 1.25rem;
+}
+
+.nav-item-mobile.active {
+    color: var(--primary);
+}
+
+/* Rating Stars */
+.rating-stars {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.rating-star {
+    font-size: 1.5rem;
+    color: var(--gray-300);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.rating-star.active,
+.rating-star:hover {
+    color: var(--warning);
+}
+
+.rating-star.half {
+    background: linear-gradient(90deg, var(--warning) 50%, var(--gray-300) 50%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Batch Survey - Desktop Table */
+.batch-table-container {
+    overflow-x: auto;
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.batch-table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+}
+
+.batch-table th {
+    position: sticky;
+    top: 0;
+    background: var(--gray-50);
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+}
+
+.batch-table td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.batch-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.batch-table .name-cell {
+    position: sticky;
+    left: 0;
+    background: white;
+    min-width: 150px;
+    font-weight: 500;
+}
+
+.batch-table tbody tr:hover .name-cell {
+    background: var(--gray-50);
+}
+
+.rating-cell {
+    text-align: center;
+}
+
+.rating-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+    background: white;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.875rem;
+}
+
+.rating-btn:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.rating-btn.selected {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Batch Survey - Mobile Cards */
+.batch-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.batch-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+}
+
+.batch-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.batch-card-name {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.batch-card-meta {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.dimension-rating {
+    margin-bottom: var(--space-4);
+}
+
+.dimension-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: var(--space-2);
+}
+
+.rating-options {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.rating-option {
+    flex: 1;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    background: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.rating-option.selected {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Subjective Comment */
+.subjective-section {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--gray-100);
+}
+
+.subjective-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: var(--space-3);
+}
+
+.comment-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: var(--space-3);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.comment-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* WeChat Entry Banner */
+.wechat-banner {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.wechat-banner i {
+    font-size: 1.5rem;
+}
+
+.wechat-banner-content h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.wechat-banner-content p {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+/* Profile Page */
+.profile-header {
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    color: white;
+    padding: var(--space-8) var(--space-6);
+    text-align: center;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    margin: 0 auto var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.profile-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+}
+
+.profile-meta {
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: white;
+    margin-bottom: var(--space-4);
+}
+
+.stat-box {
+    text-align: center;
+}
+
+.stat-box-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.stat-box-label {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-top: 0.25rem;
+}
+
+/* Badge Grid */
+.badge-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-4);
+}
+
+.badge-item {
+    aspect-ratio: 1;
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    position: relative;
+}
+
+.badge-item.earned {
+    background: var(--warning-light);
+}
+
+.badge-item.locked {
+    opacity: 0.5;
+}
+
+.badge-item.locked::after {
+    content: "🔒";
+    position: absolute;
+    font-size: 0.75rem;
+    bottom: 4px;
+    right: 4px;
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding-left: var(--space-6);
+}
+
+.timeline::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--gray-200);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: var(--space-6);
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -25px;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.timeline-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+}
+
+.timeline-title {
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: var(--space-2);
+}
+
+.timeline-meta {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: calc(80px + var(--space-4));
+    right: var(--space-4);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    transition: transform var(--transition-normal);
+    z-index: 90;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+}
+
+/* Loading Skeleton */
+.skeleton {
+    background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

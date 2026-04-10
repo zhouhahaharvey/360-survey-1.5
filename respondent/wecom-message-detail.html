@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消息详情 - 360调研</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/respondent.css">
+    <!-- 页面特有样式 -->
+    <style>
+        :root {
+            --wechat-bg: #f5f5f5;
+            --wechat-blue: #576b95;
+        }
+        
+        .wecom-preview-page {
+            background: #f0f0f0;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 60px 20px 20px;
+        }
+        
+        .phone-container {
+            background: #1a1a1a;
+            border-radius: 44px;
+            padding: 12px;
+            width: 375px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        .phone-screen {
+            background: var(--wechat-bg);
+            border-radius: 32px;
+            overflow: hidden;
+            min-height: 667px;
+        }
+        
+        .phone-notch {
+            height: 28px;
+            background: #ededed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .chat-header {
+            background: #ededed;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 0.5px solid #d9d9d9;
+        }
+        
+        .chat-header-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #000;
+            cursor: pointer;
+        }
+        
+        .chat-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+        }
+        
+        .message-content { padding: 16px; }
+        
+        .msg-time {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 16px;
+        }
+        
+        .template-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .card-source {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: var(--wechat-blue);
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .card-main { padding: 14px; }
+        
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 6px;
+        }
+        
+        .card-desc {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        
+        .card-highlight {
+            background: #f7f7f7;
+            padding: 14px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        
+        .highlight-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--warning);
+        }
+        
+        .card-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 14px;
+            border-top: 1px solid #f0f0f0;
+            color: var(--wechat-blue);
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .security-notice-wecom {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+        }
+        
+        .security-header-wecom {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--success);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .security-text-wecom {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        /* Navigation buttons */
+        .preview-nav {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .preview-nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--gray-700);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="wecom-preview-page">
+    <div class="preview-nav">
+        <a href="todo-list.html">
+            <i class="bi bi-arrow-left"></i> 返回待办
+        </a>
+        <a href="../index.html">
+            <i class="bi bi-grid-3x3-gap"></i> 原型导航
+        </a>
+    </div>
+    
+    <div class="phone-container">
+        <div class="phone-screen">
+            <div class="phone-notch">9:41</div>
+            <div class="chat-header">
+                <button class="chat-header-btn" onclick="history.back()"><i class="bi bi-chevron-left"></i></button>
+                <span class="chat-header-title">360人才调研</span>
+                <button class="chat-header-btn"><i class="bi bi-three-dots-vertical"></i></button>
+            </div>
+            <div class="message-content">
+                <div class="msg-time">昨天 14:30</div>
+                <div class="template-card">
+                    <div class="card-source">
+                        <i class="bi bi-building"></i>
+                        <span>晋升评估邀请</span>
+                    </div>
+                    <div class="card-main">
+                        <div class="card-title">张三的晋升评估</div>
+                        <div class="card-desc">诚邀您作为平级评估人参与本次晋升评估</div>
+                        <div class="card-highlight">
+                            <div class="highlight-title">4月15日截止</div>
+                        </div>
+                    </div>
+                    <a href="todo-list.html?from=wechat" class="card-btn">
+                        <span>立即填写</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="security-notice-wecom">
+                    <div class="security-header-wecom">
+                        <i class="bi bi-shield-check"></i>
+                        <span>匿名保障</span>
+                    </div>
+                    <div class="security-text-wecom">
+                        您的评估结果将匿名处理，被评估人无法查看您的具体评分和评语。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../demo-data.js"></script>
+    <script>
+        // 页面特定脚本
+        document.addEventListener('DOMContentLoaded', function() {
+            // URL参数处理 - 动态更新消息内容
+            const params = Utils.parseUrlParams();
+            
+            // 如果有动态数据，可以在这里更新
+            if (params.scene) {
+                // Message scene loaded
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配置消息推送 - 360调研系统</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <style>
+        /* Page Specific Styles */
+        .page-title {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .page-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .page-title p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        /* Stepper */
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .step.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .step.completed {
+            color: var(--success);
+        }
+        
+        .step-arrow {
+            color: var(--gray-400);
+        }
+        
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 1.5rem;
+        }
+        
+        /* Card */
+        .card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Form Group */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-label .required {
+            color: var(--danger);
+            margin-left: 0.25rem;
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-top: 0.375rem;
+        }
+        
+        /* Toggle Switch */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+        
+        .toggle-label {
+            font-size: 0.9375rem;
+            color: var(--gray-800);
+        }
+        
+        .toggle-desc {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+        
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--gray-200);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .toggle-switch.active {
+            background: var(--success);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.2s;
+        }
+        
+        .toggle-switch.active::after {
+            left: 22px;
+        }
+        
+        /* Phone Preview */
+        .phone-mockup {
+            background: #1a1a1a;
+            border-radius: 32px;
+            padding: 10px;
+        }
+        
+        .phone-screen {
+            background: #f5f5f5;
+            border-radius: 24px;
+            overflow: hidden;
+            min-height: 500px;
+        }
+        
+        .phone-header {
+            background: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .phone-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+        
+        .phone-title h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .phone-title p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        .phone-content {
+            padding: 1rem;
+        }
+        
+        .msg-time {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #999;
+            margin-bottom: 1rem;
+        }
+        
+        /* Message Card */
+        .message-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .message-source {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            font-size: 0.75rem;
+            color: #576b95;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .message-main {
+            padding: 0.875rem;
+        }
+        
+        .message-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message-desc {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .message-highlight {
+            background: #f7f7f7;
+            padding: 0.75rem;
+            margin: 0.75rem 0;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .highlight-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--warning);
+        }
+        
+        .highlight-desc {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        
+        .message-detail {
+            margin-top: 0.75rem;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0;
+            font-size: 0.8125rem;
+            color: #666;
+        }
+        
+        .message-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border-top: 1px solid #f0f0f0;
+            color: #576b95;
+            font-size: 0.9375rem;
+        }
+        
+        /* Confirm List */
+        .confirm-list {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .confirm-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .confirm-item:last-child {
+            border-bottom: none;
+        }
+        
+        .confirm-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .confirm-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        /* Action Footer */
+        .action-footer {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .btn-success:hover { background: #059669; }
+        
+        /* Info Alert */
+        .info-alert {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .info-alert-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #065f46;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-alert-text {
+            font-size: 0.8125rem;
+            color: #047857;
+        }
+        
+        /* Success Modal */
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .success-modal.show {
+            display: flex;
+        }
+        
+        .success-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        
+        .success-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        @media (max-width: 1200px) {
+            .two-column { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="adminSidebar"></aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="page-header" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="create-survey-step4.html" class="back-to-home" style="text-decoration: none;">
+                    <i class="bi bi-arrow-left"></i>
+                    返回上一步
+                </a>
+                <div class="page-title">
+                    <h1>📨 配置消息推送</h1>
+                    <p>配置推送消息内容，预览发送效果，确认无误后发起调研</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stepper -->
+        <div class="stepper">
+            <div class="step completed">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>选择场景</span>
+            </div>
+            <span class="step-arrow"><i class="bi bi-chevron-right"></i></span>
+            <div class="step completed">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>批量导入</span>
+            </div>
+            <span class="step-arrow"><i class="bi bi-chevron-right"></i></span>
+            <div class="step completed">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>确认关系</span>
+            </div>
+            <span class="step-arrow"><i class="bi bi-chevron-right"></i></span>
+            <div class="step completed">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>审核关系</span>
+            </div>
+            <span class="step-arrow"><i class="bi bi-chevron-right"></i></span>
+            <div class="step active">
+                <i class="bi bi-5-circle-fill"></i>
+                <span>配置消息</span>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="two-column">
+            <!-- Left: Message Configuration -->
+            <div>
+                <!-- Message Template -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="bi bi-envelope"></i>
+                            消息模板
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">消息标题</label>
+                            <input type="text" class="form-input" id="msgTitle" value="【晋升评估】诚邀您参与张三等3人的360度评估" oninput="updatePreview()">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">消息内容</label>
+                            <textarea class="form-textarea" id="msgContent" oninput="updatePreview()">您好！您有3位同事的晋升评估调研待完成。诚邀您客观评价其工作表现。您的反馈将严格保密，仅用于人才发展分析。</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deadline & Settings -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="bi bi-gear"></i>
+                            发送设置
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">
+                                截止时间<span class="required">*</span>
+                            </label>
+                            <input type="datetime-local" class="form-input" id="deadline" value="2026-04-15T18:00" onchange="updatePreview()">
+                            <div class="form-hint">评估人需在此时间前完成评估</div>
+                        </div>
+                        
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">发送提醒通知</div>
+                                <div class="toggle-desc">截止前自动提醒未完成评估的人</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">匿名评估</div>
+                                <div class="toggle-desc">评估人身份对被评估人保密</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Final Confirm -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="bi bi-check-square"></i>
+                            发送前确认
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="confirm-list">
+                            <div class="confirm-item">
+                                <span class="confirm-label">被评估人</span>
+                                <span class="confirm-value">3 人</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">评估人</span>
+                                <span class="confirm-value">12 人</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">消息接收人</span>
+                                <span class="confirm-value" style="color: var(--primary);">12 人（仅评估人）</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">截止时间</span>
+                                <span class="confirm-value" id="confirmDeadline">2026-04-15 18:00</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">通知方式</span>
+                                <span class="confirm-value">企微服务号</span>
+                            </div>
+                        </div>
+                        
+                        <div class="action-footer">
+                            <button class="btn btn-outline" onclick="goBack()">
+                                <i class="bi bi-arrow-left"></i>
+                                返回修改考核关系
+                            </button>
+                            <button class="btn btn-success" onclick="launchSurvey()">
+                                <i class="bi bi-rocket-takeoff"></i>
+                                确认发起调研
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Preview -->
+            <div>
+                <div class="card" style="position: sticky; top: 2rem;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="bi bi-phone"></i>
+                            消息预览
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-alert">
+                            <div class="info-alert-title">
+                                <i class="bi bi-info-circle"></i>
+                                <span>消息仅发送给评估人</span>
+                            </div>
+                            <div class="info-alert-text">
+                                被评估人不会收到任何通知
+                            </div>
+                        </div>
+                        
+                        <div class="phone-mockup">
+                            <div class="phone-screen">
+                                <div class="phone-header">
+                                    <div class="phone-avatar">360</div>
+                                    <div class="phone-title">
+                                        <h4>360调研系统</h4>
+                                        <p>企业微信服务号</p>
+                                    </div>
+                                </div>
+                                <div class="phone-content">
+                                    <div class="msg-time">刚刚</div>
+                                    
+                                    <div class="message-card">
+                                        <div class="message-source">
+                                            <i class="bi bi-building"></i>
+                                            <span>晋升评估邀请</span>
+                                        </div>
+                                        <div class="message-main">
+                                            <div class="message-title" id="previewTitle">张三的晋升评估</div>
+                                            <div class="message-desc" id="previewDesc">诚邀您参与本次晋升评估</div>
+                                            
+                                            <div class="message-highlight">
+                                                <div class="highlight-title" id="previewDeadline">⏰ 4月15日截止</div>
+                                                <div class="highlight-desc">请在此日期前完成评估</div>
+                                            </div>
+                                            
+                                            <div class="message-detail">
+                                                <div class="detail-item">
+                                                    <i class="bi bi-person-badge"></i>
+                                                    <span>您的角色：<strong>平级评估人</strong></span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <i class="bi bi-shield-check"></i>
+                                                    <span>反馈将完全匿名处理</span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <i class="bi bi-clock"></i>
+                                                    <span>预计用时：10-15分钟</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="message-btn">
+                                            <span>立即填写</span>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div class="success-modal" id="successModal">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--gray-800);">调研发起成功！</h3>
+            <p style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                已成功发送邀请给 <strong>12位评估人</strong><br>
+                被评估人未收到通知
+            </p>
+            <button class="btn btn-primary" onclick="goToDashboard()" style="width: 100%;">
+                返回首页
+            </button>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../data-store.js"></script>
+    <script>
+        // 渲染侧边栏
+        function renderSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.innerHTML = `
+                <div class="sidebar-brand">
+                    <i class="bi bi-360"></i>
+                    <span>360调研系统</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>首页</span>
+                    </a>
+                    <a href="create-survey-step1.html" class="nav-item active">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>发起调研</span>
+                    </a>
+                    <a href="my-pending-reviews.html" class="nav-item">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>我的待审核</span>
+                        <span class="badge badge-orange" id="pendingBadge" style="display: none;">0</span>
+                    </a>
+                    <a href="create-survey-step4.html" class="nav-item" style="background: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>审核中心</span>
+                        <span class="badge badge-red" id="adminBadge" style="display: none;">待审</span>
+                    </a>
+                    <a href="pending-push-pool.html" class="nav-item">
+                        <i class="bi bi-stack"></i>
+                        <span>待推送池</span>
+                    </a>
+                    <a href="survey-list.html" class="nav-item">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>调研列表</span>
+                    </a>
+
+                    <a href="templates.html" class="nav-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>模板中心</span>
+                    </a>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <a href="../index.html" class="nav-item">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>原型导航</span>
+                        </a>
+                    </div>
+                </nav>
+            `;
+        }
+
+        // Page-specific script
+        function updatePreview() {
+            const title = document.getElementById('msgTitle').value;
+            const content = document.getElementById('msgContent').value;
+            const deadline = document.getElementById('deadline').value;
+            
+            document.getElementById('previewTitle').textContent = title.replace(/【.*?】/, '').split('的')[0] + '的晋升评估';
+            document.getElementById('previewDesc').textContent = content.substring(0, 30) + '...';
+            
+            if (deadline) {
+                const date = new Date(deadline);
+                document.getElementById('previewDeadline').textContent = `⏰ ${date.getMonth() + 1}月${date.getDate()}日截止`;
+                document.getElementById('confirmDeadline').textContent = date.toLocaleString('zh-CN');
+            }
+        }
+        
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+        
+        function goBack() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const surveyId = urlParams.get('surveyId');
+            window.location.href = 'create-survey-step4.html' + (surveyId ? '?surveyId=' + surveyId : '');
+        }
+        
+        function launchSurvey() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const surveyId = urlParams.get('surveyId');
+            
+            if (typeof DataStore !== 'undefined') {
+                DataStore.updateSurvey(surveyId, {
+                    status: 'active',
+                    launchedAt: new Date().toISOString()
+                });
+            } else {
+                let reviews = JSON.parse(localStorage.getItem('myPendingReviews') || '[]');
+                const survey = reviews.find(r => r.id === surveyId);
+                if (survey) {
+                    survey.status = 'active';
+                    survey.launchedAt = new Date().toISOString();
+                    localStorage.setItem('myPendingReviews', JSON.stringify(reviews));
+                }
+            }
+            
+            document.getElementById('successModal').classList.add('show');
+        }
+        
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
